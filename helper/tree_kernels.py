@@ -136,9 +136,10 @@ def pad_verified_path(path, past_length, width, eos_token_id, workspace=None):
         num_warps=4)
     return tokens, indices, mask, last
 
-@triton.jit(do_not_specialize=["ROWS","PAST","WIDTH"])
+@triton.jit(do_not_specialize=["ROWS","PAST","WIDTH","MASK_STRIDE"])
 def _tree_mask(PARENTS, MASK, ROWS, PAST,
-               WIDTH, MINIMUM: tl.constexpr, BK: tl.constexpr):
+               WIDTH, MINIMUM: tl.constexpr, BK: tl.constexpr,
+               PAST_MASK, MASK_STRIDE, HAS_PAST_MASK:tl.constexpr):
     row, batch = tl.program_id(0), tl.program_id(1).to(tl.int64)
     columns = tl.program_id(2) * BK + tl.arange(0, BK)
     visible = columns <= PAST  # prefix and root are shared by every query
@@ -146,10 +147,14 @@ def _tree_mask(PARENTS, MASK, ROWS, PAST,
     for depth in range(WIDTH):
         visible = visible | ((current >= 0) & (columns == PAST + current))
         current = tl.load(PARENTS + batch * ROWS + tl.maximum(current, 0))
+    if HAS_PAST_MASK:
+        valid=tl.load(PAST_MASK+batch*MASK_STRIDE+columns,columns<PAST,other=1)
+        visible=visible & valid
     tl.store(MASK + (batch * ROWS + row) * (PAST + ROWS) + columns,
              tl.where(visible, 0., MINIMUM), columns < PAST + ROWS)
 
-def tree_mask(tree, past_length, mask):
+def tree_mask(tree, past_length, mask, past_mask=None):
     batch, rows = tree.parents.shape
     _tree_mask[(rows, batch, triton.cdiv(past_length + rows, 256))](tree.parents, mask, rows, past_length, tree.max_depth + 1,
-                             torch.finfo(mask.dtype).min, 256, num_warps=4)
+                             torch.finfo(mask.dtype).min, 256,
+                             past_mask,0 if past_mask is None else past_mask.stride(0),past_mask is not None,num_warps=4)

@@ -16,7 +16,7 @@ class PackedTree:
     feedback_contexts: torch.Tensor  # -1 for nodes without a draft-head context
     max_depth: int
 
-    def attention_mask(self, past_length, dtype, padding_positions=None, *, kernels=None, workspace=None):
+    def attention_mask(self, past_length, dtype, padding_positions=None, *, kernels=None, workspace=None, past_mask=None):
         batch, rows = self.parents.shape
         shape = (batch, 1, rows, past_length + rows)
         elements = batch * rows * (past_length + rows)
@@ -25,7 +25,7 @@ class PackedTree:
         else:
             mask = torch.empty(shape, device=self.parents.device, dtype=dtype)
         if kernels is not None:
-            kernels.tree_mask(self, past_length, mask)
+            kernels.tree_mask(self, past_length, mask, past_mask=past_mask)
             if isinstance(padding_positions, torch.Tensor):
                 mask[padding_positions[:, 0], 0, :, padding_positions[:, 1]] = torch.finfo(dtype).min
             return mask
@@ -39,6 +39,8 @@ class PackedTree:
             cursor = self.parents.gather(1, cursor.clamp_min(0))
         if isinstance(padding_positions, torch.Tensor):
             mask[padding_positions[:, 0], 0, :, padding_positions[:, 1]] = torch.finfo(dtype).min
+        if past_mask is not None:
+            mask[..., :past_length].masked_fill_(~past_mask[:,None,None,:past_length],torch.finfo(dtype).min)
         return mask
 
 

@@ -8,9 +8,12 @@ Nguồn chính: `SpecNaacl/grpo_speculative.py`, `scripts/launch/{train,pretrain
 Medusa architecture được đối chiếu `FlashGRPO/flashgrpo_b200/models/medusa_heads.py`;
 tree/verifier/cache được đối chiếu `decoding/{medusa_tree,flash_medusa_decoder,acceptance,tree_attention,kv_extraction}.py`.
 
-`SOURCE_MANIFEST.json` ghi hashes của files vendor. `source_snapshot.json` ghi
-407 code/config files của hai sources trước triển khai; so sánh sau triển khai
-cho thấy không file nào trong snapshot bị đổi. Runtime không đọc hai thư mục này.
+`SOURCE_MANIFEST.json` ghi hashes ban đầu lúc vendor, không phải manifest của
+mọi file sau revision. `source_snapshot.json` ghi
+407 code/config files của hai sources trước triển khai. Revision tiếp theo dùng
+`revision_source_snapshot.json` cho 450 code/config files của SpecNaacl,
+FlashGRPO, puregrpo và FastGRPO-main; không file nào trong snapshot bị đổi.
+Runtime không đọc các thư mục này. Chi tiết sửa tiếp theo ở `REVISION_AUDIT.md`.
 
 | Thành phần target | Đối chiếu SpecNaacl |
 | --- | --- |
@@ -21,7 +24,7 @@ cho thấy không file nào trong snapshot bị đổi. Runtime không đọc ha
 | Reward/advantage/filtering | Nguyên reward code; 0.2 format + accuracy; NumPy std; bỏ nhóm reward constant |
 | GRPO/KL/clipping/mask | Nguyên `compute_target_loss`; target backward/collator kiểm tra AST parity |
 | Target optimizer/scheduler | Cùng AdamW và LR; không có target scheduler, giữ cadence của source |
-| Batch/generation | Cùng model batch/accumulation, 8 responses, temp1, top-p0.95, length2048 |
+| Batch/generation | Actual launchers của cả 7 models: batch8/accum4, 8 responses, temp1, top-p0.95, length2048 |
 | BF16/SDPA/packages | Cùng install pins; native Qwen2/Qwen3/Llama target backbone |
 | Online heads | Cả hai dùng future CE offsets2/3/4, decay0.8, LR1e-4 và cùng boundaries |
 | Pretrained heads | Cả hai load strict cùng `draft.pth`; không random fallback |
@@ -35,10 +38,13 @@ Source có hai chi tiết cần giữ rõ khi so sánh:
   cadence, đồng thời ghi `target_optimizer_steps` thật và dùng nó cho
   `MAX_TARGET_OPTIMIZER_STEPS`/mỗi dòng `timing.csv`. `source_grpo_step` vẫn giữ
   nghĩa cũ. Không dùng nhãn `step` cũ để suy ra số updates khi so năm phương pháp.
-- Source sắp tokenized rows theo length trong target microbatch path; phần xử lý
-  này được giữ theo source. Repo không sửa riêng target objective hoặc microbatch
-  behavior cho Medusa. Numerical fairness tests so với source implementation,
-  không khẳng định đã audit hoặc sửa mọi lỗi có sẵn trong baseline.
+- Source sắp tokenized rows theo length nhưng không hoán vị advantages tương ứng.
+  Reproducer đã xác nhận ở SpecNaacl, PureGRPO và Medusa. Lỗi association này
+  được giữ để tránh thay đổi riêng mathematical behavior của một baseline.
+- SpecNaacl và hai Medusa methods sample một first token/prompt trước khi repeat
+  responses. PureGRPO sample độc lập. Medusa dùng strict padded-prompt length
+  cap; source FastGRPO/PureGRPO dùng real lengths và source FastGRPO có thể
+  vượt max_length theo cả verification round. Không gọi cả năm methods fully fair.
 
 ## Vì sao heads 2/3 bị starvation
 
@@ -61,7 +67,7 @@ root-to-node recompute; KV chỉ gather phần suffix theo accepted path.
 
 ## Exactness và pending token
 
-Prefill lấy target sample đầu tiên. Mỗi verification tree gồm pending root và
+Prefill lấy một target sample/prompt rồi repeat responses. Mỗi verification tree gồm pending root và
 candidates của ba heads từ anchor hidden **trước** root. Target forward tree
 dùng causal ancestor mask và logical positions. Traversal chỉ đi vào child nếu
 token target sample khớp; luôn giữ sample tại decision cuối, kể cả rejection
@@ -69,8 +75,9 @@ hoặc leaf bonus. Sample này được emit ngay và làm root chưa có KV c�
 KV committed chỉ chứa root và matched nodes; bonus không bị giả lập KV hoặc
 forward riêng. EOS dừng traversal; giới hạn sequence truncate cả path và feedback.
 
-Target sampling reuse SpecNaacl's temperature/nucleus/top-k sampler, cùng CUDA
-autocast region. Default `OPD_SAMPLER_MODE=finite` dùng contract logits hữu hạn,
+Target sampling reuse SpecNaacl's temperature/nucleus/top-k sampler. Prefill
+sampling nằm ngoài CUDA autocast (BF16 probabilities với BF16 target), còn
+verification sampling nằm trong autocast, đúng source. Default `OPD_SAMPLER_MODE=finite` dùng contract logits hữu hạn,
 giống launcher OPD mới của source; `strict` phục hồi invalid logits theo sampler
 vendor. Không có typical acceptance, residual reweighting, hoặc forced acceptance.
 
@@ -92,6 +99,7 @@ objective này. Ba B updates dùng một batched GPU grid; không loop Python qu
 Shared A gradients được aggregate từ frozen B trước update và apply tại head
 optimizer boundary. Heads CE detach target hidden/lm_head; target LoRA chỉ GRPO.
 
+EOS-containing prefixes và horizons vượt remaining budget bị loại trước feedback.
 Async stream đợi target outputs trên device, ghi event sau batched updates; main
 stream đợi event trước khi dùng B lần sau. Một packet nhỏ/round phục vụ scheduling
 và proposal backend snapshots; không thêm packet riêng cho feedback. Target
@@ -112,7 +120,11 @@ root-depth1 notation. `tree_depth_reached=3` nghĩa cả ba proposal horizons c�
 
 Host counters theo dõi per-head active rounds, proposed nodes, accepted tokens,
 head loss, verification nodes, forwards và reasons budget. OPD counters ở GPU chỉ
-đọc cuối rollout. Event time `opd_feedback_time`/`opd_proposal_time` chỉ có khi
+đọc cuối rollout, trong một contiguous packet cho cả ba heads. Thêm alias verified
+nodes, head supervised tokens, gradient batches và optimizer updates; không chạy
+kernel mới chỉ để tạo các alias này. `medusa_scheduling_syncs` chỉ đếm packet
+scheduling prefill + rounds, không giả vờ đếm toàn bộ runtime/implicit sync.
+Event time `opd_feedback_time`/`opd_proposal_time` chỉ có khi
 `OPD_PROFILE=1`; production để blank, không tạo giả timing. Không print/token
 hoặc print/verification round. Cumulative generation/E2E time cùng host basis
 và target/head training phase timings giữ implementation SpecNaacl.
@@ -134,15 +146,17 @@ actual participation bằng Markov target fixture; numerical resume cả target,
 heads và optimizers; full5 epochs incl remainder; các model launchers; prompt
 budget khi rewards bị filter; không random fallback.
 
-`compile_kernels.py` đã compile sparse construction và batched update/end cho
-sm100. Triton interpreter sparse tree đã đối chiếu CPU. Những checks này không
-thay thế CUDA execution. RTX3090 hiện diện nhưng CUDA wheel/dependency downloads
-bị DNS/timeouts; không có B200 tại máy này. Hai CUDA tests được cung cấp để chạy
-trên máy đích. Full pretrained real-model training, multi-GPU execution, B200
-throughput, memory và backend winner chưa được xác nhận.
+`compile_kernels.py` compile sparse construction, batched update/end và padded
+tree attention mask cho sm100 (compile-only). Suite CUDA đã thực thi trên RTX3090
+với torch2.8+cu126 và Triton3.4; gồm BF16 RNG/gradient/async checks và GPU KV
+recomputation ở Qwen2/Qwen3/Llama. Native tiny smoke chạy đủ 7 model configs;
+weights thật Qwen2.5-1.5B cũng đã chạy decoder/head smoke. Các tiny fixtures không
+chứng minh full-model OOM behavior. Full pretrained real-model GRPO, multi-GPU,
+B200 throughput, memory và backend winner chưa được xác nhận. Kết quả và commands
+được ghi tại `VALIDATION.json` và `REVISION_AUDIT.md`.
 
 Synthetic CPU smoke comparison dùng production GRPO loop, cùng target adapter,
-head checkpoint và seed; report tại `outputs/benchmarks/cpu_smoke/comparison.json`.
+head checkpoint và seed; report tại `outputs/benchmarks/revision_cpu_smoke/comparison.json`.
 Các số này chỉ chứng minh pipeline có thể chạy. Không dùng để báo research speedup.
 
 Default sparse policy chưa được B200 tuned. `benchmark_pair.py` chạy đủ cặp với

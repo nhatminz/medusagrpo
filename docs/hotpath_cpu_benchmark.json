@@ -1,0 +1,75 @@
+{
+  "device": "cpu",
+  "hardware": "CPU",
+  "torch": "2.8.0+cpu",
+  "synthetic_inputs": true,
+  "dimensions": {
+    "device": "cpu",
+    "hidden": 64,
+    "vocab": 4096,
+    "responses": 16,
+    "length": 96,
+    "prompt": 64,
+    "trials": 7,
+    "output": "docs/hotpath_cpu_benchmark.json"
+  },
+  "online_heads": {
+    "before": {
+      "median_ms": 111.48481722921133,
+      "trials_ms": [
+        121.89184408634901,
+        137.97421846538782,
+        137.43454590439796,
+        108.62233955413103,
+        107.24512301385403,
+        104.51338160783052,
+        111.48481722921133
+      ],
+      "peak_allocated_bytes": null
+    },
+    "after": {
+      "median_ms": 44.221172109246254,
+      "trials_ms": [
+        43.32986380904913,
+        44.221172109246254,
+        49.51363988220692,
+        47.30584379285574,
+        45.26988975703716,
+        43.54508500546217,
+        41.50428995490074
+      ],
+      "peak_allocated_bytes": null
+    },
+    "median_speedup": 2.5210733210280702
+  },
+  "kv_compaction": {
+    "before": {
+      "median_ms": 1.1287443339824677,
+      "trials_ms": [
+        1.1287443339824677,
+        1.1726710945367813,
+        1.1411132290959358,
+        1.1137593537569046,
+        1.078277826309204,
+        1.1404072865843773,
+        1.0739397257566452
+      ],
+      "peak_allocated_bytes": null
+    },
+    "after": {
+      "median_ms": 1.1223796755075455,
+      "trials_ms": [
+        1.0916003957390785,
+        1.093108206987381,
+        1.763341948390007,
+        1.2372368946671486,
+        1.132170669734478,
+        1.0998742654919624,
+        1.1223796755075455
+      ],
+      "peak_allocated_bytes": null
+    },
+    "median_speedup": 1.0056706822243944
+  },
+  "note": "Microbenchmark only; no B200/full-model claim. New trainer caps total vocabulary rows at MEDUSA_HEAD_LOGIT_ROWS (128 by default)."
+}

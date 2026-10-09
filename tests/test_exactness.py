@@ -87,8 +87,9 @@ def test_sparse_target_distribution_monte_carlo(tiny_model,monkeypatch):
             expected.append(p[token]*m.target_model(seq).logits[:,-1].float().div(.7).softmax(-1)[0])
         expected=torch.stack(expected);expected[22]=0 # prefill EOS stops
     torch.manual_seed(133)
+    prompt=prompt.expand(n,-1).clone()
     out=speculative_generate(m,prompt,torch.ones_like(prompt),SimpleNamespace(eos_token_id=22),
-        repeated_generate_nums=n,do_sample=True,temperature=.7,top_p=1.,max_length=5)
+        repeated_generate_nums=1,do_sample=True,temperature=.7,top_p=1.,max_length=5)
     empirical=torch.zeros(23,23)
     for seq in out['generated_token_ids']:
         if len(seq)>1:empirical[seq[0],seq[1]]+=1/n

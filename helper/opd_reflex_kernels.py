@@ -531,6 +531,10 @@ def prepare_teacher(state,tree,path,target,greedy=False,sampling_metadata=None,c
         _teacher_sorted[(min(n,32),)](sorted_p,sorted_ids,state.full_vocab_inverse,state.selected_ids,state.selected_count,
             probs,ids,mass,sorted_p.shape[-1],k,max(32,triton.next_power_of_2(k)),state.vocab,**(capture or {}),num_warps=4)
     else:
+        if not state.teacher_tiles:
+            tiles=(state.vocab+255)//256
+            state.teacher_tiles=[torch.empty(state.max_feedback_rows*tiles*(k if i>=2 else 1),
+                device=target.device,dtype=torch.long if i==3 else torch.float32) for i in range(4)]
         teacher(target,state.mapping,weights,k,state.teacher_tiles,(probs,ids,mass),greedy,
                 selection=(state.selected_ids,state.selected_count),capture=capture)
     state.end(ticket)

@@ -18,7 +18,7 @@ import pandas as pd
 from transformers import AutoTokenizer,AutoConfig,AutoModelForCausalLM,GenerationConfig
 from helper.rewards import accuracy_reward_func , format_reward_func
 from helper.get_QAs import get_test_QAs , get_train_QAs, get_QAs_from_path, select_train_subset
-from medusa.generate import speculative_generate
+from medusa.generate import speculative_generate,RUNTIME_SEMANTICS_VERSION
 from medusa.model import MedusaModel as Model
 from helper.fastgrpo_training import compute_target_loss
 from medusa.training import train_heads as upstream_train_draft
@@ -209,6 +209,7 @@ def save_training_checkpoint(
     checkpoint_dir = Path(checkpoint_dir)
     state = {
         "format": "medusa_grpo_checkpoint_v1",
+        "runtime_semantics_version":RUNTIME_SEMANTICS_VERSION,
         "world_size": int(current_world_size),
         "rank_states": rank_states,
         "cumulative_elapsed_time_s": max(
@@ -244,6 +245,9 @@ def load_training_checkpoint(path, *, model, optimizer_target, optimizer_draft):
     checkpoint = torch.load(path, map_location="cpu", weights_only=False)
     if checkpoint.get('format')!='medusa_grpo_checkpoint_v1':
         raise ValueError('resume requires a MedusaGRPO training checkpoint')
+    from medusa.generate import RUNTIME_SEMANTICS_VERSION
+    if checkpoint.get('runtime_semantics_version')!=RUNTIME_SEMANTICS_VERSION:
+        raise ValueError('resume sampling/feedback semantics mismatch; initialize a new run from weights instead')
     current_world_size = dist.get_world_size() if dist.is_initialized() else 1
     current_rank = dist.get_rank() if dist.is_initialized() else 0
     saved_world_size = int(checkpoint.get("world_size", 1))
@@ -823,11 +827,8 @@ def compute_target_loss_and_backward(model, input_ids, attention_mask, mask, rew
     return float(loss.detach()),float(loss1.detach()),float(loss2.detach()),old.cpu(),ref.cpu()
 
 def training_draft_model(model, outputs, prompt_mask, token_budget=None):
-    # torch.inference_mode rollout storage must become normal training tensors.
-    training_outputs = dict(outputs)
-    for name in ('all_draft_input_states', 'all_draft_input_ids'):
-        training_outputs[name] = [x.clone() if x.is_inference() else x for x in outputs[name]]
-    loss1, loss2 = upstream_train_draft(model, training_outputs, prompt_mask,
+    # The bounded online trainer copies only its current supervised chunk.
+    loss1, loss2 = upstream_train_draft(model, outputs, prompt_mask,
         repeated_generate_nums=repeated_generate_nums,
         max_training_token=max_training_token if token_budget is None else token_budget,
         max_training_padding_gap=max_training_padding_gap,
@@ -1310,7 +1311,7 @@ for epoch in epoch_bar:
             batch_data['medusa_last_metrics']={k:v for k,v in outputs.items() if k.startswith(('head','opd_head')) or k in ('tree_nodes_per_response','tree_depth_reached','verification_nodes','target_forward_calls','head_limit_reasons','opd_feedback_time','opd_proposal_time','opd_update_count')}
             totals=batch_data.setdefault('medusa_totals',{})
             for name,value in batch_data['medusa_last_metrics'].items():
-                if name.endswith(('active_rounds','proposed_nodes','accepted_tokens','selected_states','visited_states','frontier_states')) or name in ('verification_nodes','target_forward_calls','opd_update_count'):
+                if name.endswith(('active_rounds','proposed_nodes','verified_tokens','accepted_tokens','selected_states','visited_states','frontier_states','update_count')) or name in ('verification_nodes','target_forward_calls','opd_update_count'):
                     totals[name]=totals.get(name,0)+value
             for h in (1,2,3):
                 totals[f'head{h}_acceptance_rate']=totals.get(f'head{h}_accepted_tokens',0)/max(totals.get(f'head{h}_proposed_nodes',0),1)
@@ -1353,6 +1354,12 @@ for epoch in epoch_bar:
                 draft_phase_ticket = phase_timings.begin('draft')
                 draft_loss1,draft_loss2,draft_sparse_tv,draft_sparse_kl,draft_sparse_count=training_draft_model(model,outputs,attention_mask)
                 iter_outputs.update({f'head{h+1}_training_loss':v for h,v in enumerate(model.last_head_losses)})
+                for h in range(3):
+                    for suffix,values in [('supervised_tokens',model.last_head_supervised_tokens),('gradient_batches',model.last_head_gradient_batches)]:
+                        name=f'head{h+1}_{suffix}'
+                        iter_outputs[name]=values[h]
+                        totals[name]=totals.get(name,0)+values[h]
+                    iter_outputs[f'head{h+1}_optimizer_updates']=0
                 iter_outputs.update(iter_draft_feature_loss=float(draft_loss1),
                     iter_draft_distribution_loss=float(draft_loss2),iter_draft_total_loss=float(draft_loss1+draft_loss2))
                 if _as_bool(args.draft_train_profile) and is_main_process:
@@ -1383,6 +1390,10 @@ for epoch in epoch_bar:
                         optimizer_profile_end = torch.cuda.Event(enable_timing=True)
                         optimizer_profile_start.record()
                     optimizer_draft.step()
+                    for h in range(3):
+                        name=f'head{h+1}_optimizer_updates'
+                        iter_outputs[name]=1
+                        totals[name]=totals.get(name,0)+1
                     if _as_bool(args.draft_train_profile):
                         optimizer_profile_end.record()
                         optimizer_profile_end.synchronize()

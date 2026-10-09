@@ -23,6 +23,9 @@ scripts/benchmark_pair.py    paired real GRPO benchmark và tree selection
 scripts/tune_opd_proposals.py sparse/fused/GEMM proposal tuning theo hardware/vocab
 tests/                      CPU tests, checkpoint/resume, CUDA tests có điều kiện
 docs/IMPLEMENTATION.md       audit, fairness, định nghĩa metrics và giới hạn kiểm chứng
+docs/REVISION_AUDIT.md       bugs, sync audit, benchmarks và các khác biệt còn lại
+scripts/check_fairness.py    audit 35 launchers và actual runtime bindings
+scripts/benchmark_hotpaths.py trước/sau online heads và KV trên cùng tensors
 ```
 
 Có 7 pretrain scripts, 14 method scripts và 7 `train_<model>.sh` aliases cho
@@ -37,13 +40,22 @@ Các default model/data paths được giữ theo SpecNaacl:
 cd /mnt/hdd/nhatminh/SpecDecode/MedusaGRPO
 uv venv --python 3.12 .venv
 source .venv/bin/activate
-uv pip install --reinstall-package torch -r requirements.txt
+uv pip install --python .venv/bin/python --extra-index-url https://download.pytorch.org/whl/cu128 \
+  --index-strategy unsafe-best-match 'torch==2.8.0+cu128' -r requirements.txt
 export PYTHON_BIN="$PWD/.venv/bin/python"
 export MODEL=/workspace/storage-shared/models/Qwen2.5-1.5B-Instruct
 export DATA_ROOT=/workspace/storage-shared/nlp/minhpn19/data
 export CUDA_VISIBLE_DEVICES=0
 export NPROC_PER_NODE=1
+"$PYTHON_BIN" scripts/validate_environment.py --require-cuda
 ```
+
+Đây là CUDA wheel cho môi trường B200; chọn driver tương thích trên server.
+Các bản PyTorch 2.8/CUDA được liệt kê tại
+[PyTorch previous versions](https://pytorch.org/get-started/previous-versions/).
+Môi trường kiểm tra RTX 3090 trong workspace là `.venv-cuda` với torch
+`2.8.0+cu126`; `.venv` hiện là môi trường CPU. Không dùng wheel cu126 này
+để suy ra khả năng chạy B200.
 
 `TARGET_ADAPTER` phải là **cùng checkpoint LoRA khởi tạo mà các baseline khác
 đang dùng**. SpecNaacl hiện để default này rỗng, nên repo không tự đoán checkpoint.
@@ -137,17 +149,49 @@ python -m pytest -q
 python scripts/compile_kernels.py   # compile sm100; không thực thi GPU
 python scripts/smoke_cpu.py         # synthetic CPU production-loop smoke
 python scripts/validate_environment.py --require-cuda
+python scripts/check_fairness.py --output docs/fairness_report.json
+# Khi đã set MODEL/DATA_ROOT/TARGET_ADAPTER cho experiment:
+python scripts/check_fairness.py --use-environment --output outputs/fairness.json
 ```
 
-Validation hiện tại: CPU tests và synthetic GRPO/pretrain/resume đã chạy; ba
-kernel mới compile thành công cho sm100; sparse tree Triton interpreter khớp
-CPU oracle. CUDA/B200 execution, throughput tuning và 5 epoch ShareGPT thật trên
-7 model **chưa được kiểm chứng trong phiên triển khai này**. Máy hiện tại có RTX
-3090, nhưng môi trường PyTorch hiện là CPU; tải CUDA dependencies bị lỗi mạng.
-CUDA tests tự skip khi runtime CUDA chưa có. Không dùng kết quả CPU để kết luận
-speedup B200.
+Fairness checker exit 0 nghĩa audit đã chạy, không có nghĩa fully fair.
+`--strict` trả exit 1 vì vẫn còn các khác biệt đã xác nhận: PureGRPO sample
+first token độc lập, length cap của các sources khác nhau, và lỗi kế thừa sort
+sequence nhưng không sort advantages. Default initial target LoRA vẫn là
+`not verified` đến khi dùng checkpoint chung cụ thể.
 
-Kết quả lưu tại [`docs/VALIDATION.json`](docs/VALIDATION.json): **36 passed,
-2 CUDA tests skipped**. [`docs/cpu_smoke_report.json`](docs/cpu_smoke_report.json)
-chứa AAL, throughput, per-head utilization và target forward counters của cặp
-smoke CPU; đây là dữ liệu kiểm tra pipeline, không phải kết quả performance B200.
+Kiểm tra thực tế dùng CPU Python 3.12/torch2.8 và RTX3090/torch2.8+cu126.
+Suite gồm tiny native-architecture smoke của 7 configs, GRPO/head gradient
+parity, CUDA KV recomputation, B0/disabled RNG, async, pretrain5epochs và resume.
+Kết quả cuối ở [`docs/VALIDATION.json`](docs/VALIDATION.json).
+[`docs/real_qwen25_1p5b_cuda_smoke.json`](docs/real_qwen25_1p5b_cuda_smoke.json)
+kiểm tra riêng weights thật Qwen2.5-1.5B với heads khởi tạo, 2 prompts × 2
+responses × 12 new tokens. Đây chưa phải full GRPO hoặc full-concurrency OOM test.
+
+Microbenchmark RTX3090 (H1536, V151936) cho online heads: **76.29 → 19.82 ms**;
+KV compaction: **0.620 → 0.509 ms**. Xem
+[`docs/hotpath_cuda_benchmark.json`](docs/hotpath_cuda_benchmark.json).
+Không suy rộng các số này thành end-to-end/B200 speedup. Máy không có B200;
+full 5-epoch ShareGPT trên 7 weights thật, multi-GPU, full-model OOM và B200
+throughput/backend tuning **chưa được kiểm chứng**.
+
+Các lệnh kiểm tra lại trên máy hiện tại:
+
+```bash
+.venv/bin/python -m pytest -q
+TRITON_CACHE_DIR="$PWD/outputs/triton_cache" .venv-cuda/bin/python -m pytest -q
+TRITON_CACHE_DIR="$PWD/outputs/triton_cache" .venv-cuda/bin/python scripts/smoke_model.py \
+  --model-dir ../models/Qwen2.5-1.5B-Instruct --output outputs/real_model_smoke.json
+.venv-cuda/bin/python scripts/benchmark_hotpaths.py --device cuda \
+  --hidden 1536 --vocab 151936 --responses 8 --length 128 --prompt 96 --trials 11 \
+  --output outputs/hotpaths_cuda.json
+```
+
+Real-model smoke hỗ trợ `--heads "$DRAFT_CHECKPOINT"` và
+`--target-adapter "$TARGET_ADAPTER"` khi đã có checkpoints; không truyền hai flags này chỉ kiểm
+tra base target + heads khởi tạo. Có thể chạy lại với model directory của từng
+config trên máy đủ VRAM; smoke ngắn không thay thế full-concurrency OOM checks.
+
+Online heads mặc định chặn tổng LM-head projection ở 128 rows/chunk, dùng
+chung cho hai methods. Có thể giảm `MEDUSA_HEAD_LOGIT_ROWS` (ít nhất 3) để giảm
+vocabulary activation memory; normalization và optimizer cadence giữ nguyên.

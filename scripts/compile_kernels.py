@@ -7,6 +7,7 @@ from triton.compiler import compile,ASTSource
 from triton.backends.compiler import GPUTarget
 from medusa.tree_kernels import _build
 from medusa.opd_kernels import _all_updates,_all_end
+from helper.tree_kernels import _tree_mask
 
 
 def compile_all():
@@ -16,6 +17,8 @@ def compile_all():
         (_all_updates,{**{f'{n}{h}':t for h in range(3) for n,t in [('S','*i32'),('N','*i32'),('I','*i64'),('G','*fp32'),
              ('U','*fp32'),('W','*fp32'),('B','*fp32'),('T','*i32'),('A','*i32'),('C','*i32')]},'CONTEXTS':'*i64','ROWS':'i32'},dict(K=16,R=8,LR=.01)),
         (_all_end,{f'{n}{h}':t for h in range(3) for n,t in [('B','*fp32'),('T','*i32'),('A','*i32'),('C','*i32'),('W','*fp32'),('M','*fp64')]},dict(R=8,LR=.01)),
+        (_tree_mask,{'PARENTS':'*i64','MASK':'*bf16','ROWS':'i32','PAST':'i32','WIDTH':'i32',
+                     'PAST_MASK':'*i1','MASK_STRIDE':'i32'},dict(MINIMUM=-3.3895313892515355e38,BK=256,HAS_PAST_MASK=True)),
     ]
     for fn,sig,constants in specs:
         kernel=compile(ASTSource(fn,signature=sig,constexprs=constants),target=GPUTarget('cuda',100,32),

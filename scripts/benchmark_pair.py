@@ -67,6 +67,7 @@ def main():
                     opd_feedback_time_s=sum(float(r.get('opd_feedback_time') or 0) for r in steady) if a.profile else None,
                     opd_proposal_time_s=sum(float(r.get('opd_proposal_time') or 0) for r in steady) if a.profile else None,
                     aal=summary['cumulative_aal'],target_optimizer_steps=summary['target_optimizer_steps'],
+                    peak_vram_gb=summary.get('gpu_peak_allocated_gb'),
                     rollout_prompts=summary['rollout_prompts_seen'],**summary.get('medusa_totals',{}),run=str(run))
                 records.append(record)
                 output.mkdir(parents=True,exist_ok=True)

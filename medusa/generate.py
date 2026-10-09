@@ -11,9 +11,10 @@ from helper.opd_sampling import sample_target_with_metadata
 from helper.opd_static_cache import persistent_cache
 from helper.tree_verification import trace_verified_path
 from helper.opd_attention import AttentionWorkspace
-from medusa.tree import plan_tree,build_sparse_tree
+from medusa.tree import plan_tree,build_sparse_tree,restrict_feedback
 from medusa.opd import MedusaOPD
 TARGET_SAMPLER_MODE=os.environ.get('OPD_SAMPLER_MODE','finite')
+RUNTIME_SEMANTICS_VERSION='shared_prefill_terminal_feedback_v2'
 
 
 def base_lm(model):
@@ -23,11 +24,26 @@ def base_lm(model):
 def compact_kv(cache, indices, past, width):
     """Gather only the verified suffix, keeping the accepted path's KV order."""
     safe=indices[:,:width].clamp_min(0)
+    layouts={}
     for layer in cache.layers:
         # Source is the verification suffix, so history is never copied here.
         for pool in (layer.key_pool,layer.value_pool):
+            # Under FP32 target + CUDA autocast, RoPE can promote keys to FP32
+            # while values remain FP16. Reuse by actual pool layout/dtype.
+            key=('medusa_suffix',pool.device,pool.dtype,pool.shape[1],pool.shape[3])
+            layout=layouts.get(key)
+            if layout is None:
+                shape=(safe.shape[0],pool.shape[1],width,pool.shape[3])
+                count=shape[0]*shape[1]*shape[2]*shape[3]
+                scratch=cache._scratch.get(key)
+                if scratch is None or scratch.numel()<count:
+                    scratch=pool.new_empty(1<<max(0,(count-1).bit_length()))
+                    cache._scratch[key]=scratch
+                selected=scratch[:count].view(shape)
+                layout=(selected,safe[:,None,:,None].expand(shape));layouts[key]=layout
+            selected,gather_indices=layout
             source=pool[:safe.shape[0],:,past:layer.length]
-            selected=source.gather(2,safe[:,None,:,None].expand(-1,source.shape[1],-1,source.shape[3]))
+            torch.gather(source,2,gather_indices,out=selected)
             pool[:safe.shape[0],:,past:past+width].copy_(selected)
         layer.length=past+width
 
@@ -68,25 +84,36 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
                          past_key_values=cache,use_cache=True,return_dict=True)
     hidden=outputs.last_hidden_state
     anchor=hidden[:,-1].repeat_interleave(repeats,0)
-    first_logits=model.lm_head(hidden[:,-1:]).repeat_interleave(repeats,0)
-    pending,_,_=sample_target_with_metadata(first_logits,do_sample=do_sample,
-        temperature=temperature,top_p=top_p,top_k=top_k,eos_token_id=eos,return_probs=False,mode=TARGET_SAMPLER_MODE)
-    pending=pending[:,0]
+    first_logits=model.lm_head(hidden[:,-1:])
+    # Both SpecNaacl engines sample prefill OUTSIDE target autocast, whereas
+    # verification sampling is inside it. BF16 softmax otherwise becomes FP32
+    # here and changes the initial categorical/nucleus distribution.
+    with torch.autocast(device.type,enabled=False):
+        pending,_,_=sample_target_with_metadata(first_logits,do_sample=do_sample,
+            temperature=temperature,top_p=top_p,top_k=top_k,eos_token_id=eos,return_probs=False,mode=TARGET_SAMPLER_MODE)
+    prompt_lengths=attention_mask.sum(-1).long()
+    # SpecNaacl samples once/prompt BEFORE response repetition. This one
+    # scheduling packet also supplies prompt metadata for online head training.
+    initial_packet=torch.stack((prompt_lengths,pending[:,0]),1).cpu().tolist()
+    pending=pending[:,0].repeat_interleave(repeats,0)
     cache.batch_repeat_interleave(repeats)
     mask=mask.repeat_interleave(repeats,0)
-    logical=attention_mask.sum(-1).repeat_interleave(repeats,0)
+    logical=prompt_lengths.repeat_interleave(repeats,0)
     global_ids=torch.arange(total,device=device)
-    generated=torch.full((total,max_new),eos,device=device,dtype=torch.long)
+    # Four private scratch columns per response allow fixed-shape scatter of
+    # invalid path slots without duplicate writes or dynamic boolean indexing.
+    path_capacity=4
+    generated=torch.full((total,max_new+path_capacity),eos,device=device,dtype=torch.long)
     generated[:,0]=pending
     counts=torch.ones(total,device=device,dtype=torch.long)
     round_counts=torch.zeros_like(counts);accepted_sums=torch.zeros_like(counts)
     head_counts=torch.zeros((3,3),device=device,dtype=torch.long) # active,proposed,accepted
     ids_storage=states_storage=None
     if return_all_draft_input:
-        ids_storage=torch.full((total,max_length),eos,device=device,dtype=torch.long)
+        ids_storage=torch.full((total,max_length+path_capacity),eos,device=device,dtype=torch.long)
         ids_storage[:,:prompt]=input_ids.repeat_interleave(repeats,0)
         ids_storage[:,prompt]=pending
-        states_storage=torch.zeros((total,max_length,anchor.shape[-1]),device=device,dtype=model.dtype)
+        states_storage=torch.zeros((total,max_length+path_capacity,anchor.shape[-1]),device=device,dtype=model.dtype)
         states_storage[:,:prompt]=hidden.repeat_interleave(repeats,0)
     del outputs,hidden,first_logits
     workspace=getattr(model,'medusa_attention_workspace',None)
@@ -97,8 +124,9 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
     rounds=nodes=active_rounds=0
     reasons={}
     # Remove prefill EOS before verification; do not sample past EOS.
-    live=(pending!=eos)&(max_new>1)
-    keep=live.nonzero().flatten()
+    survivor=[r for i,(_,token) in enumerate(initial_packet) if token!=eos and max_new>1
+              for r in range(i*repeats,(i+1)*repeats)]
+    keep=torch.tensor(survivor,device=device,dtype=torch.long)
     if keep.numel()!=total:cache.batch_select_indices(keep)
     pending=pending[keep];anchor=anchor[keep];mask=mask[keep];logical=logical[keep];global_ids=global_ids[keep]
     while pending.numel():
@@ -109,8 +137,7 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
         candidate_ids,candidate_q=engine.propose(logits,features,max(topk))
         tree=build_sparse_tree(pending,candidate_ids,candidate_q,plan)
         del logits,features,candidate_ids,candidate_q
-        padding=(~mask).nonzero()
-        attn=tree.attention_mask(past,model.dtype,padding,kernels=kernels,
+        attn=tree.attention_mask(past,model.dtype,kernels=kernels,past_mask=mask,
                                   workspace=workspace.buffer('tree',(active,1,plan.budget,past+plan.budget),model.dtype).flatten())
         pos=logical[:,None]+tree.depths
         verified=target.model(input_ids=tree.tokens,attention_mask=attn,position_ids=pos,
@@ -136,9 +163,12 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
         path.packed_indices.masked_fill_(~valid,-1)
         path.tokens.masked_fill_(~valid,-1)
         if enabled:
+            restrict_feedback(tree,remaining,eos)
             teacher=captured['teacher']
-            if teacher is None:teacher=torch.nn.functional.one_hot(samples,model.lm_head.weight.shape[0]).float()
-            engine.feedback(tree,path,teacher,captured['metadata'])
+            engine.feedback(tree,path,samples if teacher is None else teacher,captured['metadata'],greedy=teacher is None)
+            # Feedback owns stream-lifetime protection. Do not retain a second
+            # full-vocabulary teacher alias into the next sampler allocation.
+            del teacher
         last=(path.lengths-1)[:,None]
         pending=path.tokens.gather(1,last).squeeze(1)
         finished=(pending==eos)|(path.lengths>=remaining)
@@ -156,18 +186,18 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
             accepted=(slots<(path.lengths-1)[:,None])&(slots==h)
             head_counts[h,2]+=accepted.sum()
         round_counts[global_ids]+=1;accepted_sums[global_ids]+=path.lengths
-        dest=counts[global_ids,None]+slots
-        # Invalid padding writes an EOS into a scratch column, never valid output.
+        dest=torch.where(valid,counts[global_ids,None]+slots,max_new+slots)
+        # Every invalid slot writes its own scratch column, never valid output.
         row_grid=global_ids[:,None].expand_as(dest)
-        generated[row_grid[valid],dest[valid]]=path.tokens[valid]
+        generated[row_grid,dest]=torch.where(valid,path.tokens,eos)
         if return_all_draft_input:
-            ids_storage[row_grid[valid],prompt+dest[valid]]=path.tokens[valid]
+            ids_storage[row_grid,prompt+dest]=torch.where(valid,path.tokens,eos)
             source=path.packed_indices.clamp_min(0)[:,:,None].expand(-1,-1,verified.shape[-1])
             accepted_hidden=verified.gather(1,source)
             # KV rows correspond to root and accepted children, one token before
             # each sampled decision. Bonus hidden is intentionally not invented.
-            state_dest=prompt+counts[global_ids,None]-1+slots
-            states_storage[row_grid[valid],state_dest[valid]]=accepted_hidden[valid]
+            state_dest=torch.where(valid,prompt+counts[global_ids,None]-1+slots,max_length+slots)
+            states_storage[row_grid,state_dest]=torch.where(valid[:,:,None],accepted_hidden,0.)
         counts[global_ids]+=path.lengths
         anchor=verified.gather(1,path.packed_indices.gather(1,last)[:,:,None].expand(-1,-1,verified.shape[-1])).squeeze(1)
         compact_kv(cache,path.packed_indices,past,width)
@@ -186,15 +216,18 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
     packet=torch.cat((counts,round_counts,accepted_sums,head_counts.flatten())).cpu().tolist()
     lengths=packet[:total];response_rounds=packet[total:2*total];response_acc=packet[2*total:3*total]
     hc=packet[3*total:]
-    generated_ids=[generated[r,:lengths[r]].cpu().tolist() for r in range(total)]
+    # Serialize outputs with one bulk D2H copy, not one blocking copy/response.
+    generated_host=generated[:,:max(lengths)].cpu()
+    generated_ids=[generated_host[r,:lengths[r]].tolist() for r in range(total)]
     inputs=states=None
     if return_all_draft_input:
         inputs=[];states=[]
-        real_prompt=attention_mask.bool().repeat_interleave(repeats,0)
         for r in range(total):
-            valid=torch.cat((real_prompt[r],torch.ones(lengths[r],device=device,dtype=torch.bool)))
-            inputs.append(ids_storage[r,:prompt+lengths[r]][valid].clone())
-            states.append(states_storage[r,:prompt+lengths[r]][valid].clone())
+            real_length=initial_packet[r//repeats][0]
+            # TrainDataCollator uses left padding; slices have a known shape.
+            start=prompt-real_length
+            inputs.append(ids_storage[r,start:prompt+lengths[r]].clone())
+            states.append(states_storage[r,start:prompt+lengths[r]].clone())
     accepted=sum(hc[h*3+2] for h in range(3));proposed=sum(hc[h*3+1] for h in range(3))
     metrics.update(generated_token_ids=generated_ids,max_sequence_length=max(lengths),
         total_acc_length=sum(response_acc),total_decoded_token_num=sum(response_rounds),
@@ -205,10 +238,13 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
         verification_batches=rounds,active_response_rounds=active_rounds,verified_tree_nodes=nodes,
         verification_nodes=nodes,target_forward_calls=rounds+1,
         tree_nodes_per_response=nodes/max(active_rounds,1),tree_depth_reached=max((h+1 for h in range(3) if hc[h*3]),default=0),
-        head_limit_reasons=reasons,opd_host_syncs=rounds,opd_host_syncs_per_round=1. if rounds else 0.)
+        head_limit_reasons=reasons,medusa_scheduling_syncs=rounds+1,
+        medusa_round_scheduling_syncs=rounds,medusa_prefill_scheduling_syncs=1,
+        prompt_lengths=[row[0] for row in initial_packet])
     for h in range(3):
         for i,name in enumerate(('active_rounds','proposed_nodes','accepted_tokens')):metrics[f'head{h+1}_{name}']=hc[h*3+i]
         metrics[f'head{h+1}_acceptance_rate']=hc[h*3+2]/max(hc[h*3+1],1)
+        metrics[f'head{h+1}_verified_tokens']=hc[h*3+1]
     metrics.update({f'opd_target_{k}':v for k,v in cache.statistics().items()})
     cache.end_rollout(int(os.environ.get('OPD_KV_MAX_RETAINED_TOKENS','0')))
     return metrics

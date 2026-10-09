@@ -177,7 +177,7 @@ class OPDReflex:
                 self.profile_path=str(path);self.tuning=payload
                 self.profile_selector=validate_profile(payload,key)
             elif self.proposal_mode in ('auto','adaptive'):
-                warnings.warn('No exact compatible OPD proposal profile; using UNCALIBRATED safe fallback. Run scripts/tune_opd_proposals.sh; no tuning in hot path.')
+                warnings.warn('No exact compatible OPD proposal profile; using UNCALIBRATED safe fallback. Run scripts/tune_opd_proposals.py; no tuning in hot path.')
             print(f'OPD proposal mode: {self.proposal_mode}\nprofile: {self.profile_path or "NONE (uncalibrated fallback)"}\nGPU: {key["gpu"]} cc{key["compute_capability"]}\nV: {v}\nrank: {self.rank}\ndtype: {key["dtype"]}\nkernel hash: {key["kernel_sha256"]}',flush=True)
             self._validated_tuning=True
         self._profile_execution_shape=execution_shape
@@ -231,7 +231,10 @@ class OPDReflex:
                 self.teacher_q=alloc(n*k);self.union_ids=alloc(n*2*k,torch.long);self.union_g=alloc(n*2*k)
                 self.teacher_draft_p=alloc(n*k)
                 self.state_stats=alloc(n*10);self.round_weight=alloc(1)
-                self.teacher_tiles=[alloc(n*t*(k if i>=2 else 1),torch.long if i==3 else torch.float32) for i in range(4)] if self.backend=='triton' else []
+                # Native nucleus sampling already supplies sorted teacher
+                # probabilities. Its compact extraction never uses scan tiles.
+                # Allocate the large fallback scan workspace only if needed.
+                self.teacher_tiles=[]
                 self.counters=alloc(len(OPD_COUNTER_NAMES),torch.float64)
                 if self.train_projector:
                     self.projector_head=alloc((n,hidden_size))
@@ -416,13 +419,16 @@ class OPDReflex:
         # B is shared, not row-owned. Current contexts are overwritten next tree.
         pass
 
-    def finish(self):
+    def finish(self,counter_packet=None):
         if self.enabled:
-            payload=self.counters
-            if self.diagnostics:
-                extra=torch.stack((self.B_fast.norm().double(),self.B_fast.abs().amax().double(),self.active_count[0].double()))
-                payload=torch.cat((payload,extra))
-            packet=payload.cpu().tolist()  # exactly ONE counter/diagnostic packet
+            if counter_packet is not None:
+                packet=counter_packet
+            else:
+                payload=self.counters
+                if self.diagnostics:
+                    extra=torch.stack((self.B_fast.norm().double(),self.B_fast.abs().amax().double(),self.active_count[0].double()))
+                    payload=torch.cat((payload,extra))
+                packet=payload.cpu().tolist()
         else:packet=[0.]*len(OPD_COUNTER_NAMES)
         result=dict(zip(OPD_COUNTER_NAMES,packet[:len(OPD_COUNTER_NAMES)]))
         result['opd_proposal_mode_fused_rounds']=float(self.host_fused_rounds)

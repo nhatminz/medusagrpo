@@ -98,3 +98,18 @@ def select_feedback(tree, path, head, selection='visited_capped_frontier', front
     if selection == 'all_internal_weighted': weights *= tree.scores.exp()
     kinds = on.int() + off.int()*2
     return weights,kinds
+
+
+def restrict_feedback(tree,remaining,eos_token_id):
+    """Verified output is eligible only before EOS and within the token budget.
+
+    A decision at depth d emits token d+1 after the pending root. Off-path
+    prefixes containing EOS are terminal, including their descendants.
+    This does not change proposals, attention, target sampling or traversal.
+    """
+    valid=tree.depths<remaining[:,None]
+    cursor=torch.arange(tree.tokens.shape[1],device=tree.tokens.device).expand_as(tree.tokens)
+    for _ in range(tree.max_depth+1):
+        valid &= tree.tokens.gather(1,cursor)!=int(eos_token_id)
+        cursor=tree.parents.gather(1,cursor).clamp_min(0)
+    tree.feedback_contexts.masked_fill_(~valid,-1)

@@ -52,13 +52,17 @@ class MedusaOPD:
         self.enabled=options.get('enabled',True)
         self.B_fast=(torch.zeros((3,model.lm_head.weight.shape[0],options.get('rank',8)),device=model.device)
                      if self.enabled else None)
+        self.counter_pool=(torch.zeros((3,len(OPD_COUNTER_NAMES)),device=model.device,dtype=torch.float64)
+                           if self.enabled else None)
         mapping=torch.arange(model.lm_head.weight.shape[0],device=model.device)
         for h in range(3):
             state=HeadOPD(**options)
             state.start(model,batch,mapping,model.lm_head.weight.shape[1],max_contexts=1,
                 max_nodes=max_nodes,max_path=4,max_proposal_contexts=1)
             state.defer_fast_update=state.backend=='triton'
-            if self.enabled:state.B_fast=self.B_fast[h]
+            if self.enabled:
+                state.B_fast=self.B_fast[h]
+                state.counters=self.counter_pool[h]
             self.engines.append(state)
         self.stream=(torch.cuda.Stream(device=model.device) if self.enabled and model.device.type=='cuda' and update_stream else None)
         self.event=None
@@ -69,7 +73,9 @@ class MedusaOPD:
         for h,state in enumerate(self.engines):
             state.start(self.model,batch,state.mapping,self.model.lm_head.weight.shape[1],max_contexts=1,
                 max_nodes=max_nodes,max_path=4,max_proposal_contexts=1)
-            if self.enabled:state.B_fast=self.B_fast[h]
+            if self.enabled:
+                state.B_fast=self.B_fast[h]
+                state.counters=self.counter_pool[h]
         if self.enabled:self.B_fast.zero_()
 
     def wait(self):
@@ -85,13 +91,13 @@ class MedusaOPD:
             probs.append(p[:,0].clone());ids.append(i[:,0].clone())
         return torch.stack(ids,1),torch.stack(probs,1)
 
-    def feedback(self,tree,path,teacher,metadata=None):
+    def feedback(self,tree,path,teacher,metadata=None,greedy=False):
         def work():
             for h,state in enumerate(self.engines):
                 w,kind=select_feedback(tree,path,h,self.selection,self.cap,state.visited_weight,state.frontier_weight)
                 adapted=SimpleNamespace(parents=tree.parents,feedback_contexts=torch.zeros_like(tree.parents),
                     selected_weights=w,selected_kind=kind)
-                state.feedback(adapted,path,teacher,sampling_metadata=metadata)
+                state.feedback(adapted,path,teacher,sampling_metadata=metadata,greedy=greedy)
             if self.engines[0].backend=='triton':
                 from medusa.opd_kernels import update_heads
                 ticket=self.engines[0].begin('opd_update_ms')
@@ -113,14 +119,18 @@ class MedusaOPD:
         result={name:0. for name in OPD_COUNTER_NAMES}
         result['opd_backend']=self.engines[0].backend
         result['opd_profile_time_ms']=0.
+        # One readback from already-contiguous counters; no packing kernel and
+        # no three independent production synchronization pipelines.
+        packets=(self.counter_pool.cpu().tolist() if self.enabled and not self.engines[0].diagnostics else [None]*3)
         for h,state in enumerate(self.engines,1):
-            metrics=state.finish()
+            metrics=state.finish(counter_packet=packets[h-1])
             for name in OPD_COUNTER_NAMES:result[name]+=metrics[name]
             weight=metrics['opd_state_weight'];count=metrics['opd_selected_states']
             for name,source in [('selected_states','selected_states'),('visited_states','visited_states'),('frontier_states','frontier_states'),('active_rows','active_rows_max')]:
                 result[f'opd_head{h}_{name}']=metrics['opd_'+source]
             result[f'opd_head{h}_kl']=metrics['opd_kl_sum']/max(weight,1.)
             result[f'opd_head{h}_target_mass_in_draft_top16']=metrics['opd_draft_topk_target_mass_sum']/max(count,1.)
+            result[f'opd_head{h}_update_count']=metrics['opd_updates']
             result['opd_profile_time_ms']+=metrics['opd_profile_time_ms']
             for phase in ('opd_state_select_ms','opd_teacher_extract_ms','opd_union_loss_ms','opd_update_ms','opd_feature_ms','opd_proposal_extra_ms'):
                 result[phase]=result.get(phase,0.)+(metrics.get('opd_profile_sections_ms') or {}).get(phase,0.)

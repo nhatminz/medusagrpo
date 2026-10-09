@@ -5,7 +5,7 @@ from medusa.tree import plan_tree,build_sparse_tree,select_feedback
 from helper.tree_verification import trace_verified_path
 
 
-@pytest.mark.parametrize('active,budget,max_nodes',[(1,41,41),(8,80,24),(128,512,24),(128,256,24)])
+@pytest.mark.parametrize('active,budget,max_nodes',[(1,41,41),(8,80,24),(32,512,12),(64,512,12),(128,512,24),(128,256,24)])
 def test_prefix_budget_attention_and_horizons(active,budget,max_nodes):
     plan=plan_tree(active,budget,max_nodes)
     logits=torch.randn(active,3,17)

@@ -1,0 +1,5 @@
+{
+  "greedy_output_parity": true,
+  "full_vocab_teacher_workspace_avoided": true,
+  "opd_updates": 16.0
+}

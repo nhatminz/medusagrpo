@@ -1,5 +1,12 @@
 .venv/
+.venv-cuda/
 __pycache__/
 .pytest_cache/
 outputs/
 *.pyc
+.cache/
+cache/
+*_cache/
+.mypy_cache/
+.ruff_cache/
+*.pyo

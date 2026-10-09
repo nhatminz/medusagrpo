@@ -20,7 +20,7 @@ FIELDS=('global_iter','epoch','batch_iter','method','grpo_step','used_items','el
     'iter_acceptance_rate','cumulative_acceptance_rate')+tuple('iter_opd_'+s for s in OPD_FIELDS)+KV_FIELDS+ITER_TIME_FIELDS+DRAFT_UPDATE_FIELDS
 
 
-MEDUSA_FIELDS=tuple(f'head{h}_{name}' for h in (1,2,3) for name in ('active_rounds','proposed_nodes','accepted_tokens','acceptance_rate','training_loss'))+tuple(f'opd_head{h}_{name}' for h in (1,2,3) for name in ('kl','selected_states','visited_states','frontier_states','active_rows','target_mass_in_draft_top16'))+('tree_nodes_per_response','tree_depth_reached','verification_nodes','target_forward_calls','head_limit_reasons','opd_feedback_time','opd_proposal_time','opd_update_count','target_optimizer_steps')
+MEDUSA_FIELDS=tuple(f'head{h}_{name}' for h in (1,2,3) for name in ('active_rounds','proposed_nodes','verified_tokens','accepted_tokens','acceptance_rate','training_loss','supervised_tokens','gradient_batches','optimizer_updates'))+tuple(f'opd_head{h}_{name}' for h in (1,2,3) for name in ('kl','selected_states','visited_states','frontier_states','active_rows','target_mass_in_draft_top16','update_count'))+('tree_nodes_per_response','tree_depth_reached','verification_nodes','target_forward_calls','head_limit_reasons','opd_feedback_time','opd_proposal_time','opd_update_count','target_optimizer_steps','medusa_scheduling_syncs','medusa_round_scheduling_syncs','medusa_prefill_scheduling_syncs')
 FIELDS+=MEDUSA_FIELDS
 
 class RolloutMetricsWriter:
@@ -111,8 +111,8 @@ class RolloutMetricsWriter:
         for field in OPD_FIELDS:row['iter_opd_'+field]=0.
         for field in KV_FIELDS:row[field]=''
         if self.method in ('medusa','medusa_reflex'):
-            row['iter_host_syncs']=o.get('opd_host_syncs',0)
-            row['iter_host_syncs_per_round']=o.get('opd_host_syncs_per_round',0)
+            # Legacy all-sync columns remain blank: these counters only cover
+            # explicit scheduling readbacks, not sampler/runtime implicit syncs.
             row['iter_kv_cache_bytes']=sum(o.get('opd_'+side+'_kv_cache_bytes',0) for side in ('target','draft'))
             row['iter_kv_rows_moved']=max(o.get('opd_'+side+'_kv_rows_moved',0) for side in ('target','draft'))
             row['iter_kv_pool_allocations']=sum(o.get('opd_'+side+'_pool_allocations',0) for side in ('target','draft'))

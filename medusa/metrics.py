@@ -5,9 +5,9 @@ import torch.distributed as dist
 
 COUNTER_NAMES = (
     *(f'head{h}_{name}' for h in (1,2,3)
-      for name in ('active_rounds','proposed_nodes','accepted_tokens')),
+      for name in ('active_rounds','proposed_nodes','verified_tokens','accepted_tokens','supervised_tokens','gradient_batches','optimizer_updates')),
     *(f'opd_head{h}_{name}' for h in (1,2,3)
-      for name in ('selected_states','visited_states','frontier_states')),
+      for name in ('selected_states','visited_states','frontier_states','update_count')),
     'verification_nodes','target_forward_calls','opd_update_count',
 )
 

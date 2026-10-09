@@ -1,34 +1,96 @@
 {
   "tests": {
+    "command": "TRITON_CACHE_DIR=\"$PWD/outputs/triton_cache\" .venv-cuda/bin/python -m pytest -q",
+    "passed": 85,
+    "skipped": 0,
+    "elapsed_s": 53.32,
+    "warnings": 11,
+    "warning_reason": "Expected missing compatible proposal-profile warning; uncalibrated fallback, no fabricated B200 profile",
+    "hardware": "NVIDIA GeForce RTX 3090",
+    "torch": "2.8.0+cu126"
+  },
+  "cpu_tests": {
     "command": ".venv/bin/python -m pytest -q",
-    "passed": 36,
-    "skipped": 2,
-    "elapsed_s": 40.44,
-    "skipped_reason": "CUDA runtime is unavailable in the current CPU-only PyTorch environment"
+    "passed": 69,
+    "skipped": 16,
+    "elapsed_s": 46.06,
+    "skipped_reason": "CPU-only runtime; all 16 CUDA tests executed successfully in the CUDA suite above"
+  },
+  "compileall": {
+    "paths": [
+      "grpo_speculative.py",
+      "train_draft.py",
+      "medusa",
+      "helper",
+      "scripts",
+      "tests"
+    ],
+    "passed": true
+  },
+  "shell_syntax": {
+    "files": 30,
+    "passed": true
+  },
+  "environment_validation": {
+    "command": ".venv-cuda/bin/python scripts/validate_environment.py --require-cuda",
+    "passed": true,
+    "log": "outputs/revision_environment.log"
   },
   "kernel_compilation": {
+    "command": "TRITON_CACHE_DIR=\"$PWD/outputs/triton_cache\" .venv-cuda/bin/python scripts/compile_kernels.py",
     "architecture": "sm100",
     "kernels": [
       "_build",
       "_all_updates",
-      "_all_end"
+      "_all_end",
+      "_tree_mask"
     ],
     "compiled": true,
-    "executed_on_cuda": false
-  },
-  "triton_interpreter": {
-    "sparse_tree_cpu_parity": true
+    "executed_on_sm100": false,
+    "executed_on_cuda": true,
+    "execution_architecture": "sm86"
   },
   "protected_sources": {
-    "snapshot_files": 407,
+    "snapshot": "revision_source_snapshot.json",
+    "snapshot_files": 450,
     "modified_snapshot_files": 0
   },
+  "fairness": {
+    "report": "fairness_report.json",
+    "model_configs": 7,
+    "method_launchers_inspected": 35,
+    "configuration_or_runtime_binding_mismatches": 0,
+    "fully_fair": false,
+    "initial_target_lora": "not verified"
+  },
   "smoke_report": "cpu_smoke_report.json",
+  "real_weight_smoke": {
+    "report": "real_qwen25_1p5b_cuda_smoke.json",
+    "command": "TRITON_CACHE_DIR=\"$PWD/outputs/triton_cache\" .venv-cuda/bin/python scripts/smoke_model.py --model-dir ../models/Qwen2.5-1.5B-Instruct --output docs/real_qwen25_1p5b_cuda_smoke.json",
+    "model": "Qwen2.5-1.5B-Instruct",
+    "pretrained_heads": false,
+    "common_target_lora": false,
+    "prompts": 2,
+    "responses_per_prompt": 2,
+    "max_new_tokens": 12
+  },
+  "benchmarks": {
+    "cpu": "hotpath_cpu_benchmark.json",
+    "cuda": "hotpath_cuda_benchmark.json",
+    "kind": "isolated synthetic-input before/after microbenchmark; not B200 or end-to-end training",
+    "online_head_cuda_speedup": 3.8496152379448625,
+    "kv_cuda_speedup": 1.2196011147692274
+  },
   "not_validated": [
-    "CUDA/B200 kernel execution",
-    "B200 memory and throughput tuning",
+    "B200 CUDA execution and proposal/fusion/throughput tuning",
+    "Full production-concurrency memory/OOM for all seven real model weights, especially 7B/14B",
     "Full 5-epoch ShareGPT pretraining on the seven real models",
-    "Multi-GPU end-to-end training"
+    "Multi-GPU end-to-end training and rank-asymmetric workloads",
+    "Real paired GRPO with reward filtering and common experiment target LoRA/pretrained heads"
   ],
-  "tree_default_status": "provisional; select a shared configuration with scripts/benchmark_pair.py on B200"
+  "tree_default_status": "provisional; select one shared configuration with scripts/benchmark_pair.py on B200",
+  "greedy_cuda_smoke": {
+    "report": "greedy_cuda_smoke.json",
+    "passed": true
+  }
 }
