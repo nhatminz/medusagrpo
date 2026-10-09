@@ -72,6 +72,39 @@ def discover_profile(directory,key,explicit=''):
     return None,None
 
 
+def describe_profile_search(directory,key):
+    """Explain a failed lookup using host files only, outside the hot path."""
+    directory=Path(directory).resolve()
+    lines=[f'Profile directory: {directory}',
+           f'Expected profile: {profile_filename(key)}',
+           'Runtime execution key: '+json.dumps(key,sort_keys=True)]
+    if not directory.is_dir():
+        return '\n'.join(lines+['Profile directory does not exist.'])
+    candidates=[];invalid=[]
+    for path in sorted(directory.glob('*.json')):
+        try:
+            payload=json.loads(path.read_text())
+            actual=payload.get('execution_key') if isinstance(payload,dict) else None
+            if not isinstance(actual,dict):
+                invalid.append(f'{path.name}: no execution_key (a summary is not a proposal profile)')
+                continue
+            differences=[f'{name}: profile={actual.get(name)!r}, runtime={value!r}'
+                         for name,value in key.items() if actual.get(name)!=value]
+            if differences:
+                candidates.append((len(differences),path.name,'; '.join(differences)))
+            else:
+                try:validate_profile(payload,key)
+                except (ValueError,KeyError,TypeError) as exc:
+                    invalid.append(f'{path.name}: {exc}')
+        except (ValueError,OSError) as exc:
+            invalid.append(f'{path.name}: {exc}')
+    for _,name,reason in sorted(candidates)[:3]:
+        lines.append(f'Incompatible profile {name}: {reason}')
+    lines.extend(invalid[:3])
+    if not candidates and not invalid:lines.append('No proposal JSON profiles found in this directory.')
+    return '\n'.join(lines)
+
+
 def _between(points,value,log=False):
     if value<=points[0]:return points[0],points[0],0.
     if value>=points[-1]:return points[-1],points[-1],0.

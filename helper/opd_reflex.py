@@ -16,7 +16,7 @@ from pathlib import Path
 import torch
 from helper.opd_attention import AttentionWorkspace
 from helper.shared_rollout import allocate_tree_buffers
-from helper.opd_profiles import execution_key,fingerprint,discover_profile,validate_profile
+from helper.opd_profiles import execution_key,fingerprint,discover_profile,validate_profile,describe_profile_search
 
 OPD_COUNTER_NAMES=(
     'opd_state_weight','opd_selected_states','opd_visited_states','opd_frontier_states',
@@ -177,7 +177,9 @@ class OPDReflex:
                 self.profile_path=str(path);self.tuning=payload
                 self.profile_selector=validate_profile(payload,key)
             elif self.proposal_mode in ('auto','adaptive'):
-                warnings.warn('No exact compatible OPD proposal profile; using UNCALIBRATED safe fallback. Run scripts/tune_opd_proposals.py; no tuning in hot path.')
+                warnings.warn('No exact compatible OPD proposal profile; using UNCALIBRATED safe fallback. '
+                              'Run scripts/tune_opd_proposals.py; no tuning in hot path.\n'+
+                              describe_profile_search(directory,key))
             print(f'OPD proposal mode: {self.proposal_mode}\nprofile: {self.profile_path or "NONE (uncalibrated fallback)"}\nGPU: {key["gpu"]} cc{key["compute_capability"]}\nV: {v}\nrank: {self.rank}\ndtype: {key["dtype"]}\nkernel hash: {key["kernel_sha256"]}',flush=True)
             self._validated_tuning=True
         self._profile_execution_shape=execution_shape
