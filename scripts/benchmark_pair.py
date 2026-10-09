@@ -45,7 +45,7 @@ def main():
             for method in ('medusa','medusa_reflex'):
                 name=f'nodes{global_budget}_max{max_nodes}_trial{trial}_method-{method}'
                 run=output/name
-                env=dict(os.environ,RUN_DIR=str(run),RUN_NAME=name,RESUME='',DRY_RUN='true' if a.dry_run else 'false',
+                env=dict(os.environ,LAUNCHER_USE_ENV='1',RUN_DIR=str(run),RUN_NAME=name,RESUME='',DRY_RUN='true' if a.dry_run else 'false',
                     GRPO_BENCHMARK='1',GENERATION_LENGTH_POLICY=os.environ.get('GENERATION_LENGTH_POLICY','specnaacl_compatible'),PYTHON_BIN=sys.executable,CPEAK_NODES=str(global_budget),MAX_TREE_NODES_PER_SEQ=str(max_nodes),
                     FIXED_TREE_TOPK_BY_DEPTH=a.topk,MAX_TARGET_OPTIMIZER_STEPS=str(a.steps),MAX_ROLLOUT_PROMPTS=str(a.max_prompts),
                     OPD_SELECTION='visited_capped_frontier',OPD_MAX_FRONTIER_PER_HEAD='2',OPD_PROFILE='1' if a.profile else '0')

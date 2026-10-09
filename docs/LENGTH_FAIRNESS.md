@@ -25,8 +25,9 @@ collator/loss AST, LoRA recipe and AdamW options match the inspected SpecNaacl.
 The current upstream wrappers explicitly choose 8/4 for all seven models, before
 sourcing model configs. Medusa mirrors each inspected wrapper in its own
 `configs/<model>/launcher.env`, while preserving the requested model defaults
-in `b200.env`. Exported overrides take precedence in both repositories. Selecting
-`LAUNCHER_ENV=/dev/null` uses Medusa's model defaults; the checker then reports
+in `b200.env`. New convenience wrappers reset model-bound exports unless
+`LAUNCHER_USE_ENV=1` is selected (see [WRAPPER_EXPORTS.md](WRAPPER_EXPORTS.md)). Selecting
+`LAUNCHER_USE_ENV=1 LAUNCHER_ENV=/dev/null` uses Medusa's model defaults; the checker then reports
 a mismatch against the current unmodified source launchers where appropriate.
 
 The complete JSON is [length_fairness_report.json](length_fairness_report.json).
@@ -120,6 +121,7 @@ For the main paired experiment, set real model/data paths, the common initial
 target LoRA and the **same pretrained Medusa-head checkpoint** for both runs:
 
 ```bash
+export LAUNCHER_USE_ENV=1  # explicit custom checkpoint/model paths below
 export MODEL=/absolute/path/to/Qwen2.5-3B-Instruct
 export DATA_ROOT=/absolute/path/to/data
 export TARGET_ADAPTER=/absolute/path/to/shared_initial_target_lora

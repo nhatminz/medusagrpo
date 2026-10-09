@@ -13,8 +13,15 @@ Checkpoint lưu policy và từ chối resume khi đổi policy.
 Model configs đã khớp SpecNaacl: Qwen2.5-1.5B và Qwen3-1.7B là batch/accumulation
 16/2, Qwen2.5-14B là 4/8. **Launchers SpecNaacl hiện ghi đè thành 8/4 ở cả 7
 models**, nên `configs/<model>/launcher.env` của Medusa giữ cùng defaults thực.
-Biến export của người chạy luôn ưu tiên. Dùng `LAUNCHER_ENV=/dev/null` để chọn
-model-config defaults; checker sẽ báo lệch nếu baseline chưa có cùng override.
+Các wrapper `.sh` hiện chứa exports riêng cho từng model và ghi đè cấu hình
+model còn sót trong terminal. Initial LoRA tự chọn
+`outputs/initial_target/<model_key>_seed42`; heads tự chọn
+`outputs/pretrain/<model_key>/latest_checkpoint`. Chỉ cần activate môi trường rồi
+chạy `RESUME=auto bash train_qwen25_1p5b_reflex.sh` (checkpoint phải có sẵn).
+Sửa block exports trong wrapper để thay đường dẫn. Với benchmark/ablation cần
+override qua environment, dùng `LAUNCHER_USE_ENV=1`; khi đó
+`LAUNCHER_ENV=/dev/null` chọn model-config defaults và checker vẫn báo lệch nếu
+baseline chưa có cùng cấu hình. Xem [WRAPPER_EXPORTS.md](docs/WRAPPER_EXPORTS.md).
 
 ## Cấu trúc
 
@@ -71,9 +78,12 @@ Môi trường kiểm tra RTX 3090 trong workspace là `.venv-cuda` với torch
 để suy ra khả năng chạy B200.
 
 `TARGET_ADAPTER` phải là **cùng checkpoint LoRA khởi tạo mà các baseline khác
-đang dùng**. SpecNaacl hiện để default này rỗng, nên repo không tự đoán checkpoint.
+đang dùng**. Wrapper Medusa chọn đường dẫn theo model; SpecNaacl vẫn cần trỏ
+`TARGET_ADAPTER` tới cùng checkpoint đó.
 
 ```bash
+# Chỉ cần khi dùng checkpoint ngoài đường dẫn mặc định của wrapper.
+export LAUNCHER_USE_ENV=1
 export TARGET_ADAPTER=/absolute/path/to/common_initial_target_lora
 ```
 
@@ -81,17 +91,17 @@ Nếu chưa có initial LoRA, tạo **một lần** và dùng checkpoint này ch
 phương pháp. Lệnh dưới đây không thay thế checkpoint của experiment đã chạy:
 
 ```bash
-python scripts/create_initial_lora.py --model "$MODEL" \
-  --output outputs/initial_target/qwen25_1p5b --seed 42
-export TARGET_ADAPTER="$PWD/outputs/initial_target/qwen25_1p5b"
+python scripts/create_initial_lora.py \
+  --model /workspace/storage-shared/models/Qwen2.5-1.5B-Instruct \
+  --output outputs/initial_target/qwen25_1p5b_seed42 --seed 42
 # Khi chạy các baseline SpecNaacl/PureGRPO, cũng trỏ chúng tới checkpoint này.
 ```
 
 Pretrain một lần, rồi giữ nguyên checkpoint cho cả hai ablation:
 
 ```bash
+unset LAUNCHER_USE_ENV
 bash pretrain_qwen25_1p5b.sh
-export DRAFT_CHECKPOINT="$(readlink -f outputs/pretrain/qwen25_1p5b/latest_checkpoint)"
 bash train_qwen25_1p5b_medusa.sh
 bash train_qwen25_1p5b_reflex.sh
 # Alias của Medusa+Reflex:
@@ -100,7 +110,8 @@ bash train_qwen25_1p5b.sh
 
 Pretrain default: 5 epoch đầy đủ, max length 2048, seed 42, BF16, SDPA.
 Target backbone và lm_head được freeze. Batch/accumulation theo model; các biến
-`PRETRAIN_BATCH_SIZE` và `PRETRAIN_ACCUMULATION_STEPS` có thể override.
+`PRETRAIN_BATCH_SIZE` và `PRETRAIN_ACCUMULATION_STEPS` nằm trong từng wrapper;
+environment override cần `LAUNCHER_USE_ENV=1`.
 Checkpoint cuối nằm ở `outputs/pretrain/<model>/latest_checkpoint/draft.pth`.
 Training xuất vào `outputs/train/<model>/<unique_run_name>`.
 

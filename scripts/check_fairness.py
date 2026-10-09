@@ -139,9 +139,18 @@ def audit(spec,pure,env=None,models=MODELS,runtime_reports=None):
                 _functions(spec/'grpo_speculative.py',{'compute_target_loss_and_backward'})))
     rows=[]
     for key in models:
+        model_env=dict(base)
+        # Explicit audit overrides use the same opt-in as benchmark tooling.
+        if env is not None:model_env['LAUNCHER_USE_ENV']='1'
+        # The convenient Medusa wrappers bind a per-model initial checkpoint.
+        # Compare baselines with that SAME explicit experiment input, and expose
+        # this binding in the report; this does not prove a checkpoint exists.
+        shared_initial=model_env.get('TARGET_ADAPTER') if env is not None else None
+        if not shared_initial:shared_initial=str(ROOT/'outputs/initial_target'/f'{key}_seed42')
+        model_env['TARGET_ADAPTER']=shared_initial
         methods={};differences=[]
         for method,(root,suffix,training) in entries.items():
-            flags=launcher(root,key,suffix,base) if training.is_file() else None
+            flags=launcher(root,key,suffix,model_env) if training.is_file() else None
             if flags is None:
                 methods[method]={'status':'not verified','reason':'source or model launcher unavailable'};continue
             sampler_mode=flags.pop('_sampler_mode')
@@ -174,6 +183,8 @@ def audit(spec,pure,env=None,models=MODELS,runtime_reports=None):
         config_differences=[k for k in config or {} if source_config is not None and config[k]!=source_config.get(k)]
         spec_diff=[v for v in differences if v['method']!='puregrpo']
         rows.append(dict(model=key,methods=methods,configuration_mismatches=differences,
+                         shared_initialization_input=dict(path=shared_initial,
+                             reason='Explicit common TARGET_ADAPTER supplied to baseline dry-runs to match Medusa per-model wrapper; loaded tensors require runtime proofs'),
                          specnaacl_configuration_mismatches=spec_diff,
                          configuration_status='FAIL' if spec_diff or config_differences else
                             ('PASS' if source_config is not None and all(methods[m]['status']=='inspected' for m in
