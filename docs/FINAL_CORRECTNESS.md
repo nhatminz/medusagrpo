@@ -6,6 +6,10 @@ in [LENGTH_FAIRNESS.md](LENGTH_FAIRNESS.md). Its default is now
 FAIL described below refer to the previous implementation. The old validation
 artifacts remain historical evidence, not results for the new policy.
 
+Server test portability fixes for the supplied B200/torch2.13/transformers5.12
+log are in [SERVER_CHECK_FIX.md](SERVER_CHECK_FIX.md). The latest local suite is
+188 passes; the B200 rerun is still required.
+
 This revision supersedes the historical `REVISION_AUDIT.md` and its 85-test
 results. The latest request explicitly authorizes the common training fix in
 MedusaGRPO, SpecNaacl and puregrpo. No FastGRPO/Reflex generator, PureGRPO decoder,

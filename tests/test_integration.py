@@ -43,12 +43,14 @@ def test_copied_target_loss_reward_and_data_are_exact_source_snapshot():
 
 @pytest.mark.parametrize('model',MODELS)
 def test_all_model_launchers_dry_run(model,tmp_path):
-    env=dict(os.environ,DRY_RUN='true',PYTHON_BIN=sys.executable)
+    # Test default configuration independently of the caller's experiment.
+    env={k:v for k,v in os.environ.items() if k in ('PATH','HOME','LANG','LD_LIBRARY_PATH')}
+    env.update(DRY_RUN='true',PYTHON_BIN=sys.executable,RESUME='')
     for suffix in ('_medusa','_reflex',''):
         path=ROOT/f'train_{model}{suffix}.sh'
         p=subprocess.run(['bash',str(path)],env=env,text=True,capture_output=True)
         assert p.returncode==0,p.stderr
-        assert 'MedusaGRPO/outputs/train' in p.stdout
+        assert str(ROOT/'outputs/train') in p.stdout
         assert '/workspace/storage-shared/' in p.stdout
         assert 'medusa_reflex' in p.stdout if suffix!='_medusa' else '--method medusa ' in p.stdout
     p=subprocess.run(['bash',str(ROOT/f'pretrain_{model}.sh')],env=env,text=True,capture_output=True)

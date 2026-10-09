@@ -1,0 +1,49 @@
+{
+  "local": {
+    "torch": "2.8.0+cu126",
+    "transformers": "4.51.3",
+    "gpu": "RTX 3090",
+    "full_suite": {
+      "passed": 188,
+      "failed": 0,
+      "skipped": 0
+    },
+    "without_pure": {
+      "passed": 20,
+      "skipped": 4,
+      "meaning": "NOT VERIFIED optional baseline evidence"
+    },
+    "static_checks": {
+      "python": 62,
+      "shell_and_env": 46,
+      "status": "PASS"
+    },
+    "protected_external_files_unchanged": 443,
+    "protected_algorithm_files_unchanged": 12
+  },
+  "server_supplied": {
+    "torch": "2.13.0+cu130",
+    "transformers": "5.12.1",
+    "gpu": "NVIDIA B200",
+    "matmul_precision": "high",
+    "tf32": true,
+    "original_tests": {
+      "passed": 171,
+      "failed": 9
+    },
+    "patched_retest": "NOT VERIFIED"
+  },
+  "files_changed": [
+    "tests/baseline_support.py",
+    "tests/conftest.py",
+    "tests/test_cuda.py",
+    "tests/test_final_correctness.py",
+    "tests/test_integration.py",
+    "tests/test_revision.py",
+    "tests/test_server_checks.py",
+    "scripts/check_fairness.py",
+    "pretrain_qwen3_1p7b.sh",
+    "docs/FINAL_CORRECTNESS.md",
+    "docs/SERVER_CHECK_FIX.md"
+  ]
+}

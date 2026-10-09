@@ -13,6 +13,7 @@ from helper.tree_verification import trace_verified_path
 from helper.opd_sampling import sample_target_with_metadata
 from helper.opd_static_cache import OPDStaticCache
 from reference_online import train_heads as original_train_heads
+from baseline_support import baseline_root,require_baseline_files,source_contract_complete
 
 ROOT=Path(__file__).resolve().parents[1]
 from config_smoke import MODELS as SUPPORTED_MODELS,smoke as config_smoke
@@ -237,18 +238,36 @@ def test_previous_teacher_storage_is_released_before_next_sampler(tiny_model,mon
 
 def test_fairness_audit_effective_configs_all_seven_models():
     from scripts.check_fairness import audit,MODELS
-    report=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo')
+    spec=baseline_root('SpecNaacl');pure=baseline_root('puregrpo')
+    require_baseline_files(spec,'grpo_speculative.py','helper/fastgrpo_generate.py','helper/opd_generate.py')
+    report=audit(spec,pure)
     assert [row['model'] for row in report['models']]==list(MODELS)
-    assert all(not row['configuration_mismatches'] for row in report['models'])
+    assert all(not row['specnaacl_configuration_mismatches'] for row in report['models'])
+    assert report['configuration_status']=='PASS'
     assert all(row['methods'][method]['inspection_status']=='inspected' for row in report['models']
-               for method in ('medusa','medusa_reflex','fastgrpo','fastgrpo_reflex','puregrpo'))
-    assert report['first_token_convention']==dict(medusa='shared_per_prompt',medusa_reflex='shared_per_prompt',
-        fastgrpo='shared_per_prompt',fastgrpo_reflex='shared_per_prompt',puregrpo='independent_per_response')
+               for method in ('medusa','medusa_reflex','fastgrpo','fastgrpo_reflex'))
+    assert all(report['first_token_convention'][m]=='shared_per_prompt' for m in
+               ('medusa','medusa_reflex','fastgrpo','fastgrpo_reflex'))
     assert report['initial_target_lora']['status']=='NOT VERIFIED'
-    recipes=[s['lora_recipe'] for s in report['source_checks'].values()]
+    sources=[report['source_checks'][m] for m in ('medusa','medusa_reflex','fastgrpo','fastgrpo_reflex')]
+    recipes=[s['lora_recipe'] for s in sources]
     assert all(recipe==recipes[0] for recipe in recipes)
-    optimizers=[s['target_optimizer'] for s in report['source_checks'].values()]
+    optimizers=[s['target_optimizer'] for s in sources]
     assert all(optimizer==optimizers[0] for optimizer in optimizers)
+
+
+def test_available_puregrpo_source_fairness_contract():
+    from scripts.check_fairness import audit
+    pure=baseline_root('puregrpo')
+    if not source_contract_complete(pure):
+        pytest.skip('NOT VERIFIED: complete PureGRPO comparison/audit source unavailable at '+str(pure))
+    report=audit(baseline_root('SpecNaacl'),pure)
+    assert all(not [v for v in row['configuration_mismatches'] if v['method']=='puregrpo']
+               for row in report['models'])
+    assert report['first_token_convention']['puregrpo']=='independent_per_response'
+    source=report['source_checks']['puregrpo'];reference=report['source_checks']['medusa']
+    assert source['lora_recipe']==reference['lora_recipe']
+    assert source['target_optimizer']==reference['target_optimizer']
 
 
 def test_missing_baseline_source_is_not_reported_as_pass(tmp_path):

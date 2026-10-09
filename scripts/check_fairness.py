@@ -127,6 +127,10 @@ def audit(spec,pure,env=None,models=MODELS,runtime_reports=None):
         collator=_functions(root/('helper/grpo_core.py' if method=='puregrpo' else 'grpo_speculative.py'),{'TrainDataCollator'})
         source_collator=_functions(spec/'grpo_speculative.py',{'TrainDataCollator'})
         source_checks[method]=dict(status='inspected',reward_and_dataset=reward,
+            initialization_audit=dict(status='PASS' if all((root/'helper'/name).is_file() for name in
+                ('shared_adapter.py','response_alignment.py')) else 'NOT VERIFIED',
+                missing_files=[str(root/'helper'/name) for name in ('shared_adapter.py','response_alignment.py')
+                               if not (root/'helper'/name).is_file()]),
             collator_matches=collator==source_collator,
             lora_recipe=lora_recipe(root/'helper/target.py' if method=='puregrpo' else training),
             target_optimizer=optimizer_settings(training),
@@ -163,6 +167,10 @@ def audit(spec,pure,env=None,models=MODELS,runtime_reports=None):
                 if value!=reference['generation_runtime'].get(field):
                     differences.append(dict(method=method,field='runtime_generation.'+field,medusa=reference['generation_runtime'].get(field),value=value))
         config= model_config(ROOT,key);source_config=model_config(spec,key)
+        for method,result in methods.items():
+            result['configuration_mismatches']=[v for v in differences if v['method']==method]
+            result['configuration_status']=('FAIL' if result['configuration_mismatches'] else
+                'PASS' if result['status']=='inspected' else 'NOT VERIFIED')
         config_differences=[k for k in config or {} if source_config is not None and config[k]!=source_config.get(k)]
         spec_diff=[v for v in differences if v['method']!='puregrpo']
         rows.append(dict(model=key,methods=methods,configuration_mismatches=differences,
@@ -221,6 +229,10 @@ def verify_runtime(report, runtime_reports):
             'Compare stopping rule only: actual active batch maximum AFTER full round including EOS rows before pruning; own tree controls round overshoot')
         checks['specnaacl_training_configuration']=check(row['configuration_status'],
             'Parsed CLI defaults + all shared training/generation bindings, and model b200.env defaults')
+        audit_support=[s.get('initialization_audit',{}) for s in report['source_checks'].values()]
+        checks['baseline_initialization_audit_support']=check(
+            'PASS' if len(audit_support)==5 and all(v.get('status')=='PASS' for v in audit_support) else 'NOT VERIFIED',
+            'Missing source audit files: '+str([p for v in audit_support for p in v.get('missing_files',[])]))
         checked_sources=[report['source_checks'].get(m,{}) for m in ('medusa','medusa_reflex','fastgrpo','fastgrpo_reflex')]
         inspected=all(s.get('status')=='inspected' for s in checked_sources)
         common_code=inspected and all(all(s.get('reward_and_dataset',{}).values()) and s.get('collator_matches') and
@@ -334,8 +346,8 @@ def verify_runtime(report, runtime_reports):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--spec-root',type=Path,default=ROOT.parent/'SpecNaacl')
-    p.add_argument('--pure-root',type=Path,default=ROOT.parent/'puregrpo')
+    p.add_argument('--spec-root',type=Path,default=Path(os.environ.get('SPEC_ROOT',str(ROOT.parent/'SpecNaacl'))))
+    p.add_argument('--pure-root',type=Path,default=Path(os.environ.get('PUREGRPO_ROOT',str(ROOT.parent/'puregrpo'))))
     p.add_argument('--model',choices=MODELS)
     p.add_argument('--use-environment',action='store_true')
     p.add_argument('--strict',action='store_true')

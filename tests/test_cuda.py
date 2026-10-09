@@ -123,7 +123,7 @@ def test_gpu_per_head_feedback_and_async_gradients_match_cpu(tiny_model):
 
 
 @pytest.mark.parametrize('family',['qwen2','qwen3','llama'])
-def test_gpu_tree_kv_matches_recomputation_with_padding_rejection_and_bonus(family):
+def test_gpu_tree_kv_matches_recomputation_with_padding_rejection_and_bonus(family,strict_cuda_reference):
     from transformers import Qwen2Config,Qwen2ForCausalLM,Qwen3Config,Qwen3ForCausalLM,LlamaConfig,LlamaForCausalLM
     from helper.opd_static_cache import OPDStaticCache
     from helper import tree_kernels
@@ -131,19 +131,24 @@ def test_gpu_tree_kv_matches_recomputation_with_padding_rejection_and_bonus(fami
     config_cls,model_cls={'qwen2':(Qwen2Config,Qwen2ForCausalLM),'qwen3':(Qwen3Config,Qwen3ForCausalLM),
                          'llama':(LlamaConfig,LlamaForCausalLM)}[family]
     torch.manual_seed(83)
-    target=model_cls(config_cls(vocab_size=23,hidden_size=16,intermediate_size=32,num_hidden_layers=2,
-        num_attention_heads=2,num_key_value_heads=1)).cuda().eval()
+    config=config_cls(vocab_size=23,hidden_size=16,intermediate_size=32,num_hidden_layers=2,
+        num_attention_heads=2,num_key_value_heads=1)
+    config._attn_implementation='sdpa'
+    target=model_cls(config).cuda().eval()
     prompt=torch.tensor([[1,2,3],[0,1,2]],device='cuda')
     mask=torch.tensor([[1,1,1],[0,1,1]],device='cuda')
     logical=mask.sum(-1);positions=(mask.cumsum(-1)-1).clamp_min(0)
     ids=torch.tensor([[[5,6,7,8],[9,10,11,12],[13,14,15,16]]]*2,device='cuda')
     q=torch.tensor([[[.7,.15,.1,.05]]*3]*2,device='cuda')
     tree=build_sparse_tree(torch.tensor([4,4],device='cuda'),ids,q,plan_tree(2,24,12))
+    tree_mask=tree.attention_mask(3,torch.float32,kernels=tree_kernels,past_mask=mask.bool())
+    reference_mask=tree.attention_mask(3,torch.float32,past_mask=mask.bool())
+    assert torch.equal(tree_mask,reference_mask)
     cache=OPDStaticCache(32)
     with torch.inference_mode():
         target.model(input_ids=prompt,attention_mask=mask,position_ids=positions,past_key_values=cache,use_cache=True)
         verified=target.model(input_ids=tree.tokens,position_ids=logical[:,None]+tree.depths,
-            attention_mask=tree.attention_mask(3,torch.float32,kernels=tree_kernels,past_mask=mask.bool()),
+            attention_mask=tree_mask,
             past_key_values=cache,use_cache=True).last_hidden_state
         parents=tree.parents.cpu().tolist()
         paths=[]

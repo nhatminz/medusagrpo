@@ -9,18 +9,20 @@ import numpy as np
 import torch
 from peft import get_peft_model, LoraConfig, TaskType
 from medusa.generate import speculative_generate
+from baseline_support import baseline_root,require_baseline_files
 
 ROOT=Path(__file__).resolve().parents[1]
 
 
 def module(path):
+    require_baseline_files(path.parent.parent, str(path.relative_to(path.parent.parent)))
     spec=importlib.util.spec_from_file_location(path.parent.parent.name+'_'+path.stem,path)
     value=importlib.util.module_from_spec(spec);spec.loader.exec_module(value)
     return value
 
 
-def objective(root):
-    if root.name=='puregrpo':return module(root/'helper/grpo_core.py').compute_target_loss_and_backward
+def objective(root,pure=False):
+    if pure:return module(root/'helper/grpo_core.py').compute_target_loss_and_backward
     scope={'torch':torch}
     for file,names in [('helper/fastgrpo_training.py',{'compute_target_loss'}),
                        ('grpo_speculative.py',{'compute_target_loss_and_backward'})]:
@@ -31,7 +33,11 @@ def objective(root):
 
 @pytest.mark.parametrize('repository',['MedusaGRPO','SpecNaacl','puregrpo'])
 def test_sorted_response_identity_loss_and_gradients(repository,tiny_model):
-    root=ROOT.parent/repository;alignment=module(root/'helper/response_alignment.py')
+    root=baseline_root(repository)
+    require_baseline_files(root,'helper/response_alignment.py',
+        *(['helper/grpo_core.py','helper/train_ops.py'] if repository=='puregrpo' else
+          ['helper/fastgrpo_training.py','grpo_speculative.py']))
+    alignment=module(root/'helper/response_alignment.py')
     data=dict(messages=[],rewards=[],std_rewards=[],response_metadata=[])
     ids=[[1,3,4,5,6],[1,7],[1,8,9,10]]
     masks=[[0,1,1,1,1],[0,1],[0,1,1,1]]
@@ -56,7 +62,7 @@ def test_sorted_response_identity_loss_and_gradients(repository,tiny_model):
     with torch.no_grad():
         for name,p in target.named_parameters():
             if 'lora_B' in name:p.normal_(std=.02)
-    fn=objective(root);models=[target,deepcopy(target)];reports=[]
+    fn=objective(root,pure=repository=='puregrpo');models=[target,deepcopy(target)];reports=[]
     for model,seqs,mask_rows,advantages in [(models[0],ids,masks,original['std_rewards']),
           (models[1],scope['input_ids'],scope['loss_mask'],data['std_rewards'])]:
         width=max(map(len,seqs))
@@ -112,38 +118,44 @@ def test_mixed_prompt_eos_removes_only_finished_rows(tiny_model):
         assert list(map(len,result['generated_token_ids']))==expected
 
 
-def test_five_methods_load_same_lora_tensors_and_detect_mutation(tiny_model,tmp_path):
+@pytest.mark.parametrize('method,repository,recipe_file',[
+    ('medusa','MedusaGRPO','grpo_speculative.py'),
+    ('medusa_reflex','MedusaGRPO','grpo_speculative.py'),
+    ('fastgrpo','SpecNaacl','grpo_speculative.py'),
+    ('fastgrpo_reflex','SpecNaacl','grpo_speculative.py'),
+    ('puregrpo','puregrpo','helper/target.py'),
+])
+def test_five_methods_load_same_lora_tensors_and_detect_mutation(tiny_model,tmp_path,method,repository,recipe_file):
     from scripts.check_fairness import lora_recipe
-    recipes=[(ROOT/'grpo_speculative.py','MedusaGRPO'),(ROOT/'grpo_speculative.py','MedusaGRPO'),
-             (ROOT.parent/'SpecNaacl/grpo_speculative.py','SpecNaacl'),
-             (ROOT.parent/'SpecNaacl/grpo_speculative.py','SpecNaacl'),
-             (ROOT.parent/'puregrpo/helper/target.py','puregrpo')]
-    shared=tmp_path/'shared';hashes=[]
-    for index,(file,repository) in enumerate(recipes):
-        torch.manual_seed(91+index)
-        recipe=lora_recipe(file);recipe['task_type']=TaskType.CAUSAL_LM
-        target=get_peft_model(deepcopy(tiny_model.target_model),LoraConfig(**recipe))
-        if index==0:target.save_pretrained(shared)
-        target.load_adapter(shared,adapter_name='default')
-        audit=module(ROOT.parent/repository/'helper/shared_adapter.py')
-        proof=audit.verify_loaded_adapter(target,shared)
-        hashes.append(proof['loaded_tensor_sha256'])
-        with torch.no_grad():next(p for n,p in target.named_parameters() if 'lora_A' in n).add_(1)
-        with pytest.raises(ValueError,match='differs at'):audit.verify_loaded_adapter(target,shared)
-    assert len(set(hashes))==1
+    root=baseline_root(repository)
+    require_baseline_files(root,recipe_file,'helper/shared_adapter.py')
+    recipe=lora_recipe(ROOT/'grpo_speculative.py');recipe['task_type']=TaskType.CAUSAL_LM
+    torch.manual_seed(91)
+    initial=get_peft_model(deepcopy(tiny_model.target_model),LoraConfig(**recipe))
+    shared=tmp_path/'shared';initial.save_pretrained(shared)
+    expected=module(ROOT/'helper/shared_adapter.py').verify_loaded_adapter(initial,shared)
+    recipe=lora_recipe(root/recipe_file);recipe['task_type']=TaskType.CAUSAL_LM
+    torch.manual_seed(105)
+    target=get_peft_model(deepcopy(tiny_model.target_model),LoraConfig(**recipe))
+    target.load_adapter(shared,adapter_name='default')
+    audit=module(root/'helper/shared_adapter.py')
+    proof=audit.verify_loaded_adapter(target,shared)
+    assert proof['loaded_tensor_sha256']==expected['loaded_tensor_sha256']
+    with torch.no_grad():next(p for n,p in target.named_parameters() if 'lora_A' in n).add_(1)
+    with pytest.raises(ValueError,match='differs at'):audit.verify_loaded_adapter(target,shared)
 
 
 @pytest.mark.parametrize('repository',['MedusaGRPO','SpecNaacl','puregrpo'])
 def test_official_benchmark_requires_checkpoint(repository,monkeypatch):
     monkeypatch.setenv('GRPO_BENCHMARK','1')
-    audit=module(ROOT.parent/repository/'helper/shared_adapter.py')
+    audit=module(baseline_root(repository)/'helper/shared_adapter.py')
     with pytest.raises(ValueError,match='Official benchmark requires TARGET_ADAPTER'):
         audit.preflight_shared_adapter('')
 
 
 def test_fairness_checker_never_promotes_missing_or_mismatched_proofs():
     from scripts.check_fairness import audit
-    base=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',))
+    base=audit(baseline_root('SpecNaacl'),baseline_root('puregrpo'),models=('qwen25_1p5b',))
     row=base['models'][0]
     assert row['checks']['loaded_initial_target_lora']['status']=='NOT VERIFIED'
     reports={}
@@ -152,23 +164,24 @@ def test_fairness_checker_never_promotes_missing_or_mismatched_proofs():
             'target_lora':{'status':'PASS','loaded_tensor_sha256':'equal'},
             'draft':{'status':'PASS','loaded_tensor_sha256':'pair'},'alignment_version':'response_rows_v2'},
             'target_optimizer_steps':2}
-    result=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',),runtime_reports=reports)
+    result=audit(baseline_root('SpecNaacl'),baseline_root('puregrpo'),models=('qwen25_1p5b',),runtime_reports=reports)
     assert result['models'][0]['checks']['loaded_initial_target_lora']['status']=='PASS'
-    assert result['status']=='NOT VERIFIED' # Hashes alone cannot prove executed fairness.
-    ablation=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',),
+    assert result['status']==base['status'] # Hashes cannot repair known source/config differences.
+    assert result['models'][0]['checks']['executed_prompt_order']['status']=='NOT VERIFIED'
+    ablation=audit(baseline_root('SpecNaacl'),baseline_root('puregrpo'),models=('qwen25_1p5b',),
                    env={'GENERATION_LENGTH_POLICY':'per_response'},runtime_reports=reports)
     assert ablation['models'][0]['checks']['generation_length']['status']=='FAIL'
     assert ablation['status']=='FAIL'
     reports[('qwen25_1p5b','medusa_reflex')]['initialization']['draft']={'status':'PASS'}
-    result=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',),runtime_reports=reports)
+    result=audit(baseline_root('SpecNaacl'),baseline_root('puregrpo'),models=('qwen25_1p5b',),runtime_reports=reports)
     assert result['models'][0]['checks']['loaded_draft_medusa']['status']=='NOT VERIFIED'
     # Equal runtime overrides across all methods still differ from the audited
     # launch configuration and must not be promoted to PASS.
     for summary in reports.values():summary['initialization']['effective_args']={'batch_size':99}
-    result=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',),runtime_reports=reports)
+    result=audit(baseline_root('SpecNaacl'),baseline_root('puregrpo'),models=('qwen25_1p5b',),runtime_reports=reports)
     assert result['models'][0]['checks']['observed_vs_declared_configuration']['status']=='FAIL'
     reports[('qwen25_1p5b','puregrpo')]['initialization']['target_lora']['loaded_tensor_sha256']='wrong'
-    result=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',),runtime_reports=reports)
+    result=audit(baseline_root('SpecNaacl'),baseline_root('puregrpo'),models=('qwen25_1p5b',),runtime_reports=reports)
     assert result['models'][0]['checks']['loaded_initial_target_lora']['status']=='FAIL'
 
 
