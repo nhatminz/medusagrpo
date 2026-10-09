@@ -145,3 +145,13 @@ def test_disabled_plugin_does_not_update_projector(tmp_path,monkeypatch):
     checkpoint=torch.load(tmp_path/'disabled/resume/latest.pt',weights_only=False)
     assert torch.equal(initial['opd_projector'],checkpoint['draft_model']['opd_projector'])
     assert not checkpoint['opd_enabled']
+
+
+@pytest.mark.parametrize('method',['medusa','medusa_reflex'])
+def test_actual_optimizer_budget_records_executed_cadence(method,tmp_path):
+    run(ROOT/'tests/tiny_runner.py',tmp_path,method,'budget',
+        '--max_target_optimizer_steps','1')
+    summary=json.loads((tmp_path/'budget/summary.json').read_text())
+    assert summary['target_optimizer_steps']==1
+    assert summary['optimizer_step_cadence']==[[2,1]]
+    assert summary['prompt_order_sha256']

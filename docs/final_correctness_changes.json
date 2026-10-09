@@ -1,0 +1,152 @@
+{
+  "files": {
+    "MedusaGRPO/README.md": {
+      "before_sha256": "770bd981cab1775b3966dcb63ff8a6526c6b47779249176f0b8341e0021633aa",
+      "after_sha256": "378de99fbb6aef248b57ae398f3b83a742adf62e641bce11a86b45f1cfdeb1d5"
+    },
+    "MedusaGRPO/grpo_speculative.py": {
+      "before_sha256": "e71c7573504b2eb7c09d629b69a95d0fffc1165a3bd522d1c29a36cc62f77796",
+      "after_sha256": "68050c28e26a3b344c932f40d3f22244f401f5f1e10e9bbefaceb513cb7228f5"
+    },
+    "MedusaGRPO/tests/test_revision.py": {
+      "before_sha256": "86c9b1b70e76a2852924f52af0542136d583447dd45f8706e648d93fedfba4c0",
+      "after_sha256": "29097d1a3368881410c21039b04457df38daa49954ad626027d6ca7eb38e215c"
+    },
+    "MedusaGRPO/tests/test_integration.py": {
+      "before_sha256": "2dedf7a132e554b62198875325d2d1b3ba2453c14820d2b6e971dc9ba0ada5ed",
+      "after_sha256": "73e6b6771e920420b38ac7ab5ed81e2b5499a5e78b08a5af86760534f5135c93"
+    },
+    "MedusaGRPO/tests/test_final_correctness.py": {
+      "before_sha256": null,
+      "after_sha256": "9a90336232f4d8c0754e55a4056653adc49bea6a603731408fa39d725937723e"
+    },
+    "MedusaGRPO/tests/test_cuda.py": {
+      "before_sha256": "b7dcb337c611f450d69c9971cf5db8589b2dc1e13482b5f727af71e544a65a10",
+      "after_sha256": "71cf9182ca4baf190a644449cfc6100ee1877a94905011bcc53278569b1ac4b3"
+    },
+    "MedusaGRPO/scripts/benchmark_pair.py": {
+      "before_sha256": "e6e4b0da45ab6ab36e4bbb03a4ffe48e6c92bd478c71e83d52217ae3ee89427d",
+      "after_sha256": "46170ff73efe82f2060d805dd31b1e9d596a5bfe7f5dd566615ed8612c1154e4"
+    },
+    "MedusaGRPO/scripts/smoke_model.py": {
+      "before_sha256": "65fbfa80440f485cee671dcb746d432b7f1edc716a913c3e449edd0bf7d625c3",
+      "after_sha256": "16ac156ca0c562e5ac3edd216970a0c87f7e75fe9546549a5aa05493b0d8cf03"
+    },
+    "MedusaGRPO/scripts/check_fairness.py": {
+      "before_sha256": "270283942bd297411e7819cca4322373a857151ef5521e060e93fe8aa5542ac8",
+      "after_sha256": "10095b479e165f75389d4bd31b9718a7d7aaa7431fb0e0d3aea265040dd50712"
+    },
+    "MedusaGRPO/helper/response_alignment.py": {
+      "before_sha256": null,
+      "after_sha256": "350338c045bf2319757c4747857e25290a66e71d08304342c09dd6d8d0fe36ff"
+    },
+    "MedusaGRPO/helper/shared_adapter.py": {
+      "before_sha256": null,
+      "after_sha256": "7a4617198fa7d2d60333611005b8f52501b8d76609f16defc38fc0c98f30f4f8"
+    },
+    "MedusaGRPO/medusa/generate.py": {
+      "before_sha256": "5a3b0d9c7ae964f30aadccbe0832b16a2255c1e84823ff96e0d93fd3b5e0989c",
+      "after_sha256": "e92fc6b32f397b2a3a5602fe026c99590ef1d4ad28adc3b6061b42e0aab5d406"
+    },
+    "MedusaGRPO/docs/IMPLEMENTATION.md": {
+      "before_sha256": "e5ed6f4c22d5c4c08fd973ff1be46414d04f5d8c3fbe84b0260cef5d40ac83f6",
+      "after_sha256": "790fa4644e393dd74aaafd2bf66ebe73574b7e18699ccc75126852b0f08094f3"
+    },
+    "MedusaGRPO/docs/REVISION_AUDIT.md": {
+      "before_sha256": "90f938a15b2aeea34f584b51708570c8baef0edae5e8c0af917bcfde00241b75",
+      "after_sha256": "ca353696a31c08c40bad2ad28402950435131b9386e3e347f107ce98688d3c3c"
+    },
+    "MedusaGRPO/docs/fairness_report.json": {
+      "before_sha256": "4c20e3d12f1703c63226154940d5a9da27f63a694039073b73d5a403d35cd317",
+      "after_sha256": "d79599f97c17739877a639e7e908be4a6a1db8f7dbc0e39565d321153a506c86"
+    },
+    "MedusaGRPO/docs/final_real_qwen25_3b_smoke.json": {
+      "before_sha256": null,
+      "after_sha256": "8830b7e088904544f8fb1f61d247131947396263ef050c315c51fc90c63deaa3"
+    },
+    "MedusaGRPO/docs/FINAL_VALIDATION.json": {
+      "before_sha256": null,
+      "after_sha256": "b2c39c9bac3e4184c5e9d129bfa3a2ae42de46dfa9c88658799bb3eadebf15da"
+    },
+    "MedusaGRPO/docs/FINAL_CORRECTNESS.md": {
+      "before_sha256": null,
+      "after_sha256": "a11f0be069f20ba912e9f9cb80422e077784a647c1bbf88e33253e9ee626423c"
+    },
+    "SpecNaacl/grpo_speculative.py": {
+      "before_sha256": "4ea9b441c81250587565d1c97904cb4c7290a09103c5aa1e9256ba1724e51e2f",
+      "after_sha256": "05accfb2989dd55e0e889517ad10d2225bfb869f569354d929bdf545b016adfa"
+    },
+    "SpecNaacl/tests/test_training_end_to_end.py": {
+      "before_sha256": "bd712b733c7c90cf2c12b5b5c7266028c346e04bd49f1d4b2fe27bf1acf983f2",
+      "after_sha256": "54b19d96b35ec08fb8764493e8e2a05640d7a98303948bb52e69bab4163c8c45"
+    },
+    "SpecNaacl/tests/test_step_metrics.py": {
+      "before_sha256": "d8be59c4beb738b7604efa753e8fc9d67a971e075f79ed8023afcaa177feff0e",
+      "after_sha256": "d93165060f5bf41906fdb24113bd37f1077203a7a208db51b63cbd917eed4642"
+    },
+    "SpecNaacl/scripts/launch/train_model.sh": {
+      "before_sha256": "2adbe2b3aa1e9193a5907b02c19e970930cca9fd3ee547b9f0c2e0da84bed84c",
+      "after_sha256": "b1f0939c361a710715233e2ad7c8b79b3b2e3402aa9e636f72a54f6b0231fd57"
+    },
+    "SpecNaacl/helper/response_alignment.py": {
+      "before_sha256": null,
+      "after_sha256": "350338c045bf2319757c4747857e25290a66e71d08304342c09dd6d8d0fe36ff"
+    },
+    "SpecNaacl/helper/shared_adapter.py": {
+      "before_sha256": null,
+      "after_sha256": "7a4617198fa7d2d60333611005b8f52501b8d76609f16defc38fc0c98f30f4f8"
+    },
+    "puregrpo/grpo.py": {
+      "before_sha256": "627c2931631ff737b3be88833bc35fed3961e60b6b45c338329f2bd0fa5551af",
+      "after_sha256": "01785067fa34e88257b45fd644ea9863b14c500757cc4db6b38d057b25ee458d"
+    },
+    "puregrpo/training.py": {
+      "before_sha256": "85013e720f33c8c9ab3eaa57b914186870341731b79a937216b7d30ccf78cac3",
+      "after_sha256": "b0455db09401a1c8d43e637550cd875ce2cdb84f15ba2c26ec5827849825eb98"
+    },
+    "puregrpo/tests/test_grpo_parity.py": {
+      "before_sha256": "704ad4efb0da0c5abd24ac89fdc57a6b612033698ab78e728b8c97dedd73c6f2",
+      "after_sha256": "0d271917460485d38b6b85d29016a5b90a5c59af4ba4574216b68bb40927a7bf"
+    },
+    "puregrpo/tests/test_pipeline.py": {
+      "before_sha256": "92506b84471de9fbd6ce91346e5db649b18408cde89be6ae6642526d30abe224",
+      "after_sha256": "341d468706a19533c746921fe907181e34d2606d630ae7a6fc2b9f86e9343e55"
+    },
+    "puregrpo/tests/test_launch_and_sources.py": {
+      "before_sha256": "4e9c0b59fd942146d1056b5a39435833a5aa60e3ab79b4f1535ffd265c13c161",
+      "after_sha256": "302d903eb32466273654c077e3885ab85570f113c1c2fd6b088f7ef7324d3a05"
+    },
+    "puregrpo/scripts/check_fair_config.py": {
+      "before_sha256": "b1c75a8545654d722807d47450811cffeb60e49f1d339fa31e59495f05b9f0d9",
+      "after_sha256": "ed13aa64429c15424edc4af17211c3d12c6851df202f4e0fbe0162d64e4b8725"
+    },
+    "puregrpo/scripts/benchmark_pair.sh": {
+      "before_sha256": "4809b257ef0f5340996f08bb3364610833024691be8f11dd0ce2fdf84031be12",
+      "after_sha256": "740f6eac23c8052c2e73979c0ec175bc0501c405383456a6f3f974c70e838dc0"
+    },
+    "puregrpo/scripts/launch/train_model.sh": {
+      "before_sha256": "4b98f34712bf370f960ab0794c358f2cdfca1da62dc8cc189b941d7f2ef00131",
+      "after_sha256": "e959a3318b4ca9cbfed62c5fb4fff096033401970db80f278995b29c348114a1"
+    },
+    "puregrpo/helper/response_alignment.py": {
+      "before_sha256": null,
+      "after_sha256": "350338c045bf2319757c4747857e25290a66e71d08304342c09dd6d8d0fe36ff"
+    },
+    "puregrpo/helper/target_checkpoint.py": {
+      "before_sha256": "e4e443d2d79d29d06a9ec36055dd81b8f32a3c16e9b27901f11ace437c19c7c3",
+      "after_sha256": "99e19505780ea2a49de0df1b8bc65e749209aed8591401fa4e4119908fbb82cd"
+    },
+    "puregrpo/helper/target.py": {
+      "before_sha256": "833ca0c56f891c4e39afa48f2add79c9051449f8dfba09daa1ba8ec6b956b136",
+      "after_sha256": "4d05f979d552c9ec2367e56378c24cc9ba60d4107e33be8840f7d6f066872baa"
+    },
+    "puregrpo/helper/train_ops.py": {
+      "before_sha256": "5b080a6d355fb5571381776a94af95ea17068bcd5038d3cea80c2cffc19ec125",
+      "after_sha256": "56d5b7dae952bc64cdf37705b28281569bbfae23aab6fcd6ba780ba6fd43750a"
+    },
+    "puregrpo/helper/shared_adapter.py": {
+      "before_sha256": "0ea7f16fe62c7b18aa7080032c5da3d24e1828ea05247abfc2faaf6d03dd1d9e",
+      "after_sha256": "7a4617198fa7d2d60333611005b8f52501b8d76609f16defc38fc0c98f30f4f8"
+    }
+  }
+}

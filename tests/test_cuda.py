@@ -58,7 +58,7 @@ def test_gpu_decoder_opd_async_and_zero_identity(tiny_model):
 def test_gpu_prefill_probability_precision_and_group_rng(tiny_model):
     from helper.opd_sampling import sample_target_with_metadata
     m=tiny_model.to('cuda');m.target_model.bfloat16();m.draft_model.heads.bfloat16()
-    x=torch.tensor([[1,2,3],[0,1,4]],device='cuda');mask=torch.tensor([[1,1,1],[0,1,1]],device='cuda')
+    x=torch.tensor([[1,2,3],[2,1,4]],device='cuda');mask=torch.tensor([[1,1,1],[1,1,1]],device='cuda')
     with torch.inference_mode(),torch.autocast('cuda',dtype=torch.bfloat16):
         hidden=m.target_model.model(input_ids=x,attention_mask=mask,
             position_ids=(mask.cumsum(-1)-1).clamp_min(0)).last_hidden_state

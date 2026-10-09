@@ -38,6 +38,7 @@ def main():
         if not torch.cuda.is_available():p.error('CUDA runtime required; this tool does not fabricate GPU timings')
     output=(a.output or ROOT/'outputs/benchmarks'/f'{a.model}_{time.strftime("%Y%m%dT%H%M%S",time.gmtime())}').resolve()
     records=[]
+    initialization_proofs={}
     for config in a.budgets.split(','):
         global_budget,max_nodes=map(int,config.split(':'))
         for trial in range(a.trials):
@@ -45,13 +46,21 @@ def main():
                 name=f'nodes{global_budget}_max{max_nodes}_trial{trial}_method-{method}'
                 run=output/name
                 env=dict(os.environ,RUN_DIR=str(run),RUN_NAME=name,RESUME='',DRY_RUN='true' if a.dry_run else 'false',
-                    PYTHON_BIN=sys.executable,CPEAK_NODES=str(global_budget),MAX_TREE_NODES_PER_SEQ=str(max_nodes),
+                    GRPO_BENCHMARK='1',PYTHON_BIN=sys.executable,CPEAK_NODES=str(global_budget),MAX_TREE_NODES_PER_SEQ=str(max_nodes),
                     FIXED_TREE_TOPK_BY_DEPTH=a.topk,MAX_TARGET_OPTIMIZER_STEPS=str(a.steps),MAX_ROLLOUT_PROMPTS=str(a.max_prompts),
                     OPD_SELECTION='visited_capped_frontier',OPD_MAX_FRONTIER_PER_HEAD='2',OPD_PROFILE='1' if a.profile else '0')
                 suffix='medusa' if method=='medusa' else 'reflex'
                 subprocess.run(['bash',str(ROOT/f'train_{a.model}_{suffix}.sh')],env=env,cwd=ROOT,check=True)
                 if a.dry_run:continue
                 summary=json.loads((run/'summary.json').read_text())
+                proof=summary['initialization']
+                if proof['target_lora']['status']!='PASS' or proof.get('draft',{}).get('status')!='PASS':
+                    raise RuntimeError('Benchmark requires loaded target/draft tensor proofs')
+                identity=(proof['target_lora']['loaded_tensor_sha256'],proof['draft']['loaded_tensor_sha256'])
+                pair=(global_budget,max_nodes,trial)
+                if pair in initialization_proofs and initialization_proofs[pair]!=identity:
+                    raise RuntimeError('Paired benchmark initialization tensors differ')
+                initialization_proofs[pair]=identity
                 if not a.max_prompts and summary['target_optimizer_steps']!=a.steps:
                     raise RuntimeError('trial did not reach target optimizer budget; increase NUM_EPOCHS or inspect reward filtering')
                 rows=list(csv.DictReader((run/'logs/rollout_timing.csv').open()))

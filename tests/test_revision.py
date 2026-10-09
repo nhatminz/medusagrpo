@@ -56,7 +56,7 @@ def test_online_loss_gradients_match_original_variable_responses(tiny_model,monk
 
 
 def test_first_token_grouping_rng_matches_specnaacl(tiny_model):
-    x=torch.tensor([[1,2,3],[0,1,4]]);mask=torch.tensor([[1,1,1],[0,1,1]])
+    x=torch.tensor([[1,2,3],[2,1,4]]);mask=torch.tensor([[1,1,1],[1,1,1]])
     with torch.no_grad():
         hidden=tiny_model.target_model.model(input_ids=x,attention_mask=mask,
             position_ids=(mask.cumsum(-1)-1).clamp_min(0)).last_hidden_state
@@ -240,11 +240,11 @@ def test_fairness_audit_effective_configs_all_seven_models():
     report=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo')
     assert [row['model'] for row in report['models']]==list(MODELS)
     assert all(not row['configuration_mismatches'] for row in report['models'])
-    assert all(row['methods'][method]['status']=='inspected' for row in report['models']
+    assert all(row['methods'][method]['inspection_status']=='inspected' for row in report['models']
                for method in ('medusa','medusa_reflex','fastgrpo','fastgrpo_reflex','puregrpo'))
     assert report['first_token_convention']==dict(medusa='shared_per_prompt',medusa_reflex='shared_per_prompt',
         fastgrpo='shared_per_prompt',fastgrpo_reflex='shared_per_prompt',puregrpo='independent_per_response')
-    assert report['initial_target_lora']['status']=='not verified'
+    assert report['initial_target_lora']['status']=='NOT VERIFIED'
     recipes=[s['lora_recipe'] for s in report['source_checks'].values()]
     assert all(recipe==recipes[0] for recipe in recipes)
     optimizers=[s['target_optimizer'] for s in report['source_checks'].values()]
@@ -254,30 +254,8 @@ def test_fairness_audit_effective_configs_all_seven_models():
 def test_missing_baseline_source_is_not_reported_as_pass(tmp_path):
     from scripts.check_fairness import audit
     report=audit(ROOT.parent/'SpecNaacl',tmp_path/'missing',models=('qwen25_1p5b',))
-    assert report['models'][0]['methods']['puregrpo']['status']=='not verified'
+    assert report['models'][0]['methods']['puregrpo']['status']=='NOT VERIFIED'
     assert report['source_checks']['puregrpo']['status']=='not verified'
-
-
-def test_inherited_sequence_sort_advantage_misalignment_is_reproduced():
-    # An unequal-length trajectory exposes the inherited association defect.
-    # Keep this mathematical behavior shared with the unmodified baselines.
-    for root,file in [(ROOT,'grpo_speculative.py'),(ROOT.parent/'SpecNaacl','grpo_speculative.py'),
-                      (ROOT.parent/'puregrpo','helper/train_ops.py')]:
-        tree=ast.parse((root/file).read_text())
-        assigns=[]
-        for node in ast.walk(tree):
-            if not isinstance(node,ast.Assign):continue
-            names={n.id for target in node.targets for n in ast.walk(target) if isinstance(n,ast.Name)}
-            if 'sorted_pairs' in names or {'input_ids_sorted','attention_mask_sorted','loss_mask_sorted'}<=names:
-                assigns.append(node)
-            elif {'input_ids','attention_mask','loss_mask'}<=names and isinstance(node.value,ast.Tuple):
-                if 'input_ids_sorted' in ast.unparse(node.value):assigns.append(node)
-        assigns.sort(key=lambda n:n.lineno)
-        scope=dict(input_ids=[[11,12,13,14],[21,22]],attention_mask=[[1]*4,[1]*2],
-                   loss_mask=[[0,1,1,1],[0,1]],advantages=[-1.,1.])
-        exec(compile(ast.Module(body=assigns,type_ignores=[]),'inherited_sort_reproducer','exec'),scope)
-        assert scope['input_ids']==[[21,22],[11,12,13,14]]
-        assert scope['advantages']==[-1.,1.] # unchanged, hence attached to the wrong response
 
 
 @pytest.mark.parametrize('field,value,message',[
@@ -295,7 +273,7 @@ def test_resume_rejects_incompatible_runtime_or_ablation(tmp_path,field,value,me
     scope=dict(torch=torch,dist=dist)
     exec(compile(ast.Module(body=[loader],type_ignores=[]),'checkpoint_loader','exec'),scope)
     checkpoint=dict(format='medusa_grpo_checkpoint_v1',runtime_semantics_version=RUNTIME_SEMANTICS_VERSION,
-                    method='medusa',opd_enabled=False,world_size=1)
+                    method='medusa',opd_enabled=False,world_size=1,grpo_alignment_version='response_rows_v2')
     checkpoint[field]=value
     path=tmp_path/'resume.pt';torch.save(checkpoint,path)
     model=SimpleNamespace(_training_method='medusa',_opd_enabled=False)

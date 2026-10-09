@@ -12,8 +12,10 @@ tree/verifier/cache được đối chiếu `decoding/{medusa_tree,flash_medusa_
 mọi file sau revision. `source_snapshot.json` ghi
 407 code/config files của hai sources trước triển khai. Revision tiếp theo dùng
 `revision_source_snapshot.json` cho 450 code/config files của SpecNaacl,
-FlashGRPO, puregrpo và FastGRPO-main; không file nào trong snapshot bị đổi.
-Runtime không đọc các thư mục này. Chi tiết sửa tiếp theo ở `REVISION_AUDIT.md`.
+FlashGRPO, puregrpo và FastGRPO-main là snapshot lịch sử. Lần sửa cuối được
+user cho phép sửa training trong cả ba repositories; inventory trước/sau ở
+`final_correctness_changes.json`. Runtime không import các repositories khác.
+Báo cáo hiện tại ở `FINAL_CORRECTNESS.md`; `REVISION_AUDIT.md` là lịch sử.
 
 | Thành phần target | Đối chiếu SpecNaacl |
 | --- | --- |
@@ -39,11 +41,13 @@ Source có hai chi tiết cần giữ rõ khi so sánh:
   `MAX_TARGET_OPTIMIZER_STEPS`/mỗi dòng `timing.csv`. `source_grpo_step` vẫn giữ
   nghĩa cũ. Không dùng nhãn `step` cũ để suy ra số updates khi so năm phương pháp.
 - Source sắp tokenized rows theo length nhưng không hoán vị advantages tương ứng.
-  Reproducer đã xác nhận ở SpecNaacl, PureGRPO và Medusa. Lỗi association này
-  được giữ để tránh thay đổi riêng mathematical behavior của một baseline.
+  Lỗi đã được sửa đồng nhất ở SpecNaacl, puregrpo và Medusa: tokens/masks,
+  identity, rewards và standardized advantages dùng cùng permutation. Loss và
+  gradient được so với tham chiếu không sort. Các GRPO run cũ cần retrain.
 - SpecNaacl và hai Medusa methods sample một first token/prompt trước khi repeat
-  responses. PureGRPO sample độc lập. Medusa dùng strict padded-prompt length
-  cap; source FastGRPO/PureGRPO dùng real lengths và source FastGRPO có thể
+  responses. PureGRPO sample độc lập. Medusa dùng cap riêng từng response theo
+  actual valid prompt length; source FastGRPO/PureGRPO dừng cả batch theo real
+  lengths và source FastGRPO có thể
   vượt max_length theo cả verification round. Không gọi cả năm methods fully fair.
 
 ## Vì sao heads 2/3 bị starvation

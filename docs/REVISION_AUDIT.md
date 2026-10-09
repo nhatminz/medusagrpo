@@ -1,3 +1,5 @@
+> Historical audit from the previous revision. The current correction, baseline training edits, and known fairness failures are documented in [FINAL_CORRECTNESS.md](FINAL_CORRECTNESS.md).
+
 # Correctness, performance và fairness revision
 
 Chỉ sửa MedusaGRPO. Snapshot `revision_source_snapshot.json` bảo vệ 450 source/config

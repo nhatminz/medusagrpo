@@ -154,19 +154,24 @@ python scripts/check_fairness.py --output docs/fairness_report.json
 python scripts/check_fairness.py --use-environment --output outputs/fairness.json
 ```
 
-Fairness checker exit 0 nghĩa audit đã chạy, không có nghĩa fully fair.
-`--strict` trả exit 1 vì vẫn còn các khác biệt đã xác nhận: PureGRPO sample
-first token độc lập, length cap của các sources khác nhau, và lỗi kế thừa sort
-sequence nhưng không sort advantages. Default initial target LoRA vẫn là
-`not verified` đến khi dùng checkpoint chung cụ thể.
+Fairness checker exit 0 nghĩa audit đã chạy. `--strict` hiện trả exit 1 vì
+length stopping của các baseline và sampling precision còn khác nhau.
+Lỗi sort response/advantage đã được sửa đồng nhất trong cả ba trainer; các
+GRPO run cũ cần retrain từ initial LoRA chung. `GRPO_BENCHMARK=1` bắt buộc
+checkpoint chung và xác minh tensor thực sau khi load. Xem báo cáo mới
+[`docs/FINAL_CORRECTNESS.md`](docs/FINAL_CORRECTNESS.md) và
+[`docs/FINAL_VALIDATION.json`](docs/FINAL_VALIDATION.json).
 
 Kiểm tra thực tế dùng CPU Python 3.12/torch2.8 và RTX3090/torch2.8+cu126.
 Suite gồm tiny native-architecture smoke của 7 configs, GRPO/head gradient
 parity, CUDA KV recomputation, B0/disabled RNG, async, pretrain5epochs và resume.
-Kết quả cuối ở [`docs/VALIDATION.json`](docs/VALIDATION.json).
+Kết quả mới: **537 tests passed, không failed/skipped trên môi trường CUDA**, ở
+[`docs/FINAL_VALIDATION.json`](docs/FINAL_VALIDATION.json).
+[`docs/VALIDATION.json`](docs/VALIDATION.json) giữ kết quả revision trước.
 [`docs/real_qwen25_1p5b_cuda_smoke.json`](docs/real_qwen25_1p5b_cuda_smoke.json)
-kiểm tra riêng weights thật Qwen2.5-1.5B với heads khởi tạo, 2 prompts × 2
-responses × 12 new tokens. Đây chưa phải full GRPO hoặc full-concurrency OOM test.
+giữ smoke Qwen2.5-1.5B trước đây. Lần sửa cuối đã kiểm tra weights thật
+Qwen2.5-3B, xem [`docs/final_real_qwen25_3b_smoke.json`](docs/final_real_qwen25_3b_smoke.json),
+với heads khởi tạo, disabled/B0 RNG và serial/async parity. Đây chưa phải full GRPO hoặc full-concurrency OOM test.
 
 Microbenchmark RTX3090 (H1536, V151936) cho online heads: **76.29 → 19.82 ms**;
 KV compaction: **0.620 → 0.509 ms**. Xem

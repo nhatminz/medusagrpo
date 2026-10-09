@@ -16,6 +16,8 @@ sys.path.insert(0, repo_import_path)
 
 import pandas as pd
 from transformers import AutoTokenizer,AutoConfig,AutoModelForCausalLM,GenerationConfig
+from helper.response_alignment import append_response_group, sort_training_rows, GRPO_ALIGNMENT_VERSION
+from helper.shared_adapter import preflight_shared_adapter, verify_loaded_adapter, initialization_report
 from helper.rewards import accuracy_reward_func , format_reward_func
 from helper.get_QAs import get_test_QAs , get_train_QAs, get_QAs_from_path, select_train_subset
 from medusa.generate import speculative_generate,RUNTIME_SEMANTICS_VERSION
@@ -209,6 +211,8 @@ def save_training_checkpoint(
     checkpoint_dir = Path(checkpoint_dir)
     state = {
         "format": "medusa_grpo_checkpoint_v1",
+        "grpo_alignment_version": "response_rows_v2",
+        "initial_target_tensor_sha256":getattr(model.target_model,"_shared_initialization",{}).get("loaded_tensor_sha256"),
         "runtime_semantics_version":RUNTIME_SEMANTICS_VERSION,
         "world_size": int(current_world_size),
         "rank_states": rank_states,
@@ -248,6 +252,8 @@ def load_training_checkpoint(path, *, model, optimizer_target, optimizer_draft):
     from medusa.generate import RUNTIME_SEMANTICS_VERSION
     if checkpoint.get('runtime_semantics_version')!=RUNTIME_SEMANTICS_VERSION:
         raise ValueError('resume sampling/feedback semantics mismatch; initialize a new run from weights instead')
+    if checkpoint.get('grpo_alignment_version') != 'response_rows_v2':
+        raise ValueError('GRPO alignment changed; old runs require retraining from initial weights')
     current_world_size = dist.get_world_size() if dist.is_initialized() else 1
     current_rank = dist.get_rank() if dist.is_initialized() else 0
     saved_world_size = int(checkpoint.get("world_size", 1))
@@ -281,6 +287,9 @@ def load_training_checkpoint(path, *, model, optimizer_target, optimizer_draft):
             'resume checkpoint predates the learned draft projector; start a new '
             'run using its draft weights as initialization, not optimizer resume'
         )
+    current_initial=getattr(model.target_model,'_shared_initialization',{}).get('loaded_tensor_sha256')
+    if checkpoint.get('initial_target_tensor_sha256') != current_initial:
+        raise ValueError('resume initial target tensor hash mismatch')
     model.draft_model.load_state_dict(checkpoint["draft_model"])
     if checkpoint.get("opd_projector") is not None:model.load_opd_projector(checkpoint["opd_projector"])
     for key, attribute in (
@@ -414,6 +423,7 @@ parser.add_argument('--analysis_draft_update_steps', type=int, default=1)
 parser.add_argument('--analysis_bootstrap_samples', type=int, default=2000)
 parser.add_argument('--analysis_resume', default='true')
 args = parser.parse_args()
+preflight_shared_adapter(args.load_lora_path, args.model_dir)
 method,_=resolve_method(args.method)
 runtime_device=torch.device(args.device)
 if args.draft_initialization_mode != "pretrained":
@@ -738,7 +748,9 @@ lora_config = LoraConfig(
 model.target_model = get_peft_model(model.target_model,lora_config)
 if  args.load_lora_path != "":
     model.target_model.load_adapter(args.load_lora_path,adapter_name="default")
+    verify_loaded_adapter(model.target_model,args.load_lora_path,args.model_dir)
 model.target_model.print_trainable_parameters()
+initialization_proof=initialization_report(model.target_model,args,draft=model.draft_model,method=method)
 
 def _get_base_causal_lm(causal_lm):
     """Return the underlying causal LM while preserving injected LoRA modules."""
@@ -851,6 +863,7 @@ batch_data={
     'messages':[],
     'rewards':[],
     'std_rewards':[],
+    'response_metadata':[],
     'generate_time_cost':0,
     'last_generate_time_cost':[],
     'train_time_cost':0,
@@ -1307,6 +1320,9 @@ for epoch in epoch_bar:
                 return_all_draft_input=True,statistical_time=statistical_time,
                 **opd_kwargs)
             iter_outputs=rollout_metrics.capture(outputs)
+            import hashlib
+            batch_data['prompt_order_sha256']=hashlib.sha256((batch_data.get('prompt_order_sha256','')+
+                json.dumps(batch['messages'],sort_keys=True,ensure_ascii=True)).encode()).hexdigest()
             batch_data['rollout_prompts_seen']=batch_data.get('rollout_prompts_seen',0)+len(batch['answers'])
             batch_data['medusa_last_metrics']={k:v for k,v in outputs.items() if k.startswith(('head','opd_head')) or k in ('tree_nodes_per_response','tree_depth_reached','verification_nodes','target_forward_calls','head_limit_reasons','opd_feedback_time','opd_proposal_time','opd_update_count')}
             totals=batch_data.setdefault('medusa_totals',{})
@@ -1450,9 +1466,8 @@ for epoch in epoch_bar:
                     continue
 
                 std_rewards=(rewards-rewards.mean())/rewards.std()
-                batch_data['messages']+=new_messages
-                batch_data['rewards']+=rewards.tolist()
-                batch_data['std_rewards']+=std_rewards.tolist()
+                append_response_group(batch_data, new_messages, rewards.tolist(),
+                                      std_rewards.tolist(), (rank, epoch, i, idx_batch))
                 used_items+=1
 
             generate_length /= len(answers)
@@ -1554,15 +1569,8 @@ for epoch in epoch_bar:
             input_ids=text.input_ids
             attention_mask=text.attention_mask
 
-            sorted_pairs = sorted(
-                zip(input_ids, attention_mask, loss_mask),
-                key=lambda x: len(x[0]),
-                reverse=False
-            )
-
-            input_ids_sorted, attention_mask_sorted, loss_mask_sorted = zip(*sorted_pairs)
-
-            input_ids, attention_mask, loss_mask = list(input_ids_sorted), list(attention_mask_sorted), list(loss_mask_sorted)
+            input_ids, attention_mask, loss_mask = sort_training_rows(
+                input_ids, attention_mask, loss_mask, batch_data)
 
             synchronized_used_items = int(used_items)
             if dist.is_initialized():
@@ -2041,9 +2049,12 @@ for epoch in epoch_bar:
 
                 torch.cuda.empty_cache()
 
+            batch_data.setdefault('optimizer_step_cadence',[]).append(
+                (batch_data.get('rollout_prompts_seen',0),batch_data.get('target_optimizer_steps',0)))
             batch_data['messages'].clear()
             batch_data['rewards'].clear()
             batch_data['std_rewards'].clear()
+            batch_data['response_metadata'].clear()
             batch_old_logps.clear()
             batch_ref_logps.clear()
 
@@ -2265,6 +2276,11 @@ summary.update(target_adapter=args.load_lora_path,initial_medusa_checkpoint=adap
     cpeak_nodes=int(os.environ.get('CPEAK_NODES',str(verification_capacity))),
     max_tree_nodes_per_seq=int(os.environ.get('MAX_TREE_NODES_PER_SEQ','12')),
     fixed_tree_topk_by_depth=os.environ.get('FIXED_TREE_TOPK_BY_DEPTH','4,3,2'))
+summary.update(initialization=initialization_proof,grpo_alignment_version=GRPO_ALIGNMENT_VERSION,
+    target_optimizer_steps=batch_data.get('target_optimizer_steps',0),
+    rollout_prompts_seen=batch_data.get('rollout_prompts_seen',0),
+    prompt_order_sha256=batch_data.get('prompt_order_sha256'),
+    optimizer_step_cadence=batch_data.get('optimizer_step_cadence',[]))
 summary_text = json.dumps(summary, indent=2, ensure_ascii=True)
 if is_main_process:
     with open(summary_file, "w", encoding="utf-8") as f:

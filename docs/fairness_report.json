@@ -1,11 +1,11 @@
 {
-  "status": "audit_complete_with_limits",
+  "status": "FAIL",
   "models": [
     {
       "model": "qwen25_1p5b",
       "methods": {
         "medusa": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-1.5B-Instruct",
             "model_type": "qwen2",
@@ -33,7 +33,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -48,10 +50,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "medusa_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-1.5B-Instruct",
             "model_type": "qwen2",
@@ -79,7 +82,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -94,10 +99,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "fastgrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-1.5B-Instruct",
             "model_type": "qwen2",
@@ -125,7 +131,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -136,10 +144,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "fastgrpo_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-1.5B-Instruct",
             "model_type": "qwen2",
@@ -167,7 +176,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -178,10 +189,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "puregrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-1.5B-Instruct",
             "model_type": "qwen2",
@@ -209,7 +221,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -220,16 +234,96 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         }
       },
-      "configuration_mismatches": []
+      "configuration_mismatches": [],
+      "checks": {
+        "launcher_configuration": {
+          "status": "PASS",
+          "reason": "Effective dry-run commands; runtime overrides checked separately"
+        },
+        "generation_length": {
+          "status": "FAIL",
+          "reason": "Medusa per-response actual length cap differs from unchanged baseline batch stopping/overshoot"
+        },
+        "loaded_initial_target_lora": {
+          "status": "NOT VERIFIED",
+          "reason": "Compare every loaded target LoRA tensor, including dtype and shape, across five startup proofs"
+        },
+        "loaded_draft_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_draft_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_target_backbone": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "tokenizer_artifacts": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "dataset_artifact": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "effective_runtime_configuration": {
+          "status": "NOT VERIFIED",
+          "reason": "Runtime common-argument differences: []"
+        },
+        "deployed_environment": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual packages, GPU, dtype and resolved attention implementation"
+        },
+        "actual_optimizer_updates": {
+          "status": "NOT VERIFIED",
+          "reason": "Completed optimizer.step counts: [None, None, None, None, None]"
+        },
+        "executed_prompt_order": {
+          "status": "NOT VERIFIED",
+          "reason": "Executed prompt-batch hash chains; compare same rank/world size"
+        },
+        "actual_optimizer_cadence": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual (prompts seen, optimizer updates) at training boundaries"
+        },
+        "distributed_rank_coverage": {
+          "status": "NOT VERIFIED",
+          "reason": "Per-rank startup proofs and complete multi-rank prompt/cadence traces have not been supplied"
+        },
+        "checkpoint_resume": {
+          "status": "NOT VERIFIED",
+          "reason": "Local tiny-model resume tests do not prove full-model B200 continuation"
+        },
+        "sampling_precision": {
+          "status": "FAIL",
+          "reason": "PureGRPO FP32 sampling and source speculative BF16 prefill probabilities differ; source conventions preserved"
+        },
+        "paired_recipe_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "paired_recipe_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "reward_advantage_alignment": {
+          "status": "NOT VERIFIED",
+          "reason": "All three trainers carry identity/reward/advantage through a common stable permutation; cross-repository loss/gradient tests required"
+        }
+      },
+      "status": "FAIL"
     },
     {
       "model": "qwen25_3b",
       "methods": {
         "medusa": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-3B-Instruct",
             "model_type": "qwen2",
@@ -257,7 +351,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -272,10 +368,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "medusa_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-3B-Instruct",
             "model_type": "qwen2",
@@ -303,7 +400,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -318,10 +417,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "fastgrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-3B-Instruct",
             "model_type": "qwen2",
@@ -349,7 +449,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -360,10 +462,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "fastgrpo_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-3B-Instruct",
             "model_type": "qwen2",
@@ -391,7 +494,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -402,10 +507,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "puregrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-3B-Instruct",
             "model_type": "qwen2",
@@ -433,7 +539,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -444,16 +552,96 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         }
       },
-      "configuration_mismatches": []
+      "configuration_mismatches": [],
+      "checks": {
+        "launcher_configuration": {
+          "status": "PASS",
+          "reason": "Effective dry-run commands; runtime overrides checked separately"
+        },
+        "generation_length": {
+          "status": "FAIL",
+          "reason": "Medusa per-response actual length cap differs from unchanged baseline batch stopping/overshoot"
+        },
+        "loaded_initial_target_lora": {
+          "status": "NOT VERIFIED",
+          "reason": "Compare every loaded target LoRA tensor, including dtype and shape, across five startup proofs"
+        },
+        "loaded_draft_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_draft_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_target_backbone": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "tokenizer_artifacts": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "dataset_artifact": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "effective_runtime_configuration": {
+          "status": "NOT VERIFIED",
+          "reason": "Runtime common-argument differences: []"
+        },
+        "deployed_environment": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual packages, GPU, dtype and resolved attention implementation"
+        },
+        "actual_optimizer_updates": {
+          "status": "NOT VERIFIED",
+          "reason": "Completed optimizer.step counts: [None, None, None, None, None]"
+        },
+        "executed_prompt_order": {
+          "status": "NOT VERIFIED",
+          "reason": "Executed prompt-batch hash chains; compare same rank/world size"
+        },
+        "actual_optimizer_cadence": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual (prompts seen, optimizer updates) at training boundaries"
+        },
+        "distributed_rank_coverage": {
+          "status": "NOT VERIFIED",
+          "reason": "Per-rank startup proofs and complete multi-rank prompt/cadence traces have not been supplied"
+        },
+        "checkpoint_resume": {
+          "status": "NOT VERIFIED",
+          "reason": "Local tiny-model resume tests do not prove full-model B200 continuation"
+        },
+        "sampling_precision": {
+          "status": "FAIL",
+          "reason": "PureGRPO FP32 sampling and source speculative BF16 prefill probabilities differ; source conventions preserved"
+        },
+        "paired_recipe_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "paired_recipe_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "reward_advantage_alignment": {
+          "status": "NOT VERIFIED",
+          "reason": "All three trainers carry identity/reward/advantage through a common stable permutation; cross-repository loss/gradient tests required"
+        }
+      },
+      "status": "FAIL"
     },
     {
       "model": "qwen25_7b",
       "methods": {
         "medusa": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-7B-Instruct",
             "model_type": "qwen2",
@@ -481,7 +669,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -496,10 +686,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "medusa_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-7B-Instruct",
             "model_type": "qwen2",
@@ -527,7 +718,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -542,10 +735,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "fastgrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-7B-Instruct",
             "model_type": "qwen2",
@@ -573,7 +767,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -584,10 +780,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "fastgrpo_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-7B-Instruct",
             "model_type": "qwen2",
@@ -615,7 +812,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -626,10 +825,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "puregrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-7B-Instruct",
             "model_type": "qwen2",
@@ -657,7 +857,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -668,16 +870,96 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         }
       },
-      "configuration_mismatches": []
+      "configuration_mismatches": [],
+      "checks": {
+        "launcher_configuration": {
+          "status": "PASS",
+          "reason": "Effective dry-run commands; runtime overrides checked separately"
+        },
+        "generation_length": {
+          "status": "FAIL",
+          "reason": "Medusa per-response actual length cap differs from unchanged baseline batch stopping/overshoot"
+        },
+        "loaded_initial_target_lora": {
+          "status": "NOT VERIFIED",
+          "reason": "Compare every loaded target LoRA tensor, including dtype and shape, across five startup proofs"
+        },
+        "loaded_draft_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_draft_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_target_backbone": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "tokenizer_artifacts": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "dataset_artifact": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "effective_runtime_configuration": {
+          "status": "NOT VERIFIED",
+          "reason": "Runtime common-argument differences: []"
+        },
+        "deployed_environment": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual packages, GPU, dtype and resolved attention implementation"
+        },
+        "actual_optimizer_updates": {
+          "status": "NOT VERIFIED",
+          "reason": "Completed optimizer.step counts: [None, None, None, None, None]"
+        },
+        "executed_prompt_order": {
+          "status": "NOT VERIFIED",
+          "reason": "Executed prompt-batch hash chains; compare same rank/world size"
+        },
+        "actual_optimizer_cadence": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual (prompts seen, optimizer updates) at training boundaries"
+        },
+        "distributed_rank_coverage": {
+          "status": "NOT VERIFIED",
+          "reason": "Per-rank startup proofs and complete multi-rank prompt/cadence traces have not been supplied"
+        },
+        "checkpoint_resume": {
+          "status": "NOT VERIFIED",
+          "reason": "Local tiny-model resume tests do not prove full-model B200 continuation"
+        },
+        "sampling_precision": {
+          "status": "FAIL",
+          "reason": "PureGRPO FP32 sampling and source speculative BF16 prefill probabilities differ; source conventions preserved"
+        },
+        "paired_recipe_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "paired_recipe_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "reward_advantage_alignment": {
+          "status": "NOT VERIFIED",
+          "reason": "All three trainers carry identity/reward/advantage through a common stable permutation; cross-repository loss/gradient tests required"
+        }
+      },
+      "status": "FAIL"
     },
     {
       "model": "qwen25_14b",
       "methods": {
         "medusa": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-14B-Instruct",
             "model_type": "qwen2",
@@ -705,7 +987,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -720,10 +1004,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "medusa_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-14B-Instruct",
             "model_type": "qwen2",
@@ -751,7 +1036,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -766,10 +1053,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "fastgrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-14B-Instruct",
             "model_type": "qwen2",
@@ -797,7 +1085,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -808,10 +1098,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "fastgrpo_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-14B-Instruct",
             "model_type": "qwen2",
@@ -839,7 +1130,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -850,10 +1143,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "puregrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen2.5-14B-Instruct",
             "model_type": "qwen2",
@@ -881,7 +1175,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -892,16 +1188,96 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         }
       },
-      "configuration_mismatches": []
+      "configuration_mismatches": [],
+      "checks": {
+        "launcher_configuration": {
+          "status": "PASS",
+          "reason": "Effective dry-run commands; runtime overrides checked separately"
+        },
+        "generation_length": {
+          "status": "FAIL",
+          "reason": "Medusa per-response actual length cap differs from unchanged baseline batch stopping/overshoot"
+        },
+        "loaded_initial_target_lora": {
+          "status": "NOT VERIFIED",
+          "reason": "Compare every loaded target LoRA tensor, including dtype and shape, across five startup proofs"
+        },
+        "loaded_draft_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_draft_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_target_backbone": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "tokenizer_artifacts": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "dataset_artifact": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "effective_runtime_configuration": {
+          "status": "NOT VERIFIED",
+          "reason": "Runtime common-argument differences: []"
+        },
+        "deployed_environment": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual packages, GPU, dtype and resolved attention implementation"
+        },
+        "actual_optimizer_updates": {
+          "status": "NOT VERIFIED",
+          "reason": "Completed optimizer.step counts: [None, None, None, None, None]"
+        },
+        "executed_prompt_order": {
+          "status": "NOT VERIFIED",
+          "reason": "Executed prompt-batch hash chains; compare same rank/world size"
+        },
+        "actual_optimizer_cadence": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual (prompts seen, optimizer updates) at training boundaries"
+        },
+        "distributed_rank_coverage": {
+          "status": "NOT VERIFIED",
+          "reason": "Per-rank startup proofs and complete multi-rank prompt/cadence traces have not been supplied"
+        },
+        "checkpoint_resume": {
+          "status": "NOT VERIFIED",
+          "reason": "Local tiny-model resume tests do not prove full-model B200 continuation"
+        },
+        "sampling_precision": {
+          "status": "FAIL",
+          "reason": "PureGRPO FP32 sampling and source speculative BF16 prefill probabilities differ; source conventions preserved"
+        },
+        "paired_recipe_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "paired_recipe_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "reward_advantage_alignment": {
+          "status": "NOT VERIFIED",
+          "reason": "All three trainers carry identity/reward/advantage through a common stable permutation; cross-repository loss/gradient tests required"
+        }
+      },
+      "status": "FAIL"
     },
     {
       "model": "qwen3_1p7b",
       "methods": {
         "medusa": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen3-1.7B",
             "model_type": "qwen3",
@@ -929,7 +1305,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -944,10 +1322,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "medusa_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen3-1.7B",
             "model_type": "qwen3",
@@ -975,7 +1354,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -990,10 +1371,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "fastgrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen3-1.7B",
             "model_type": "qwen3",
@@ -1021,7 +1403,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1032,10 +1416,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "fastgrpo_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen3-1.7B",
             "model_type": "qwen3",
@@ -1063,7 +1448,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1074,10 +1461,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "puregrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen3-1.7B",
             "model_type": "qwen3",
@@ -1105,7 +1493,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1116,16 +1506,96 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         }
       },
-      "configuration_mismatches": []
+      "configuration_mismatches": [],
+      "checks": {
+        "launcher_configuration": {
+          "status": "PASS",
+          "reason": "Effective dry-run commands; runtime overrides checked separately"
+        },
+        "generation_length": {
+          "status": "FAIL",
+          "reason": "Medusa per-response actual length cap differs from unchanged baseline batch stopping/overshoot"
+        },
+        "loaded_initial_target_lora": {
+          "status": "NOT VERIFIED",
+          "reason": "Compare every loaded target LoRA tensor, including dtype and shape, across five startup proofs"
+        },
+        "loaded_draft_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_draft_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_target_backbone": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "tokenizer_artifacts": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "dataset_artifact": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "effective_runtime_configuration": {
+          "status": "NOT VERIFIED",
+          "reason": "Runtime common-argument differences: []"
+        },
+        "deployed_environment": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual packages, GPU, dtype and resolved attention implementation"
+        },
+        "actual_optimizer_updates": {
+          "status": "NOT VERIFIED",
+          "reason": "Completed optimizer.step counts: [None, None, None, None, None]"
+        },
+        "executed_prompt_order": {
+          "status": "NOT VERIFIED",
+          "reason": "Executed prompt-batch hash chains; compare same rank/world size"
+        },
+        "actual_optimizer_cadence": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual (prompts seen, optimizer updates) at training boundaries"
+        },
+        "distributed_rank_coverage": {
+          "status": "NOT VERIFIED",
+          "reason": "Per-rank startup proofs and complete multi-rank prompt/cadence traces have not been supplied"
+        },
+        "checkpoint_resume": {
+          "status": "NOT VERIFIED",
+          "reason": "Local tiny-model resume tests do not prove full-model B200 continuation"
+        },
+        "sampling_precision": {
+          "status": "FAIL",
+          "reason": "PureGRPO FP32 sampling and source speculative BF16 prefill probabilities differ; source conventions preserved"
+        },
+        "paired_recipe_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "paired_recipe_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "reward_advantage_alignment": {
+          "status": "NOT VERIFIED",
+          "reason": "All three trainers carry identity/reward/advantage through a common stable permutation; cross-repository loss/gradient tests required"
+        }
+      },
+      "status": "FAIL"
     },
     {
       "model": "qwen3_4b",
       "methods": {
         "medusa": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen3-4B",
             "model_type": "qwen3",
@@ -1153,7 +1623,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1168,10 +1640,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "medusa_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen3-4B",
             "model_type": "qwen3",
@@ -1199,7 +1672,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1214,10 +1689,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "fastgrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen3-4B",
             "model_type": "qwen3",
@@ -1245,7 +1721,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1256,10 +1734,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "fastgrpo_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen3-4B",
             "model_type": "qwen3",
@@ -1287,7 +1766,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1298,10 +1779,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "puregrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Qwen3-4B",
             "model_type": "qwen3",
@@ -1329,7 +1811,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1340,16 +1824,96 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         }
       },
-      "configuration_mismatches": []
+      "configuration_mismatches": [],
+      "checks": {
+        "launcher_configuration": {
+          "status": "PASS",
+          "reason": "Effective dry-run commands; runtime overrides checked separately"
+        },
+        "generation_length": {
+          "status": "FAIL",
+          "reason": "Medusa per-response actual length cap differs from unchanged baseline batch stopping/overshoot"
+        },
+        "loaded_initial_target_lora": {
+          "status": "NOT VERIFIED",
+          "reason": "Compare every loaded target LoRA tensor, including dtype and shape, across five startup proofs"
+        },
+        "loaded_draft_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_draft_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_target_backbone": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "tokenizer_artifacts": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "dataset_artifact": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "effective_runtime_configuration": {
+          "status": "NOT VERIFIED",
+          "reason": "Runtime common-argument differences: []"
+        },
+        "deployed_environment": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual packages, GPU, dtype and resolved attention implementation"
+        },
+        "actual_optimizer_updates": {
+          "status": "NOT VERIFIED",
+          "reason": "Completed optimizer.step counts: [None, None, None, None, None]"
+        },
+        "executed_prompt_order": {
+          "status": "NOT VERIFIED",
+          "reason": "Executed prompt-batch hash chains; compare same rank/world size"
+        },
+        "actual_optimizer_cadence": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual (prompts seen, optimizer updates) at training boundaries"
+        },
+        "distributed_rank_coverage": {
+          "status": "NOT VERIFIED",
+          "reason": "Per-rank startup proofs and complete multi-rank prompt/cadence traces have not been supplied"
+        },
+        "checkpoint_resume": {
+          "status": "NOT VERIFIED",
+          "reason": "Local tiny-model resume tests do not prove full-model B200 continuation"
+        },
+        "sampling_precision": {
+          "status": "FAIL",
+          "reason": "PureGRPO FP32 sampling and source speculative BF16 prefill probabilities differ; source conventions preserved"
+        },
+        "paired_recipe_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "paired_recipe_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "reward_advantage_alignment": {
+          "status": "NOT VERIFIED",
+          "reason": "All three trainers carry identity/reward/advantage through a common stable permutation; cross-repository loss/gradient tests required"
+        }
+      },
+      "status": "FAIL"
     },
     {
       "model": "llama31_8b",
       "methods": {
         "medusa": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Llama-3.1-8B-Instruct",
             "model_type": "llama",
@@ -1377,7 +1941,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1392,10 +1958,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "medusa_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Llama-3.1-8B-Instruct",
             "model_type": "llama",
@@ -1423,7 +1990,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1438,10 +2007,11 @@
             "CPEAK_NODES": "512",
             "MAX_TREE_NODES_PER_SEQ": "12",
             "FIXED_TREE_TOPK_BY_DEPTH": "4,3,2"
-          }
+          },
+          "inspection_status": "inspected"
         },
         "fastgrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Llama-3.1-8B-Instruct",
             "model_type": "llama",
@@ -1469,7 +2039,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1480,10 +2052,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "fastgrpo_reflex": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Llama-3.1-8B-Instruct",
             "model_type": "llama",
@@ -1511,7 +2084,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1522,10 +2097,11 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         },
         "puregrpo": {
-          "status": "inspected",
+          "status": "NOT VERIFIED",
           "effective_flags": {
             "model_dir": "/workspace/storage-shared/models/Llama-3.1-8B-Instruct",
             "model_type": "llama",
@@ -1553,7 +2129,9 @@
             "beta": "0.04",
             "epsilon": "0.1",
             "seed": "42",
-            "nproc_per_node": "1"
+            "nproc_per_node": "1",
+            "max_target_optimizer_steps": "0",
+            "max_rollout_prompts": "0"
           },
           "generation_runtime": {
             "do_sample": true,
@@ -1564,10 +2142,90 @@
             "top_k": null
           },
           "top_k": null,
-          "tree_budget": null
+          "tree_budget": null,
+          "inspection_status": "inspected"
         }
       },
-      "configuration_mismatches": []
+      "configuration_mismatches": [],
+      "checks": {
+        "launcher_configuration": {
+          "status": "PASS",
+          "reason": "Effective dry-run commands; runtime overrides checked separately"
+        },
+        "generation_length": {
+          "status": "FAIL",
+          "reason": "Medusa per-response actual length cap differs from unchanged baseline batch stopping/overshoot"
+        },
+        "loaded_initial_target_lora": {
+          "status": "NOT VERIFIED",
+          "reason": "Compare every loaded target LoRA tensor, including dtype and shape, across five startup proofs"
+        },
+        "loaded_draft_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_draft_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Loaded pretrained proposal tensors must agree within the Reflex pair"
+        },
+        "loaded_target_backbone": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "tokenizer_artifacts": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "dataset_artifact": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual startup hashes across five methods"
+        },
+        "effective_runtime_configuration": {
+          "status": "NOT VERIFIED",
+          "reason": "Runtime common-argument differences: []"
+        },
+        "deployed_environment": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual packages, GPU, dtype and resolved attention implementation"
+        },
+        "actual_optimizer_updates": {
+          "status": "NOT VERIFIED",
+          "reason": "Completed optimizer.step counts: [None, None, None, None, None]"
+        },
+        "executed_prompt_order": {
+          "status": "NOT VERIFIED",
+          "reason": "Executed prompt-batch hash chains; compare same rank/world size"
+        },
+        "actual_optimizer_cadence": {
+          "status": "NOT VERIFIED",
+          "reason": "Actual (prompts seen, optimizer updates) at training boundaries"
+        },
+        "distributed_rank_coverage": {
+          "status": "NOT VERIFIED",
+          "reason": "Per-rank startup proofs and complete multi-rank prompt/cadence traces have not been supplied"
+        },
+        "checkpoint_resume": {
+          "status": "NOT VERIFIED",
+          "reason": "Local tiny-model resume tests do not prove full-model B200 continuation"
+        },
+        "sampling_precision": {
+          "status": "FAIL",
+          "reason": "PureGRPO FP32 sampling and source speculative BF16 prefill probabilities differ; source conventions preserved"
+        },
+        "paired_recipe_medusa": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "paired_recipe_fastgrpo": {
+          "status": "NOT VERIFIED",
+          "reason": "Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: []"
+        },
+        "reward_advantage_alignment": {
+          "status": "NOT VERIFIED",
+          "reason": "All three trainers carry identity/reward/advantage through a common stable permutation; cross-repository loss/gradient tests required"
+        }
+      },
+      "status": "FAIL"
     }
   ],
   "source_checks": {
@@ -1720,7 +2378,7 @@
     "puregrpo": "independent_per_response"
   },
   "initial_target_lora": {
-    "status": "not verified",
+    "status": "NOT VERIFIED",
     "path": "",
     "reason": "set TARGET_ADAPTER to the same existing initial checkpoint"
   },
@@ -1816,11 +2474,9 @@
     }
   },
   "remaining_differences": [
-    "PureGRPO independently samples first tokens; four speculative methods share one first token/prompt.",
-    "Medusa uses a strict per-response padded-prompt length cap. Source FastGRPO stops a full verification batch using real lengths and can overshoot; PureGRPO uses real prompt lengths.",
-    "All inspected trainers retain the inherited sequence-length sort without permuting advantages. This association defect is deliberately not fixed only in Medusa.",
-    "Source max_grpo_steps is a legacy eligible-prompt step label; Medusa MAX_TARGET_OPTIMIZER_STEPS counts actual optimizer updates. Align actual updates/prompts from logs.",
-    "SpecNaacl and Medusa prefill sampling occur outside autocast (BF16 probabilities for BF16 targets); verification sampling occurs inside autocast. PureGRPO explicitly computes FP32 probabilities.",
-    "Pinned packages are declarations; deployed B200 environments and full real-model initial LoRA tensors are not verified by this read-only audit."
+    "Medusa caps each response using actual prompt length; unchanged SpecNaacl/PureGRPO stop a whole batch using its longest real sequence. SpecNaacl may overshoot a verification round.",
+    "PureGRPO independently samples first tokens and uses FP32 probabilities; speculative methods share first tokens per prompt and preserve source prefill/verification dtype conventions.",
+    "Old GRPO checkpoints used mismatched advantages after length sorting; retrain all methods from shared initialization.",
+    "Launcher/package declarations do not prove actual weights, deployed dependencies, prompt order or optimizer budgets. Supply completed runtime reports."
   ]
 }

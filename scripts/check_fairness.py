@@ -21,7 +21,8 @@ COMMON=('model_dir','model_type','dtype','attn_implementation','load_lora_path',
     'dataset_path','train_data_fraction','train_subset_seed','max_train_samples','batch_size',
     'num_epochs','accumulation_steps','target_lr','temperature','top_p','max_length',
     'max_prompt_length','max_training_padding_gap','max_training_token','logps_chunk_size',
-    'grpo_iteration_num','repeated_generate_nums','beta','epsilon','seed','nproc_per_node')
+    'grpo_iteration_num','repeated_generate_nums','beta','epsilon','seed','nproc_per_node',
+    'max_target_optimizer_steps','max_rollout_prompts')
 
 
 def launcher(root,key,suffix,env):
@@ -100,7 +101,7 @@ def _prefill_convention(path,sample_name):
     return 'shared_per_prompt' if min(samples)<min(repeats) else 'independent_per_response'
 
 
-def audit(spec,pure,env=None,models=MODELS):
+def audit(spec,pure,env=None,models=MODELS,runtime_reports=None):
     base={k:v for k,v in os.environ.items() if k in ('PATH','HOME','LANG','LD_LIBRARY_PATH')}
     if env is not None:base.update(env)
     base.update(DRY_RUN='true',PYTHON_BIN=sys.executable,RUN_NAME='fairness_audit',
@@ -164,15 +165,99 @@ def audit(spec,pure,env=None,models=MODELS):
     for method,(root,_,_) in entries.items():
         path=root/'requirements.txt'
         requirements[method]=dict(line.strip().split('==',1) for line in path.read_text().splitlines() if '==' in line and not line.lstrip().startswith('#')) if path.exists() else 'not verified'
-    return dict(status='audit_complete_with_limits',models=rows,source_checks=source_checks,
+    report = dict(status='NOT VERIFIED',models=rows,source_checks=source_checks,
         first_token_convention=conventions,initial_target_lora=initial_status,declared_packages=requirements,
         remaining_differences=[
-            ('PureGRPO independently samples first tokens; four speculative methods share one first token/prompt.' if conventions['puregrpo']!='not verified' else 'PureGRPO source unavailable: its sampling convention is not verified.'),
-            'Medusa uses a strict per-response padded-prompt length cap. Source FastGRPO stops a full verification batch using real lengths and can overshoot; PureGRPO uses real prompt lengths.',
-            'All inspected trainers retain the inherited sequence-length sort without permuting advantages. This association defect is deliberately not fixed only in Medusa.',
-            'Source max_grpo_steps is a legacy eligible-prompt step label; Medusa MAX_TARGET_OPTIMIZER_STEPS counts actual optimizer updates. Align actual updates/prompts from logs.',
-            'SpecNaacl and Medusa prefill sampling occur outside autocast (BF16 probabilities for BF16 targets); verification sampling occurs inside autocast. PureGRPO explicitly computes FP32 probabilities.',
-            'Pinned packages are declarations; deployed B200 environments and full real-model initial LoRA tensors are not verified by this read-only audit.'])
+            'Medusa caps each response using actual prompt length; unchanged SpecNaacl/PureGRPO stop a whole batch using its longest real sequence. SpecNaacl may overshoot a verification round.',
+            'PureGRPO independently samples first tokens and uses FP32 probabilities; speculative methods share first tokens per prompt and preserve source prefill/verification dtype conventions.',
+            'Old GRPO checkpoints used mismatched advantages after length sorting; retrain all methods from shared initialization.',
+            'Launcher/package declarations do not prove actual weights, deployed dependencies, prompt order or optimizer budgets. Supply completed runtime reports.'])
+    return verify_runtime(report, runtime_reports or {})
+
+
+def check(status,reason):
+    return dict(status=status,reason=reason)
+
+
+def verify_runtime(report, runtime_reports):
+    """Accept only startup tensor proofs + completed summaries, per model/method.
+
+    runtime_reports maps (model,method) to a production summary JSON dictionary.
+    Missing evidence remains NOT VERIFIED, even when launcher flags match.
+    """
+    for row in report['models']:
+        methods=row['methods'];checks={}
+        available=all(v['status']=='inspected' for v in methods.values())
+        checks['launcher_configuration']=check('FAIL' if row['configuration_mismatches'] else
+            ('PASS' if available else 'NOT VERIFIED'),'Effective dry-run commands; runtime overrides checked separately')
+        checks['generation_length']=check('FAIL','Medusa per-response actual length cap differs from unchanged baseline batch stopping/overshoot')
+        evidence={m:runtime_reports.get((row['model'],m)) for m in methods}
+        proofs={m:(v or {}).get('initialization',{}) for m,v in evidence.items()}
+        loras=[p.get('target_lora',{}) for p in proofs.values()]
+        known=[p for p in loras if p.get('status')=='PASS' and p.get('loaded_tensor_sha256')]
+        hashes={p['loaded_tensor_sha256'] for p in known}
+        checks['loaded_initial_target_lora']=check('FAIL' if len(hashes)>1 else
+            ('PASS' if len(known)==5 else 'NOT VERIFIED'),'Compare every loaded target LoRA tensor, including dtype and shape, across five startup proofs')
+        for pair in (('medusa','medusa_reflex'),('fastgrpo','fastgrpo_reflex')):
+            values=[proofs[m].get('draft',{}) for m in pair]
+            known_draft=[v.get('loaded_tensor_sha256') for v in values if v.get('status')=='PASS']
+            checks['loaded_draft_' + pair[0]]=check('FAIL' if len(set(known_draft))>1 else
+                ('PASS' if len(known_draft)==2 else 'NOT VERIFIED'),'Loaded pretrained proposal tensors must agree within the Reflex pair')
+        settings=[p.get('effective_args',{}) for p in proofs.values()]
+        fields=[k for k in COMMON if k not in ('load_lora_path','nproc_per_node')]
+        mismatch=[k for k in fields if len({json.dumps(v.get(k)) for v in settings if v})>1]
+        for name,field,content in (('loaded_target_backbone','target_backbone','loaded_tensor_sha256'),
+                                   ('tokenizer_artifacts','tokenizer_files','hashes'),
+                                   ('dataset_artifact','dataset','file_sha256')):
+            values=[p.get(field,{}) for p in proofs.values()]
+            known_values=[json.dumps(v.get(content),sort_keys=True) for v in values
+                          if v.get('status')=='PASS' and v.get(content)]
+            checks[name]=check('FAIL' if len(set(known_values))>1 else
+                ('PASS' if len(known_values)==5 else 'NOT VERIFIED'),'Actual startup hashes across five methods')
+        checks['effective_runtime_configuration']=check('FAIL' if mismatch else
+            ('PASS' if all(all(k in v for k in fields) for v in settings) else 'NOT VERIFIED'),'Runtime common-argument differences: '+str(mismatch))
+        environments=[{k:p.get(k) for k in ('packages','cuda','gpu','target_dtype','attention_implementation')} for p in proofs.values()]
+        complete=all(p.get('packages') and p.get('target_dtype') for p in proofs.values())
+        checks['deployed_environment']=check('FAIL' if complete and any(v!=environments[0] for v in environments) else
+            ('PASS' if complete else 'NOT VERIFIED'),'Actual packages, GPU, dtype and resolved attention implementation')
+        counts=[(v or {}).get('target_optimizer_steps',(v or {}).get('optimizer_steps')) for v in evidence.values()]
+        checks['actual_optimizer_updates']=check('FAIL' if len({v for v in counts if v is not None})>1 else
+            ('PASS' if all(v is not None for v in counts) else 'NOT VERIFIED'),'Completed optimizer.step counts: '+str(counts))
+        # A startup report cannot prove executed prompt order/cadence or resume.
+        order=[(v or {}).get('prompt_order_sha256') for v in evidence.values()]
+        checks['executed_prompt_order']=check('FAIL' if len({v for v in order if v})>1 else
+            ('PASS' if all(order) else 'NOT VERIFIED'),'Executed prompt-batch hash chains; compare same rank/world size')
+        cadence=[(v or {}).get('optimizer_step_cadence') for v in evidence.values()]
+        checks['actual_optimizer_cadence']=check('FAIL' if len({json.dumps(v) for v in cadence if v is not None})>1 else
+            ('PASS' if all(v is not None for v in cadence) else 'NOT VERIFIED'),'Actual (prompts seen, optimizer updates) at training boundaries')
+        checks['distributed_rank_coverage']=check('NOT VERIFIED','Per-rank startup proofs and complete multi-rank prompt/cadence traces have not been supplied')
+        checks['checkpoint_resume']=check('NOT VERIFIED','Local tiny-model resume tests do not prove full-model B200 continuation')
+        checks['sampling_precision']=check('FAIL','PureGRPO FP32 sampling and source speculative BF16 prefill probabilities differ; source conventions preserved')
+        for pair in (('medusa','medusa_reflex'),('fastgrpo','fastgrpo_reflex')):
+            left,right=(proofs[m] for m in pair)
+            args_left=dict(left.get('effective_args',{}));args_right=dict(right.get('effective_args',{}))
+            ignored=('method','version_name','log_file','timing_file','summary_file','saved_model_dir',
+                     'saved_draft_model_dir','saved_statistics_dir','checkpoint_dir','opd_train_projector')
+            common=(set(args_left)&set(args_right))-set(ignored)
+            diff=[k for k in common if args_left[k]!=args_right[k]]
+            env_left={k:v for k,v in left.get('environment',{}).items() if k!='OPD_ENABLED'}
+            env_right={k:v for k,v in right.get('environment',{}).items() if k!='OPD_ENABLED'}
+            checks['paired_recipe_'+pair[0]]=check('FAIL' if diff or (env_left and env_right and env_left!=env_right) else
+                ('PASS' if args_left and args_right and env_left and env_right else 'NOT VERIFIED'),
+                'Paired proposal/verifier/tree/online-training arguments and runtime environment; differences: '+str(diff))
+        alignment=[p.get('alignment_version') for p in proofs.values()]
+        checks['reward_advantage_alignment']=check('PASS' if all(v=='response_rows_v2' for v in alignment) else
+            'NOT VERIFIED','All three trainers carry identity/reward/advantage through a common stable permutation; cross-repository loss/gradient tests required')
+        for method,value in methods.items():
+            value['inspection_status']=value['status']
+            value['status']='NOT VERIFIED' if not evidence[method] else 'FAIL'
+        row['checks']=checks
+        row['status']='FAIL' if any(v['status']=='FAIL' for v in checks.values()) else 'NOT VERIFIED'
+    lora_status=[row['checks']['loaded_initial_target_lora']['status'] for row in report['models']]
+    report['initial_target_lora']['status']='FAIL' if 'FAIL' in lora_status else ('PASS' if all(v=='PASS' for v in lora_status) else 'NOT VERIFIED')
+    report['status']='FAIL' if any(row['status']=='FAIL' for row in report['models']) else 'NOT VERIFIED'
+    return report
+
 
 
 def main():
@@ -183,11 +268,19 @@ def main():
     p.add_argument('--use-environment',action='store_true')
     p.add_argument('--strict',action='store_true')
     p.add_argument('--output',type=Path)
-    a=p.parse_args();report=audit(a.spec_root.resolve(),a.pure_root.resolve(),dict(os.environ) if a.use_environment else None,(a.model,) if a.model else MODELS)
+    p.add_argument('--runtime-report',action='append',default=[],metavar='MODEL:METHOD:SUMMARY_JSON')
+    a=p.parse_args();runtime_reports={}
+    for item in a.runtime_report:
+        model,method,path=item.split(':',2)
+        if model not in MODELS or method not in ('medusa','medusa_reflex','fastgrpo','fastgrpo_reflex','puregrpo'):
+            p.error('Unknown model/method in --runtime-report')
+        runtime_reports[(model,method)]=json.loads(Path(path).read_text())
+    report=audit(a.spec_root.resolve(),a.pure_root.resolve(),dict(os.environ) if a.use_environment else None,
+                 (a.model,) if a.model else MODELS,runtime_reports)
     text=json.dumps(report,indent=2)+'\n'
     if a.output:a.output.parent.mkdir(parents=True,exist_ok=True);a.output.write_text(text)
     print(text)
-    if a.strict:sys.exit(1) # Known sampling/length/initialization limits preclude a fully-fair PASS.
+    if a.strict and report['status']!='PASS':sys.exit(1)
 
 
 if __name__=='__main__':main()

@@ -14,7 +14,7 @@ from helper.opd_attention import AttentionWorkspace
 from medusa.tree import plan_tree,build_sparse_tree,restrict_feedback
 from medusa.opd import MedusaOPD
 TARGET_SAMPLER_MODE=os.environ.get('OPD_SAMPLER_MODE','finite')
-RUNTIME_SEMANTICS_VERSION='shared_prefill_terminal_feedback_v2'
+RUNTIME_SEMANTICS_VERSION='actual_prompt_response_budget_v3'
 
 
 def base_lm(model):
@@ -58,8 +58,7 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
     if method not in ('medusa','medusa_reflex'):raise ValueError('unsupported Medusa method')
     enabled=method=='medusa_reflex' and (os.environ.get('OPD_ENABLED','1')=='1' if opd_enabled is None else opd_enabled)
     b,prompt=input_ids.shape;repeats=int(repeated_generate_nums or 1);total=b*repeats
-    max_new=max_length-prompt
-    if max_new<1:raise ValueError('max_length must exceed padded prompt length')
+    if prompt>=max_length:raise ValueError('max_length must exceed padded prompt length')
     eos=int(tokenizer.eos_token_id);device=input_ids.device
     cpeak=int(os.environ.get('CPEAK_NODES',str(verification_capacity)))
     max_nodes=int(os.environ.get('MAX_TREE_NODES_PER_SEQ','12'))
@@ -95,6 +94,12 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
     # SpecNaacl samples once/prompt BEFORE response repetition. This one
     # scheduling packet also supplies prompt metadata for online head training.
     initial_packet=torch.stack((prompt_lengths,pending[:,0]),1).cpu().tolist()
+    if any(length<1 for length,_ in initial_packet):raise ValueError('empty valid prompt')
+    # Reuse the existing scheduling readback; left-padding consumes storage,
+    # never a response token budget. Physical KV positions remain batch-wide.
+    max_new=max_length-min(length for length,_ in initial_packet)
+    storage_length=prompt+max_new
+    response_budget=(max_length-prompt_lengths).repeat_interleave(repeats,0)
     pending=pending[:,0].repeat_interleave(repeats,0)
     cache.batch_repeat_interleave(repeats)
     mask=mask.repeat_interleave(repeats,0)
@@ -110,10 +115,10 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
     head_counts=torch.zeros((3,3),device=device,dtype=torch.long) # active,proposed,accepted
     ids_storage=states_storage=None
     if return_all_draft_input:
-        ids_storage=torch.full((total,max_length+path_capacity),eos,device=device,dtype=torch.long)
+        ids_storage=torch.full((total,storage_length+path_capacity),eos,device=device,dtype=torch.long)
         ids_storage[:,:prompt]=input_ids.repeat_interleave(repeats,0)
         ids_storage[:,prompt]=pending
-        states_storage=torch.zeros((total,max_length+path_capacity,anchor.shape[-1]),device=device,dtype=model.dtype)
+        states_storage=torch.zeros((total,storage_length+path_capacity,anchor.shape[-1]),device=device,dtype=model.dtype)
         states_storage[:,:prompt]=hidden.repeat_interleave(repeats,0)
     del outputs,hidden,first_logits
     workspace=getattr(model,'medusa_attention_workspace',None)
@@ -124,7 +129,7 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
     rounds=nodes=active_rounds=0
     reasons={}
     # Remove prefill EOS before verification; do not sample past EOS.
-    survivor=[r for i,(_,token) in enumerate(initial_packet) if token!=eos and max_new>1
+    survivor=[r for i,(length,token) in enumerate(initial_packet) if token!=eos and max_length-length>1
               for r in range(i*repeats,(i+1)*repeats)]
     keep=torch.tensor(survivor,device=device,dtype=torch.long)
     if keep.numel()!=total:cache.batch_select_indices(keep)
@@ -156,7 +161,7 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
         del verify_logits
         path=trace_verified_path(tree,samples,eos,kernels=kernels)
         # Enforce remaining token budget on device; no feedback after truncation.
-        remaining=max_new-counts[global_ids]
+        remaining=response_budget[global_ids]-counts[global_ids]
         path.lengths.copy_(torch.minimum(path.lengths,remaining))
         slots=torch.arange(path.tokens.shape[1],device=device)[None,:]
         valid=slots<path.lengths[:,None]
@@ -196,7 +201,7 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
             accepted_hidden=verified.gather(1,source)
             # KV rows correspond to root and accepted children, one token before
             # each sampled decision. Bonus hidden is intentionally not invented.
-            state_dest=torch.where(valid,prompt+counts[global_ids,None]-1+slots,max_length+slots)
+            state_dest=torch.where(valid,prompt+counts[global_ids,None]-1+slots,storage_length+slots)
             states_storage[row_grid,state_dest]=torch.where(valid[:,:,None],accepted_hidden,0.)
         counts[global_ids]+=path.lengths
         anchor=verified.gather(1,path.packed_indices.gather(1,last)[:,:,None].expand(-1,-1,verified.shape[-1])).squeeze(1)
