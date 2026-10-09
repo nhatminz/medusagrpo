@@ -1,5 +1,6 @@
 """Actual CUDA checks, explicitly skipped when a CUDA PyTorch runtime is absent."""
 from types import SimpleNamespace
+import os
 import pytest
 import torch
 from medusa.tree import plan_tree,build_sparse_tree
@@ -9,9 +10,24 @@ pytestmark=pytest.mark.skipif(not torch.cuda.is_available(),reason='requires act
 from config_smoke import MODELS as SUPPORTED_MODELS,smoke as config_smoke
 
 
-def test_gpu_launcher_runtime_probe_supports_float32_target_autocast():
+@pytest.mark.parametrize('profile_mode',['none','explicit','automatic'])
+def test_gpu_launcher_runtime_probe_supports_float32_target_autocast(profile_mode,monkeypatch,tmp_path):
+    import json
+    import warnings
     from helper.environment_checks import probe_training_runtime
-    result=probe_training_runtime('cuda')
+    from helper.opd_profiles import execution_key,fingerprint
+    key=execution_key(fingerprint(),151936,8,'bf16',16)
+    profile=tmp_path/'qwen-production.json'
+    if profile_mode!='none':
+        profile.write_text(json.dumps(dict(execution_key=key,records=[dict(contexts=1,
+            trials=[dict(slots=0,sparse=1.,fused=2.,gemm=3.)])])))
+    monkeypatch.setenv('OPD_PROPOSAL_PROFILE',str(profile) if profile_mode=='explicit' else '')
+    monkeypatch.setenv('OPD_PROPOSAL_PROFILE_DIR',str(tmp_path))
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        result=probe_training_runtime('cuda')
+    assert not any('No exact compatible OPD proposal profile' in str(w.message) for w in caught)
+    assert os.environ['OPD_PROPOSAL_PROFILE']==(str(profile) if profile_mode=='explicit' else '')
     assert result['architecture']=='medusa_parallel_3'
     assert result['target_forward_calls']>=2
 
