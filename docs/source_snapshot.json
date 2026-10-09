@@ -1,0 +1,2037 @@
+{
+  "SpecNaacl/configs/_shared/b200_common.env": {
+    "sha256": "36e72c90151608db667dd83d89fc4af60ff49dbcc04ec4f06daaabf58171ecfd",
+    "bytes": 3576,
+    "lines": 82
+  },
+  "SpecNaacl/configs/b200.env": {
+    "sha256": "dac3259d2068424c0bc4195480020d355768ac5eef1a7e863d11f63bbeb6e4aa",
+    "bytes": 449,
+    "lines": 11
+  },
+  "SpecNaacl/configs/llama31_8b/b200.env": {
+    "sha256": "9138781306368c0a7c7a3be1e7f8fdd1edd6645fd0acb649ac4d86c27f19da32",
+    "bytes": 489,
+    "lines": 11
+  },
+  "SpecNaacl/configs/qwen25_14b/b200.env": {
+    "sha256": "ee3587bf40e47703e73e702959969dd9cbc1f80aa2b147632bb198acd83af4c1",
+    "bytes": 489,
+    "lines": 11
+  },
+  "SpecNaacl/configs/qwen25_1p5b/b200.env": {
+    "sha256": "9449b923939f31c15c1fe87c3013615fcfa9558b245a92eef37b9bd9210db929",
+    "bytes": 491,
+    "lines": 11
+  },
+  "SpecNaacl/configs/qwen25_3b/b200.env": {
+    "sha256": "dba1e1103b417e3ce09775f04c7ab9078dfa36e4285ba0cc21e70f5bb685502c",
+    "bytes": 487,
+    "lines": 11
+  },
+  "SpecNaacl/configs/qwen25_7b/b200.env": {
+    "sha256": "54900367bb244cb032cb4628e3007d075e8edf98a31c1dc05f2af1553b235613",
+    "bytes": 487,
+    "lines": 11
+  },
+  "SpecNaacl/configs/qwen3_1p7b/b200.env": {
+    "sha256": "33ab7e292730b2c00fa2f67b1329478dfc5326ef5b9fd2b83e6a944bf1935abc",
+    "bytes": 341,
+    "lines": 7
+  },
+  "SpecNaacl/configs/qwen3_4b/b200.env": {
+    "sha256": "5ab61e11b5e4b2c0ba72c63ee0d9747897e5d1561bfda43b19aa8f92e03f69c2",
+    "bytes": 338,
+    "lines": 7
+  },
+  "SpecNaacl/grpo_speculative.py": {
+    "sha256": "4ea9b441c81250587565d1c97904cb4c7290a09103c5aa1e9256ba1724e51e2f",
+    "bytes": 110040,
+    "lines": 2206
+  },
+  "SpecNaacl/helper/__init__.py": {
+    "sha256": "13a9095f8cbb5cab149c508822e2a5021dd033f3e4e3665c44d89fc70abd90cb",
+    "bytes": 60,
+    "lines": 1
+  },
+  "SpecNaacl/helper/checkpointing.py": {
+    "sha256": "16a8f37b5faec68a820e7cb70d8e547d90d9fd5d3ab010eb4d4066ea459854cb",
+    "bytes": 958,
+    "lines": 34
+  },
+  "SpecNaacl/helper/drift_metrics.py": {
+    "sha256": "3bef046c88aebe97c8e86c66e502f5d88ca1c3783f7783cca46e509d433f678f",
+    "bytes": 1883,
+    "lines": 38
+  },
+  "SpecNaacl/helper/environment_checks.py": {
+    "sha256": "b1406dc5575937b3084ca85f993a8f8dbd483d3256f1aefd25fb8008decbe635",
+    "bytes": 5185,
+    "lines": 82
+  },
+  "SpecNaacl/helper/fastgrpo_generate.py": {
+    "sha256": "dd9495d765b9669a6b673e61e13e2af6f073b4140b00adb1bf42c4bab64efd93",
+    "bytes": 48909,
+    "lines": 1116
+  },
+  "SpecNaacl/helper/fastgrpo_model.py": {
+    "sha256": "cab14c5b933937627970c16a74eca935f5b7e116740438d5f624ddfaf585aea6",
+    "bytes": 9579,
+    "lines": 219
+  },
+  "SpecNaacl/helper/fastgrpo_training.py": {
+    "sha256": "bbc0971609b7ac0e4961921155ff844faec8de428303fda7e76882fa3b7a9359",
+    "bytes": 10816,
+    "lines": 262
+  },
+  "SpecNaacl/helper/get_QAs.py": {
+    "sha256": "72974e50046cd70fe956a00a787fdaa070bce36110ee239a7d4ecd94dcfd58d2",
+    "bytes": 8654,
+    "lines": 187
+  },
+  "SpecNaacl/helper/method_config.py": {
+    "sha256": "a9c8aea52278111a98e048f75332367c1fee931f6511d371be98bc46d79a3ccb",
+    "bytes": 454,
+    "lines": 15
+  },
+  "SpecNaacl/helper/modeling_draft.py": {
+    "sha256": "5887fdbdac155af5c01c99c80249cd44baa8e5f9136fd5915aaf325047d21df4",
+    "bytes": 23121,
+    "lines": 559
+  },
+  "SpecNaacl/helper/opd_attention.py": {
+    "sha256": "b7ae3e3c41c73c1763930fd172074540e26b2a3a6c028ca79cea97b8fd3071f7",
+    "bytes": 1888,
+    "lines": 46
+  },
+  "SpecNaacl/helper/opd_attention_kernels.py": {
+    "sha256": "afefad13dead7020885843ccde9aec84e509b7696e27cb115629000ee0b7089f",
+    "bytes": 888,
+    "lines": 22
+  },
+  "SpecNaacl/helper/opd_generate.py": {
+    "sha256": "d078ad2b23680c83a18e3cbb35ff7c4b2071a7577ed9404b8c9413a4d69da806",
+    "bytes": 45378,
+    "lines": 676
+  },
+  "SpecNaacl/helper/opd_history.py": {
+    "sha256": "e4f10c62a132a528dab337b51bab22ca212576fb61018c95baccc0144fe9867c",
+    "bytes": 3739,
+    "lines": 67
+  },
+  "SpecNaacl/helper/opd_kv_kernels.py": {
+    "sha256": "355404f3dbfcf0a2d7be3d50d15474a9a8f7bb227ab24eb3ee009e229ad415ce",
+    "bytes": 2541,
+    "lines": 58
+  },
+  "SpecNaacl/helper/opd_optimizer.py": {
+    "sha256": "7b38bd020385a2a703e4634473d7eeb94e4e8f119ce41c8fdbca464eb4ed7387",
+    "bytes": 2051,
+    "lines": 37
+  },
+  "SpecNaacl/helper/opd_profiles.py": {
+    "sha256": "feacabb631e3ee1a87d4fde179ab64e9ad4308465e28e47b34b2ffb2d5092a1c",
+    "bytes": 7450,
+    "lines": 152
+  },
+  "SpecNaacl/helper/opd_reflex.py": {
+    "sha256": "cb6041e45aa10109d4280c93f03ffe27fdaac334d2854b23ea4e25a49917e07a",
+    "bytes": 28309,
+    "lines": 451
+  },
+  "SpecNaacl/helper/opd_reflex_kernels.py": {
+    "sha256": "65fdb32878ec1aec9b3c4c83a105d9f938f7d9512aceed37ed8e2bfefd01259b",
+    "bytes": 35690,
+    "lines": 605
+  },
+  "SpecNaacl/helper/opd_sampling.py": {
+    "sha256": "04d53d765fe4884aec5403ec4ec1ce869bab314d3fc577e63f36077ebc2bf5e9",
+    "bytes": 7885,
+    "lines": 170
+  },
+  "SpecNaacl/helper/opd_scheduling.py": {
+    "sha256": "afe739c27f5f1ce32b3d448a8f39345ffd00d34376dbc34741ca6be1bcc4b3cb",
+    "bytes": 3327,
+    "lines": 58
+  },
+  "SpecNaacl/helper/opd_static_cache.py": {
+    "sha256": "3d048c93cd70a0556acdf522df5cb55a2d050b226853e0456bc73f568ff64d98",
+    "bytes": 13684,
+    "lines": 264
+  },
+  "SpecNaacl/helper/pretrain_data.py": {
+    "sha256": "181e4dfb791d6cbd8125aaf4ace3a02f1654e116e2203d05cf7531e7d5e7af08",
+    "bytes": 1864,
+    "lines": 28
+  },
+  "SpecNaacl/helper/rewards.py": {
+    "sha256": "4a14324812d999a31e8b414cd8dca33d98c275876e7b81ca1e0847874ae55f30",
+    "bytes": 2152,
+    "lines": 73
+  },
+  "SpecNaacl/helper/rollout_history.py": {
+    "sha256": "903ebbb740f8595a6bb77ef4fae3def916f7d9e1ce3d1a35b1dccc0a6c936a7f",
+    "bytes": 3714,
+    "lines": 74
+  },
+  "SpecNaacl/helper/rollout_metrics.py": {
+    "sha256": "fecb866a88846f1986dbcc1f88295277b0f8554c618835f95d4f36d3d9d3923d",
+    "bytes": 8995,
+    "lines": 133
+  },
+  "SpecNaacl/helper/shared_rollout.py": {
+    "sha256": "8ec3ba1c4ff27d4f5b32ba7cdc1a97cbd7a3cb58cf0be3ad8c06fcae9eba38d8",
+    "bytes": 1491,
+    "lines": 22
+  },
+  "SpecNaacl/helper/specualtive_generate.py": {
+    "sha256": "db187143ed4f7d79933435c40aecee2fc7f0e75a6c47a1745e9e2a08a2124313",
+    "bytes": 646,
+    "lines": 13
+  },
+  "SpecNaacl/helper/step_metrics.py": {
+    "sha256": "0597ba0a566d1da52809c2ae725af2f4b7e75f9d6412f79e60943b6441a41062",
+    "bytes": 14857,
+    "lines": 282
+  },
+  "SpecNaacl/helper/transformers_compat.py": {
+    "sha256": "d373f2043f39ca5d7fe990e365a9c17a7ab5d29720b6c113c61cd0b1baa78b3c",
+    "bytes": 4525,
+    "lines": 119
+  },
+  "SpecNaacl/helper/tree_kernels.py": {
+    "sha256": "cb2bf42fd6128945ccf5ebd51c77d819648e3fea9cd53eeedc4f623614f53248",
+    "bytes": 9027,
+    "lines": 155
+  },
+  "SpecNaacl/helper/tree_verification.py": {
+    "sha256": "70abc46dd67af397d8288695f992b97d819cf29b73409c9dfdd333e39adeec29",
+    "bytes": 8962,
+    "lines": 167
+  },
+  "SpecNaacl/legacy_tests/specforge/opd_fixtures.py": {
+    "sha256": "0720954709b70b547d316074c46d9ed05ffa440e78d8b63ede72800c8affe150",
+    "bytes": 8890,
+    "lines": 162
+  },
+  "SpecNaacl/legacy_tests/specforge/oracles/opd_rollout_before_memory.py": {
+    "sha256": "14e2c01159ef32240a6f37f851ba2602c0f493cbafaccf29049cfedbb26623b9",
+    "bytes": 47286,
+    "lines": 706
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/configs/qwen25_1p5b/eagle3_full_vocab.json": {
+    "sha256": "9064c34852d37ee2288f7d8bf281472c53f18108d0555e318b77a1f1a2f5b697",
+    "bytes": 688,
+    "lines": 27
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/configs/qwen25_7b/eagle3_full_vocab.json": {
+    "sha256": "c00ac5cfa13254b40c969c7e1035c38102261453ea3a9b4264f9e3beed28b2b0",
+    "bytes": 689,
+    "lines": 27
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/helper/eagle3_online_objective.py": {
+    "sha256": "db4b93d6013a17ccc0c42946da1dcfec43e48625def7cfd1d1bbc10d91e114ea",
+    "bytes": 2452,
+    "lines": 40
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/helper/eagle3_specforge.py": {
+    "sha256": "378b250045945a2e482573730edec13667d785cf32baa0f60efe413df3d424c8",
+    "bytes": 20083,
+    "lines": 429
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/helper/historical_fastgrpo.py": {
+    "sha256": "899ee1038f77fa18c199bd68d9ef2b5f11c61fe11e8785cce2202b4bb56b68dc",
+    "bytes": 49133,
+    "lines": 771
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/helper/sampling.py": {
+    "sha256": "2f5c9f8ef8777c6380d0ec7f10ee23b6c2e88fc244427863fafb7a832bb096b3",
+    "bytes": 2650,
+    "lines": 69
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/pretrain_eagle3_sharegpt_b200.sh": {
+    "sha256": "756e0e5334f60fd3ef94630932019a332e72a7175d143bfeac09de9d6dd5f129",
+    "bytes": 19606,
+    "lines": 431
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/scripts/benchmark_pretrain.py": {
+    "sha256": "3cb39610794aac0c5232a0a4173d071895f752c590b27793584c03467690e22c",
+    "bytes": 7672,
+    "lines": 164
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/scripts/benchmark_pretrain.sh": {
+    "sha256": "1b228a254877b9436e9eea34680234bfc1f28b1eb3af150d6dc80e1712ffacfa",
+    "bytes": 3623,
+    "lines": 63
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/scripts/check_pretrain_attention.py": {
+    "sha256": "4f6725cb87a1fb58720053d768d5fbe9956f59317130a25024dca7561ea345f5",
+    "bytes": 1643,
+    "lines": 44
+  },
+  "SpecNaacl/legacy_tests/specforge/runtime/scripts/generate_eagle3_config.py": {
+    "sha256": "2f33bb0044ecf26839f6fc3bb772d8d92c5d6f7273abe15161ee759e93ed5607",
+    "bytes": 3914,
+    "lines": 111
+  },
+  "SpecNaacl/legacy_tests/specforge/test_eagle3_position_ids.py": {
+    "sha256": "a0e559742661a9d6677927cfb756b8a59fff416558399dba3a1203a8637eacf5",
+    "bytes": 20126,
+    "lines": 339
+  },
+  "SpecNaacl/legacy_tests/specforge/test_eagle3_pretrain.py": {
+    "sha256": "21a3b2a27ceead8165750f3f77dc704946ef346b302620dc40edd26978483fa2",
+    "bytes": 26403,
+    "lines": 554
+  },
+  "SpecNaacl/legacy_tests/specforge/test_eagle3_training_inputs.py": {
+    "sha256": "c5af3ab9768248ff7d553879d8220db3edc920ac8351355a55d61395f3b9bbec",
+    "bytes": 11356,
+    "lines": 228
+  },
+  "SpecNaacl/legacy_tests/specforge/test_environment.py": {
+    "sha256": "2aa43520a564122ff0f11a1d73c46d8dc3b8122179b69ebfd6fa0ed20800ea1b",
+    "bytes": 6059,
+    "lines": 128
+  },
+  "SpecNaacl/legacy_tests/specforge/test_fair_fastgrpo.py": {
+    "sha256": "dc00f667ffffd22944c6f4bd885149ae289eb33e5c8a064010d84db4999a8e9c",
+    "bytes": 6130,
+    "lines": 112
+  },
+  "SpecNaacl/legacy_tests/specforge/test_model_configs.py": {
+    "sha256": "bc75a3faa62ec017c96013f62dcd5e3edc53a8499a81372ae354cc8137c19da0",
+    "bytes": 1858,
+    "lines": 49
+  },
+  "SpecNaacl/legacy_tests/specforge/test_opd_contracts.py": {
+    "sha256": "d157591064466dc300f4d932f89d6783f27de8655180e209eeddbd07877399df",
+    "bytes": 9567,
+    "lines": 164
+  },
+  "SpecNaacl/legacy_tests/specforge/test_opd_final_optimization.py": {
+    "sha256": "b5703a91771770295a2c9c6d5b6184c3ad070f4f12a3095ffaa870c51c8bf334",
+    "bytes": 11000,
+    "lines": 189
+  },
+  "SpecNaacl/legacy_tests/specforge/test_opd_last_three.py": {
+    "sha256": "0120fc6db2c9a5605458ec52740f22509e7d731c7ba011d790b0911843ec9dda",
+    "bytes": 8568,
+    "lines": 146
+  },
+  "SpecNaacl/legacy_tests/specforge/test_opd_memory_revision.py": {
+    "sha256": "46014ad8f2525b6b439df58ed4c116ee1ecb0d61c594bb7038215ff85a9f40fe",
+    "bytes": 10019,
+    "lines": 183
+  },
+  "SpecNaacl/legacy_tests/specforge/test_opd_performance_contracts.py": {
+    "sha256": "883eb5cd969ae73cc70423ac242b5a0518b3dd7f836b1e215c2ce48cbafa2619",
+    "bytes": 9855,
+    "lines": 181
+  },
+  "SpecNaacl/legacy_tests/specforge/test_opd_profiles.py": {
+    "sha256": "7cb5de6a12870e73c6381508fb8b5abf338d5bd6732aeb47b6a53f8a44a8ce90",
+    "bytes": 13740,
+    "lines": 239
+  },
+  "SpecNaacl/legacy_tests/specforge/test_opd_proposal_lifetime.py": {
+    "sha256": "f06b085ac02ec0c5c75e79387a2bcc0a2634b5129e91347d17301fca9c22a365",
+    "bytes": 8186,
+    "lines": 156
+  },
+  "SpecNaacl/legacy_tests/specforge/test_opd_reflex.py": {
+    "sha256": "6f5ab13725de8ffb4e1df7c36a1c07e9e742262add9dee77e24e661d1e3cd578",
+    "bytes": 13551,
+    "lines": 225
+  },
+  "SpecNaacl/legacy_tests/specforge/test_opd_revision.py": {
+    "sha256": "a34df54c7293d1f214af883766bf1b67e56bab1fe1c1f0d6d306099948245f65",
+    "bytes": 14918,
+    "lines": 247
+  },
+  "SpecNaacl/legacy_tests/specforge/test_pretrain_attention_check.py": {
+    "sha256": "49bc9c9acc352be1b1331b2e6433397e63f132a3c7fbff9e5d3a1b29c6852cbf",
+    "bytes": 1868,
+    "lines": 46
+  },
+  "SpecNaacl/legacy_tests/specforge/test_requirements.py": {
+    "sha256": "db2c29214dc61d4e1baf36bb270b171613558bd71ad2aa861ac77bee5eea2c0d",
+    "bytes": 2778,
+    "lines": 71
+  },
+  "SpecNaacl/legacy_tests/specforge/test_rollout_history.py": {
+    "sha256": "e8a837f9e9b1e175d1aaefab1d596bfe63c638b02083407487301b5585fd78c6",
+    "bytes": 8952,
+    "lines": 187
+  },
+  "SpecNaacl/legacy_tests/specforge/test_sampling.py": {
+    "sha256": "dfd8639fdf78c70c83ee391171b0f35a9a57bd040d0346c5689ceca13b8a0994",
+    "bytes": 1754,
+    "lines": 43
+  },
+  "SpecNaacl/legacy_tests/specforge/test_sdpa_tree_attention.py": {
+    "sha256": "387001e99f13d6c4b28f04db602f61e86d5d261caf3469b302439d9a215aec8b",
+    "bytes": 2347,
+    "lines": 44
+  },
+  "SpecNaacl/legacy_tests/specforge/test_shell_scripts.py": {
+    "sha256": "95acc1c3809f353a1002ae135eed6213252ff3358a739eea0e5c7b422ab44a20",
+    "bytes": 8391,
+    "lines": 148
+  },
+  "SpecNaacl/legacy_tests/specforge/test_training_imports.py": {
+    "sha256": "01e6db8f0e0e6558e8e36a25c1f0230ad8de5e477f262fade00a2430ef06bb32",
+    "bytes": 8909,
+    "lines": 193
+  },
+  "SpecNaacl/legacy_tests/specforge/test_training_progress.py": {
+    "sha256": "486c53bb1b179ef0792a2bad2434cc247aae34d6a7369b704a99ba1d5ec4d9c3",
+    "bytes": 5419,
+    "lines": 120
+  },
+  "SpecNaacl/legacy_tests/specforge/test_tree_confidence_selection.py": {
+    "sha256": "40f082d4074b6ae1701dccfac75ea1bfe0bb1fff9257dccaa368eea71afcd2fa",
+    "bytes": 6645,
+    "lines": 136
+  },
+  "SpecNaacl/policy_lag_analysis.py": {
+    "sha256": "2eacebcc600935b2c45e2db8b75b4588d235f7c6c8296747ff67a701a85565ff",
+    "bytes": 15383,
+    "lines": 362
+  },
+  "SpecNaacl/pretrain_llama31_8b.sh": {
+    "sha256": "24850c642204a7d2e3f162b30e9ded88490d6d8158d95e89d1f9146079698f0d",
+    "bytes": 472,
+    "lines": 11
+  },
+  "SpecNaacl/pretrain_qwen25_14b.sh": {
+    "sha256": "4dfba2ffada07b348bdd354b9bfa03f0de0f8629359c2d9226e0288c3e489746",
+    "bytes": 471,
+    "lines": 11
+  },
+  "SpecNaacl/pretrain_qwen25_1p5b.sh": {
+    "sha256": "982e6cf55936c4d85af6e25cf79a2585fbbba805f9e70c5c90ccf445af8b36dc",
+    "bytes": 474,
+    "lines": 11
+  },
+  "SpecNaacl/pretrain_qwen25_3b.sh": {
+    "sha256": "d51e9eb2d9efcaf54ae3535b4a1bd43e6dee66cfc6cbdf317c1bc84c88d146df",
+    "bytes": 469,
+    "lines": 11
+  },
+  "SpecNaacl/pretrain_qwen25_7b.sh": {
+    "sha256": "305ae96c46c7a0d0c4430222590db7cb0b41bf1df1487cff388780761135b28f",
+    "bytes": 469,
+    "lines": 11
+  },
+  "SpecNaacl/pretrain_qwen3_1p7b.sh": {
+    "sha256": "89ed1dae76246611e00891e5659211b17abf8fcd5f296a622022ba11d69190a7",
+    "bytes": 461,
+    "lines": 8
+  },
+  "SpecNaacl/pretrain_qwen3_4b.sh": {
+    "sha256": "b62e23d04dcfe0c5d7af81a97e9a494e93f330b7fb279b9ff9b3e961ef7782c6",
+    "bytes": 456,
+    "lines": 8
+  },
+  "SpecNaacl/reports/opd_20261007_kv_rtx3090.json": {
+    "sha256": "8ee0d0dc4f2c43a443d606c65b2580affa540dccc912b43770cb35ae60fa974b",
+    "bytes": 18351,
+    "lines": 550
+  },
+  "SpecNaacl/reports/opd_20261007_rtx3090_proposal.json": {
+    "sha256": "3e6492483b77a95401566fccd39c2fe976bce4a8e164d2f1973fce1ea05156a1",
+    "bytes": 4859,
+    "lines": 165
+  },
+  "SpecNaacl/run_b200_policy_lag_pipeline.sh": {
+    "sha256": "4127258fece3e7ff38bbb64f8d0dff40b9036185700e3729ed67d8a8a14814ba",
+    "bytes": 343,
+    "lines": 15
+  },
+  "SpecNaacl/run_policy_lag_analysis.sh": {
+    "sha256": "bec11b03a1d6156f352d62663c8b0cd4db7f91948a326ecb4bee3c47c7f7f901",
+    "bytes": 7708,
+    "lines": 195
+  },
+  "SpecNaacl/run_policy_lag_analysis_b200.sh": {
+    "sha256": "95069c1a99d406c24f369b2381c5653583d5dd3ba1de8bb3eb90baa7b4d7137a",
+    "bytes": 4762,
+    "lines": 105
+  },
+  "SpecNaacl/scripts/benchmark_online_draft_training.sh": {
+    "sha256": "a38db26c1ee3948beb8679533725b4726335675b41e30b024799f92df1d3e7e8",
+    "bytes": 1376,
+    "lines": 20
+  },
+  "SpecNaacl/scripts/benchmark_opd_kv.py": {
+    "sha256": "f6b9d4cc47c653c08a84d5d067fab2f397517cdc42268e6c490a6632b148628f",
+    "bytes": 9634,
+    "lines": 158
+  },
+  "SpecNaacl/scripts/benchmark_opd_kv.sh": {
+    "sha256": "833af3682c092f88ecb07fa81437497619a3e608db6460262660e3f2744b6e3b",
+    "bytes": 1329,
+    "lines": 21
+  },
+  "SpecNaacl/scripts/benchmark_opd_reflex.py": {
+    "sha256": "9da3657060ff804a102da3f285a0aac26577d27f0c04e7a47165071f8a79918d",
+    "bytes": 21068,
+    "lines": 291
+  },
+  "SpecNaacl/scripts/benchmark_opd_sampler.py": {
+    "sha256": "38a20f265b50da0d64d3580ebe21241d3df9e337786f7d38a81d33f841297ba7",
+    "bytes": 14304,
+    "lines": 257
+  },
+  "SpecNaacl/scripts/check_training_sources.py": {
+    "sha256": "e0bf6df09158e7e47bd58d5ac5c6c3546d25fdb2b9c7940ebfa4f2f40f6a36d5",
+    "bytes": 2128,
+    "lines": 51
+  },
+  "SpecNaacl/scripts/gpu_utilization.py": {
+    "sha256": "5e9396144dd366c04fcfd2f4993675cbe25445e393891f1adc47cd08e3773aaa",
+    "bytes": 1442,
+    "lines": 33
+  },
+  "SpecNaacl/scripts/launch/pretrain_model.sh": {
+    "sha256": "69ae9301edb1a3c31bcdfa2932725361736fac6b1e94247d92c37afc9b5c13c3",
+    "bytes": 4923,
+    "lines": 92
+  },
+  "SpecNaacl/scripts/launch/train_model.sh": {
+    "sha256": "2adbe2b3aa1e9193a5907b02c19e970930cca9fd3ee547b9f0c2e0da84bed84c",
+    "bytes": 11307,
+    "lines": 239
+  },
+  "SpecNaacl/scripts/plot_opd_aal.py": {
+    "sha256": "bfbd42c922ec359f7e26397637d34d3917a11de5b527f17dc95d29a8678bc36b",
+    "bytes": 1351,
+    "lines": 30
+  },
+  "SpecNaacl/scripts/plot_training_time.py": {
+    "sha256": "7ab5ac623ebe9a7a390e884856d630706b1a28b8234fa1c0504773830fbb971e",
+    "bytes": 1679,
+    "lines": 49
+  },
+  "SpecNaacl/scripts/plot_training_time.sh": {
+    "sha256": "5b667005d3f269360ec7105a2e81ce2598370798d923c9a14d341bd8caeb68d4",
+    "bytes": 666,
+    "lines": 17
+  },
+  "SpecNaacl/scripts/prepare_dapo_policy_lag.py": {
+    "sha256": "a27297832f3e809625c0c92011a9d614ae86269f26bad1b3e3bd7363b6a1165c",
+    "bytes": 5276,
+    "lines": 130
+  },
+  "SpecNaacl/scripts/prepare_local_pretrain_data.py": {
+    "sha256": "622f0f62ae94475d3bfad85472a9bd6ee00a24301f2d8a487c815584c93f7d77",
+    "bytes": 2617,
+    "lines": 69
+  },
+  "SpecNaacl/scripts/resolve_opd_profile.py": {
+    "sha256": "57b148eae2f2f0b2a4e4cb632c08075a8fc590759ee7a439d049e5a3a4403399",
+    "bytes": 2135,
+    "lines": 35
+  },
+  "SpecNaacl/scripts/run_fastgrpo_fair.sh": {
+    "sha256": "bdef6a1ad3151cd1055397b39fde74cc24ec92a4b230b26cf207760e0f4dc117",
+    "bytes": 598,
+    "lines": 15
+  },
+  "SpecNaacl/scripts/run_opd_reflex.sh": {
+    "sha256": "4e37c0613d39d716586414ee107f325b923dd2789b541ad8fefc6b2f9df7a114",
+    "bytes": 580,
+    "lines": 14
+  },
+  "SpecNaacl/scripts/summarize_online_draft_training.py": {
+    "sha256": "e7321a80df74cecf6d100f3edc41c3645ccf0056fb960e403b00059626bf5df3",
+    "bytes": 2208,
+    "lines": 45
+  },
+  "SpecNaacl/scripts/sweep_opd_reflex.sh": {
+    "sha256": "939f7ebbc754d266de639a6c3626015b4c3c69400c6492abe223a3b89a3fba3f",
+    "bytes": 3317,
+    "lines": 54
+  },
+  "SpecNaacl/scripts/tune_opd_proposals.py": {
+    "sha256": "5a6fe3d0cace3344e7ca27c1a6e03b9a59955af08e868e0a1a78f2508506dbda",
+    "bytes": 10946,
+    "lines": 170
+  },
+  "SpecNaacl/scripts/tune_opd_proposals.sh": {
+    "sha256": "0679bccc342048d4b1b5f86ea82b9fae94516f885c294d2c957e8d5e7547e156",
+    "bytes": 1750,
+    "lines": 31
+  },
+  "SpecNaacl/scripts/validate_environment.py": {
+    "sha256": "bfe6e9b5813d9d7e73f53415b4707577e17398de2227b8cc40240561bfe9d785",
+    "bytes": 6764,
+    "lines": 163
+  },
+  "SpecNaacl/scripts/write_run_metadata.py": {
+    "sha256": "57b5116f42666c0a6ffce535abec99fbc9e7c9d027a716613b17b1fd6c65aaa0",
+    "bytes": 1716,
+    "lines": 45
+  },
+  "SpecNaacl/sources/FastGRPO/SOURCE_MANIFEST.json": {
+    "sha256": "ce49214df7b9d9a3b8a04c74251d722181f58aff1dba3cbff481cef02c1197e4",
+    "bytes": 896,
+    "lines": 14
+  },
+  "SpecNaacl/sources/FastGRPO/grpo_speculative.py": {
+    "sha256": "62bd4428a869db40ad4a8252fb895defd9bbeb33b7deffe486dc43be393607d0",
+    "bytes": 36450,
+    "lines": 843
+  },
+  "SpecNaacl/sources/FastGRPO/helper/get_QAs.py": {
+    "sha256": "aab0fe8e541f83b754910ebf3ab2e5dd935405436192733b39b46e4e0b11d0b5",
+    "bytes": 5440,
+    "lines": 110
+  },
+  "SpecNaacl/sources/FastGRPO/helper/modeling_draft.py": {
+    "sha256": "5887fdbdac155af5c01c99c80249cd44baa8e5f9136fd5915aaf325047d21df4",
+    "bytes": 23121,
+    "lines": 559
+  },
+  "SpecNaacl/sources/FastGRPO/helper/rewards.py": {
+    "sha256": "f871872c58fc3d1eef5da261b78f165bb5db0d6233d3b07de81dd600f59d7d43",
+    "bytes": 2207,
+    "lines": 67
+  },
+  "SpecNaacl/sources/FastGRPO/helper/specualtive_generate.py": {
+    "sha256": "7a129d33f7eb4b9e484784b91f3dabfe1797577053705aa1176cc6bf59528765",
+    "bytes": 47667,
+    "lines": 1098
+  },
+  "SpecNaacl/sources/FastGRPO/train_draft.py": {
+    "sha256": "b7e7d5f84a547e52cc59868a3bf95e96b438aff1c878ee7b29227e76acc89629",
+    "bytes": 14502,
+    "lines": 375
+  },
+  "SpecNaacl/tests/fastgrpo_golden.json": {
+    "sha256": "f69e359991c1b5da32f1a3d457abc942ea6a2d06e41389cc31a52b21994b7916",
+    "bytes": 2344,
+    "lines": 1
+  },
+  "SpecNaacl/tests/references/opd_sampling_before_finite.py": {
+    "sha256": "ef33be635e73c7fb42cf09e49bfd976a26efd316e724d511ce0e86ceae58600b",
+    "bytes": 4808,
+    "lines": 108
+  },
+  "SpecNaacl/tests/test_checkpointing.py": {
+    "sha256": "d7530ab8d5785c430c1572e6b9e286765ea0f4803db525ff6c9d1b91346b828e",
+    "bytes": 930,
+    "lines": 26
+  },
+  "SpecNaacl/tests/test_environment_compat.py": {
+    "sha256": "0a3ab9c7eb406038da03285c2549f4405e371c829f6e355df1f637b9512a4fcd",
+    "bytes": 4341,
+    "lines": 97
+  },
+  "SpecNaacl/tests/test_fastgrpo_rewrite.py": {
+    "sha256": "b18939043b4c427bf92b68f192d04cc0042e9a46a7405715eb9b9d26f3fdec80",
+    "bytes": 13821,
+    "lines": 234
+  },
+  "SpecNaacl/tests/test_launchers_rewrite.py": {
+    "sha256": "78dfbc704a6e8572f8223589586b60aeaf19524bc14f2b23fabba7f62d692f41",
+    "bytes": 3856,
+    "lines": 74
+  },
+  "SpecNaacl/tests/test_opd_final_optimization.py": {
+    "sha256": "1671fddade032211806fcab2ef4882ba8f56443b04013bc47a3ca58ad5cca4d0",
+    "bytes": 6008,
+    "lines": 119
+  },
+  "SpecNaacl/tests/test_opd_last_three.py": {
+    "sha256": "c020c3b62514a7fb4ef1e15ab70b046dc7c7182cd35ad0eaa85c4a7f333a4bca",
+    "bytes": 2716,
+    "lines": 56
+  },
+  "SpecNaacl/tests/test_opd_memory_revision.py": {
+    "sha256": "d4ac0ab1287008789b5a718ab4c0ffe0fe2e45454869cbb6a19c70cebcffdae8",
+    "bytes": 5755,
+    "lines": 108
+  },
+  "SpecNaacl/tests/test_opd_profiles.py": {
+    "sha256": "f799ef67e92103743c2ae3d0f402356cc56fc4821f4ef483c6a540df4ad4808e",
+    "bytes": 13357,
+    "lines": 236
+  },
+  "SpecNaacl/tests/test_opd_reflex.py": {
+    "sha256": "164cd6e779bd81aa10541709c0626be2984f982ceb4dca9f662d27e270eb3381",
+    "bytes": 10255,
+    "lines": 188
+  },
+  "SpecNaacl/tests/test_opd_revision.py": {
+    "sha256": "7f3249bc074925501c373dc3c45b8d7891b6f062603c7a0b53e79aa8cdc5cefd",
+    "bytes": 12106,
+    "lines": 217
+  },
+  "SpecNaacl/tests/test_opd_sampling_finite.py": {
+    "sha256": "1a06c2f51ba445cdf8f2ded5e4fb8a3c931703cf6ec1bf9fc230d6eab8593171",
+    "bytes": 11086,
+    "lines": 232
+  },
+  "SpecNaacl/tests/test_rollout_metrics_logging.py": {
+    "sha256": "a2c4ddbd843dd8a29fea666ad0f8281e8096b56325e73c8e9f90c7b95eaba07b",
+    "bytes": 7402,
+    "lines": 146
+  },
+  "SpecNaacl/tests/test_step_metrics.py": {
+    "sha256": "d8be59c4beb738b7604efa753e8fc9d67a971e075f79ed8023afcaa177feff0e",
+    "bytes": 11732,
+    "lines": 218
+  },
+  "SpecNaacl/tests/test_training_end_to_end.py": {
+    "sha256": "bd712b733c7c90cf2c12b5b5c7266028c346e04bd49f1d4b2fe27bf1acf983f2",
+    "bytes": 6587,
+    "lines": 112
+  },
+  "SpecNaacl/tests/tiny_training_runner.py": {
+    "sha256": "3bdf2ae63d37245f09be79713aa5fdead9515c437cbe93321efa123cdcd5a3e2",
+    "bytes": 6472,
+    "lines": 99
+  },
+  "SpecNaacl/third_party/SpecForge/configs/qwen2.5-3b-eagle3.json": {
+    "sha256": "8a02cdb622e34d9b07a1beb88faf00094820586ab40abe1d43380e5ea05b6125",
+    "bytes": 788,
+    "lines": 32
+  },
+  "SpecNaacl/third_party/SpecForge/configs/qwen2.5-7b-eagle3.json": {
+    "sha256": "9060b0da99270c8b748e5aaf1dec989e88e28b0ad4107448270d5e123ad0fd54",
+    "bytes": 748,
+    "lines": 30
+  },
+  "SpecNaacl/third_party/SpecForge/examples/configs/offline/colocated/qwen2.5-7b-eagle3-offline.yaml": {
+    "sha256": "4c3f66188e59760e66d46efee6343ea6603ed6d30128da13ffc55901f0444718",
+    "bytes": 1001,
+    "lines": 38
+  },
+  "SpecNaacl/third_party/SpecForge/pyproject.toml": {
+    "sha256": "6e8d40f488a5fa9a19e2979be7511b486dfa93a9a307759141a43e59ed708649",
+    "bytes": 1041,
+    "lines": 50
+  },
+  "SpecNaacl/third_party/SpecForge/scripts/prepare_data.py": {
+    "sha256": "81f186b275aae48ddd7b1abbd3dd645f9a19578b33c34fe0e61a735f1cee5ad1",
+    "bytes": 18244,
+    "lines": 614
+  },
+  "SpecNaacl/third_party/SpecForge/scripts/prepare_hidden_states.py": {
+    "sha256": "a15d8fb7d2f895b44bde0cb3443f62bafdd92909316abaa8ad48360ffd94ab11",
+    "bytes": 35813,
+    "lines": 938
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/__init__.py": {
+    "sha256": "75fdd124964a31d3e130ae97fe84fa282bef85d93005278468722b1164a5f9da",
+    "bytes": 187,
+    "lines": 5
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/__init__.py": {
+    "sha256": "3fcd1ca88f294fc309526ff7ae447b0760475d7730859595401c27a932e6940c",
+    "bytes": 548,
+    "lines": 22
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/builtin.py": {
+    "sha256": "5fe3726c0da8af7305d4964b3685b59909debec882bff7758812eb1b2d45f923",
+    "bytes": 903,
+    "lines": 20
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/common/__init__.py": {
+    "sha256": "ef3eead1f6f5d6982eb0082ed625bb4e08341cae48ada0857e37563ec5848c7e",
+    "bytes": 757,
+    "lines": 31
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/common/collation.py": {
+    "sha256": "55b1b82c415b6f4224afe266ea86ec315347896bc34c7dfcf35c2e4c695eff32",
+    "bytes": 2710,
+    "lines": 86
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/common/defaults.py": {
+    "sha256": "8aadef922684587af5153f4f87bce7f5af7a877a804054372b34682946f174a5",
+    "bytes": 630,
+    "lines": 32
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/common/dflash_family_model.py": {
+    "sha256": "3ea975b866f9f8190d052e726c72d0993a7009cd0edca37a3be3a3a8590b63b1",
+    "bytes": 100565,
+    "lines": 2531
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/common/dflash_metrics.py": {
+    "sha256": "74af7746c1b5750c2673f34d7fe8cd14423551a84a79842e73fbb6a4da49b6f9",
+    "bytes": 2437,
+    "lines": 64
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/common/hidden_states_data.py": {
+    "sha256": "32698837e33f726de496f4495032c4cf295ac191e1837190c95313cb539b348f",
+    "bytes": 7879,
+    "lines": 267
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/common/providers.py": {
+    "sha256": "18a2be5f60e54a507c8761ce7759863c60eba2a9934c34d472ce14b738d3be12",
+    "bytes": 33214,
+    "lines": 864
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/contracts.py": {
+    "sha256": "ad882660f3bebe833c5faa26698dcecb0735c68c8f6be0b1cca1f5e6484db5f2",
+    "bytes": 13582,
+    "lines": 370
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/dflash/__init__.py": {
+    "sha256": "3649771fd146b6df0aabc2690a4cb81b2f9aa469a3be3817adf5d31e6bb47315",
+    "bytes": 143,
+    "lines": 5
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/dflash/providers.py": {
+    "sha256": "2610e29034853093f5dd6ea66caa55ee10598164d39b74bef79cd479c84065cd",
+    "bytes": 9813,
+    "lines": 282
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/domino/__init__.py": {
+    "sha256": "449401600ef4b0666fcfbed8e47a8b16fc4214535fd69d05f7d29d39b464c618",
+    "bytes": 143,
+    "lines": 5
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/domino/providers.py": {
+    "sha256": "edb81ad8ead7da38618c0b6b70872b5f4011dc898569bd4f2036824cd1a98bc6",
+    "bytes": 6996,
+    "lines": 216
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/dspark/__init__.py": {
+    "sha256": "2ee80b124f2c9c4acca9b6703b5a285a22a760fe7ee952b0bf25db98707f0a16",
+    "bytes": 143,
+    "lines": 5
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/dspark/providers.py": {
+    "sha256": "097f290c7ebe17b318226c0310ed3e87bdc1b7fcfad8dab0256352cee0e10b42",
+    "bytes": 7260,
+    "lines": 212
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/eagle3/__init__.py": {
+    "sha256": "bc86e2e570c711b73c1181a8ab6acbbf409f119b0ac640bfb9d58b3d19f51b01",
+    "bytes": 143,
+    "lines": 5
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/eagle3/data.py": {
+    "sha256": "4ab4f607f3230339af4f7ce04177640f2c7ed9ef74f9d011f11eac2b986b8541",
+    "bytes": 3003,
+    "lines": 103
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/eagle3/model.py": {
+    "sha256": "7814ab57890fa673fcec4ab9d7fe5aff40a86a5f366dd0392036b893bed427bc",
+    "bytes": 34304,
+    "lines": 808
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/eagle3/providers.py": {
+    "sha256": "48faeba759b150104c77467ef48786475b2a64fce2d8f05c0348fda6ad744f5e",
+    "bytes": 8313,
+    "lines": 241
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/model_providers.py": {
+    "sha256": "040bf759d4204a53a68c89a6b40a0901d3345b02d7716e9c840d1057a4a96908",
+    "bytes": 18469,
+    "lines": 546
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/mtp/__init__.py": {
+    "sha256": "0502caa0f7fecf9238329b7da694c51f7f7f5513cc0c5a10f5878271b2763bde",
+    "bytes": 137,
+    "lines": 5
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/mtp/providers.py": {
+    "sha256": "1e8e6010c43b1ec6da383e1da2d9a85b6c995c82c359b88de15b31a07f379213",
+    "bytes": 11673,
+    "lines": 321
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/peagle/__init__.py": {
+    "sha256": "d702bebfdb94e6b01bf7b4e8e2c0cbed0a347ee1e5103a7c011804794d8ae3fc",
+    "bytes": 144,
+    "lines": 5
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/peagle/model.py": {
+    "sha256": "2af867450fd18cda642e50c1ec5620a6035add93ba340e597b7f4225101ae48c",
+    "bytes": 12350,
+    "lines": 347
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/peagle/providers.py": {
+    "sha256": "d2c09720ed6ed3907de50ea55732e8f451a30b73ed77fa2a097c82bec54c64c5",
+    "bytes": 5274,
+    "lines": 159
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/algorithms/registry.py": {
+    "sha256": "2878564b35bf2cc5df94c8bfb221ff33f524e84f94ef80b9085891124776e81a",
+    "bytes": 3281,
+    "lines": 99
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/application/__init__.py": {
+    "sha256": "e13efe6234dc1546b1a5c6f7dcb4c33d575ead2a1aae1c3fcd3faefc2437e235",
+    "bytes": 419,
+    "lines": 19
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/application/composition.py": {
+    "sha256": "26cbf69790ae54f54e7bdc4066e9722a7b334812def044a9eb9c74372be83fcc",
+    "bytes": 4979,
+    "lines": 158
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/application/planning.py": {
+    "sha256": "0cbecfbe59340aa153c6f96911c021c30899e55d3d7c0999226b300eff7c3d54",
+    "bytes": 8163,
+    "lines": 223
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/benchmarks/__init__.py": {
+    "sha256": "f004c5068444a5997bc337ec36aaf4dfa1e6521e980ce28fbbdbf25e4b8e3096",
+    "bytes": 49,
+    "lines": 1
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/benchmarks/benchmark_dflash2_conv.py": {
+    "sha256": "bbcd100f7e5ec2613afaa4b3d25d7b55ad7be518d73026518c0de30e2df34152",
+    "bytes": 12265,
+    "lines": 348
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/benchmarks/benchmark_flex_attention.py": {
+    "sha256": "097d4614989ca2251f700a416826399427cd043e371cd9a3412f7b51a4800125",
+    "bytes": 11020,
+    "lines": 334
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/benchmarks/benchmark_loss.py": {
+    "sha256": "781f71888ef40323379bbeaee80d6c57fbd324a13cd8c4e8427581b3c672ceff",
+    "bytes": 5656,
+    "lines": 179
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/benchmarks/sglang.py": {
+    "sha256": "95a5a349219b31e217882971ed0efe3cbf89f6c3315183b33117b70708069948",
+    "bytes": 7431,
+    "lines": 220
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/cli.py": {
+    "sha256": "ba250f9fd9ae2c477cb285e347eb016db79f70647fd688504b7da39b0e5f6bd2",
+    "bytes": 12580,
+    "lines": 364
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/config/__init__.py": {
+    "sha256": "16597ccd98581846acf8274caa6f6f1b242d94a3e8814e1c34f1e2d85d7915e2",
+    "bytes": 1004,
+    "lines": 42
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/config/schema.py": {
+    "sha256": "abae864a0d57e68025dfc1af4dbeb62feb4d593e6c5fd0a766c4e2cdf1200752",
+    "bytes": 63266,
+    "lines": 1427
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/core/__init__.py": {
+    "sha256": "e186f87148f34b9632aa922f98531869f6355635e83870afb513ad8dcf016920",
+    "bytes": 201,
+    "lines": 6
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/core/chunking.py": {
+    "sha256": "feade2bd81fe9738af5a37e9c10129889fbecbfcb6c1ca836c8349792244feb4",
+    "bytes": 3896,
+    "lines": 108
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/core/compact_teacher.py": {
+    "sha256": "4997b88ab8ffc710ae2dc06f7d17d0fc41262c2be31e96b87cc6c2d0f6a79b98",
+    "bytes": 11747,
+    "lines": 318
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/core/dflash_head_triton.py": {
+    "sha256": "49af2965efc9a43741992b98ab77758676d24b725d055245112dafd85e9baf21",
+    "bytes": 19857,
+    "lines": 521
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/core/domino_loss.py": {
+    "sha256": "ad4a7dc49fe47dea9d30164285e5d806e1a2f6101117977d4b0714c2ba0614a2",
+    "bytes": 5408,
+    "lines": 144
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/core/domino_loss_triton.py": {
+    "sha256": "43374a9605a422718ef43acb035bc37bf56a7a39d04bf20c51738aec4662408b",
+    "bytes": 15647,
+    "lines": 464
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/core/eagle3_adapters.py": {
+    "sha256": "13064ce56ef530ae132a3c1a33334518b30aaa172b634a9c288bb44edbc7c227",
+    "bytes": 7694,
+    "lines": 223
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/core/lk_loss.py": {
+    "sha256": "3385ca4587674f695038862e7331de7b7168bc2b69733305244538278f05948e",
+    "bytes": 3737,
+    "lines": 108
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/core/loss.py": {
+    "sha256": "7ef770e0bcb59682d6b3d2dbc8a5e953d5472c59f488edd028bf4442978f81ac",
+    "bytes": 8093,
+    "lines": 240
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/core/mtp.py": {
+    "sha256": "96f7669cfe89b7da8fe57d59575aaff74c636b33e4308786cd815f24366e0e05",
+    "bytes": 8786,
+    "lines": 204
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/data/__init__.py": {
+    "sha256": "27edd6fcbf36fa154462917c3e0d4331cc1fc4fa354027810ed7d5e6285ae4ed",
+    "bytes": 171,
+    "lines": 5
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/data/encoders/__init__.py": {
+    "sha256": "6bb7b2e0fc24af98ea336ea59e1182a225a2ee6536775e142e0b0a1a68dee179",
+    "bytes": 38,
+    "lines": 1
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/data/encoders/deepseek_v4.py": {
+    "sha256": "9fd92ff0b8d4a56d845df24dc5138cf1fb4b5977e70ceb29a1edc8cd75098572",
+    "bytes": 30228,
+    "lines": 785
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/data/loss_mask.py": {
+    "sha256": "1957636c306fafcd7e483585cbff294fd132ec7e593edb4f9b3d9c76534c0eab",
+    "bytes": 697,
+    "lines": 21
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/data/parse.py": {
+    "sha256": "cb1033cc44f523af4cd5b1df8ca60ff91c78143605bc74dd5df6bf1cd1ebab02",
+    "bytes": 24052,
+    "lines": 628
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/data/preprocessing.py": {
+    "sha256": "8cf2434799b52dfc94fd1175f74a6746fad2196428507f1659582014a8aa087c",
+    "bytes": 29432,
+    "lines": 779
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/data/prompt_builder.py": {
+    "sha256": "67d194fc90e0751ad13ad4f1534803004b1375f84bb7740fde13372a31a4659a",
+    "bytes": 12446,
+    "lines": 373
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/data/template.py": {
+    "sha256": "6173c93a834c00a2dac5a0c622ae50d3e6f54ebef7c91ec30985a59989b1bc0d",
+    "bytes": 13630,
+    "lines": 436
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/data/utils.py": {
+    "sha256": "69dcf00657d6f5db35862b71ea3e47386c0046b4f41979e487874aa24d7d1eb0",
+    "bytes": 10054,
+    "lines": 287
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/distributed.py": {
+    "sha256": "f5a640c047fd80c144da5102b3d8a9cd91c9f2a4bf39372c23ccec8b707f6be4",
+    "bytes": 12725,
+    "lines": 379
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/eval/__init__.py": {
+    "sha256": "16364a247d6ae5e75a01c93d6578753da3a3241968eefdc3d6eb2598afe73872",
+    "bytes": 171,
+    "lines": 6
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/eval/evaluator.py": {
+    "sha256": "e5cab27db628be01d70007cc5183038280ec112abc82f2adc81063b497b93201",
+    "bytes": 9577,
+    "lines": 223
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/export/__init__.py": {
+    "sha256": "eaa1adf4da2513f7cd6554583992948bf120fcbe34ecea2feaa29f3f5b2f9bcf",
+    "bytes": 249,
+    "lines": 7
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/export/checkpoint_io.py": {
+    "sha256": "fca1a7c687fb8f45ab907961f776ce499b05c50fbcce18ea97a67db3206da499",
+    "bytes": 6902,
+    "lines": 189
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/export/mtp.py": {
+    "sha256": "a6251de71d2c0acdd9ef21277fe349a528d6aec1b589a58270ee5dc0e76913ae",
+    "bytes": 14291,
+    "lines": 381
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/export/to_hf.py": {
+    "sha256": "45713eae2688b8c18667a4bddd591e4c8ff4e911a489459cb583deecde53fb55",
+    "bytes": 6088,
+    "lines": 156
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/export/to_sglang.py": {
+    "sha256": "286c0769da8b654dc52815f93fb1e42465d546a36afd408e7167b8c82e1e1630",
+    "bytes": 4147,
+    "lines": 109
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/inference/__init__.py": {
+    "sha256": "2b93a1bd45d662457c6ef6d0ffc5997e0dc040c049e6a3444dfdedf4b84f7a53",
+    "bytes": 233,
+    "lines": 6
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/inference/adapters/__init__.py": {
+    "sha256": "7ea3fef70a069eb820b3d1f5cef733a24555428e1cb93ba6ced8ef2cef72cab1",
+    "bytes": 76,
+    "lines": 2
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/inference/adapters/server_capture.py": {
+    "sha256": "f7addd96f428e6f363f88597e681d0718ff17ed05cb7e4d5d795d213d40502b8",
+    "bytes": 21506,
+    "lines": 528
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/inference/batch_partition.py": {
+    "sha256": "60b6539d9345ceff44e4be0479035e67b20c9079616bf8bc8ccf04b97a078808",
+    "bytes": 3163,
+    "lines": 87
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/inference/capture.py": {
+    "sha256": "31845205079b5f8c803712580eb0466a1858dd2b29cb04f8f08ed8a86febcc36",
+    "bytes": 7112,
+    "lines": 192
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/inference/media.py": {
+    "sha256": "0ba8804152d6827e098bdaf7d84fd8e6935c32e22aa0a2dc452f1b3daa80f3a1",
+    "bytes": 817,
+    "lines": 34
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/inference/rollout_worker.py": {
+    "sha256": "a714efb04d2d6e0abd2ab92dd75d57de3b714b5de83bc4fe6d0bd7dfab993066",
+    "bytes": 13658,
+    "lines": 350
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/launch.py": {
+    "sha256": "0a411aa8450fd59e75ba6bc1091d4bbb42e9b025b8387e0966565f69ef8d8eef",
+    "bytes": 81157,
+    "lines": 1998
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/launch_plan.py": {
+    "sha256": "1dae586a305b3ffa2ed57167dd51c41137572cddb667351b72f7b11e5db2b2b0",
+    "bytes": 48055,
+    "lines": 1307
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/layers/__init__.py": {
+    "sha256": "46961cecc347caf7fe593dbf08a6ed36902b7f2356a8e11d1bfa752163ff80ba",
+    "bytes": 262,
+    "lines": 10
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/layers/embedding.py": {
+    "sha256": "878069b9ed7582015a7a2c8373ccbda444f33ed6e02d81e0e6133a258f933561",
+    "bytes": 4568,
+    "lines": 132
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/layers/linear.py": {
+    "sha256": "7ab414c1b77059b4670dc21facf2271a8997192f85f06e945fbeead8a14cc5f1",
+    "bytes": 8028,
+    "lines": 204
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/layers/lm_head.py": {
+    "sha256": "57f2330580bcae104a3d634153c2f87d28f25e58665a5ca4d8346e5ae7309774",
+    "bytes": 3965,
+    "lines": 109
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/layers/ring/__init__.py": {
+    "sha256": "3b2c426e09794ab226c80f4f1dcb3e6bff2970831944506d3ce10382267e0728",
+    "bytes": 333,
+    "lines": 12
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/layers/ring/ring_flash_attn.py": {
+    "sha256": "89803c7c6cc1319d315b497077adb2c5a2e53568cdcdd9a433492efc61da0d1a",
+    "bytes": 8358,
+    "lines": 336
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/layers/ring/utils.py": {
+    "sha256": "450d981f9bf029b152ce30f99e77db9f43bd56edd887033845bfa2e5651e1dfb",
+    "bytes": 4006,
+    "lines": 119
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/lr_scheduler.py": {
+    "sha256": "06f74da16014706b1ea55575511a3fdace8710c0b6de30da90835703cba8895a",
+    "bytes": 5804,
+    "lines": 150
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/__init__.py": {
+    "sha256": "41cc6777c60b4f8b1a232934450ff44b68c37588ae824d9c6dc3e240b1c1aadb",
+    "bytes": 168,
+    "lines": 5
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/_mask_utils.py": {
+    "sha256": "6ee263c9c781d8db1dfdb05eee67e78b17a7de6874e59f60c5292fba2bc043ac",
+    "bytes": 3834,
+    "lines": 109
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/auto.py": {
+    "sha256": "9dd22e9c627edc9d770adf0b3e783c5954746d2dd83b412e3f4695bd7f4e6c68",
+    "bytes": 3940,
+    "lines": 116
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/__init__.py": {
+    "sha256": "a684d1384a615a589243be30ecd2e337e9a0a6a582076c4c2e74422b59d96032",
+    "bytes": 855,
+    "lines": 32
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/base.py": {
+    "sha256": "365e2ff71639b8d2eeb26cdaa12f41551c4f941dd2ba74da2f3a52f256a8c1e6",
+    "bytes": 7223,
+    "lines": 191
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/dflash.py": {
+    "sha256": "97af112a6ecf66d4b397aae77f0f97c08a49759c6305a4c70577a4f78b45ca90",
+    "bytes": 34842,
+    "lines": 932
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/dflash2.py": {
+    "sha256": "819c6b3d8d6d8ffc31a843ed40d539ddf635f58b148a01c8c43d0bff1dd02b09",
+    "bytes": 17615,
+    "lines": 486
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/dflash2_conv_triton.py": {
+    "sha256": "f6c3871412b2327b276e130a09a1523c44b9b53275864cb7171111ad9efc9cc5",
+    "bytes": 12781,
+    "lines": 358
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/dflash_kernels.py": {
+    "sha256": "ce6496a07282b8d3ab4b69942191d27a8ba2d0a107613b2ae74e60604b0faf46",
+    "bytes": 1690,
+    "lines": 57
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/domino.py": {
+    "sha256": "53c577d4cf9546b56096fddba7aff2c5344f9b91cbb0359713cb65255731770f",
+    "bytes": 5996,
+    "lines": 153
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/dspark.py": {
+    "sha256": "bf2ad78eefe5ec881bb9d0e5cd34c427ba899a0251f460c739c1f2dc2ddd1172",
+    "bytes": 15263,
+    "lines": 405
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/flex_attention.py": {
+    "sha256": "8629f03760401d42bc37e494324a920cda52cddb33d3df59498e46c2efd19dcb",
+    "bytes": 3732,
+    "lines": 127
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/flex_attention_backend.py": {
+    "sha256": "99cdd72db228f1001f715264ae4954bfccd4a989447bdc8b6aec3088e50a2b4f",
+    "bytes": 785,
+    "lines": 28
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/llama3_eagle.py": {
+    "sha256": "8d113a65ce5f0f2df9c1d4b9f7b550a154ef53a56641ea6b93237d3ae2b755e2",
+    "bytes": 66019,
+    "lines": 1720
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/mtp/__init__.py": {
+    "sha256": "3827bf1a7790583d3cd8114f47b8e7bfe2e9d7423cfa19e00e4758dfe4a86dad",
+    "bytes": 270,
+    "lines": 7
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/mtp/base.py": {
+    "sha256": "fbaab7cc45b931edfcb4eebf32b3f24717dc5dc778e600cdf4dd6b8833e255fc",
+    "bytes": 5538,
+    "lines": 139
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/mtp/qwen3_5.py": {
+    "sha256": "8400c8d7be4a4e39ff90ace651f3c9175d9b9a69644e8d2940e235c13472d97e",
+    "bytes": 21213,
+    "lines": 557
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/peagle.py": {
+    "sha256": "f030c12080cebd8c2f7f71687fac9a14884e3f4a588b690b08ae315738d87969",
+    "bytes": 12082,
+    "lines": 322
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/draft/registry.py": {
+    "sha256": "7fd72df335c441d09b6586f6cd0572e5b7baf0cb9cdcf1905b041341ce5f16f3",
+    "bytes": 2342,
+    "lines": 66
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/target/__init__.py": {
+    "sha256": "a9e2cfc965bc188989fcf68a51c0d25a40cfb931affac0375b9f119a0343c709",
+    "bytes": 188,
+    "lines": 5
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/target/checkpoint.py": {
+    "sha256": "8efead9083a5d2517e0956f59ca14413ce5d9313da52c48e7c6b3a62e9438782",
+    "bytes": 7629,
+    "lines": 215
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/target/target_head.py": {
+    "sha256": "478d06a4ffe9cfd50865945c6d036a2b6b4b734153ff06ae84533df178fbf61c",
+    "bytes": 4325,
+    "lines": 127
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/modeling/target/target_utils.py": {
+    "sha256": "6f61f2028b4cef229a1af9125de4c1c7015b2f13c9bad38bf1d5e5f1dfb36263",
+    "bytes": 9689,
+    "lines": 288
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/offline_capture/__init__.py": {
+    "sha256": "c69d247054dff3100f36335f0ffd2500f7b76f513607373666a0503bfe3bd6d6",
+    "bytes": 768,
+    "lines": 25
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/offline_capture/sglang.py": {
+    "sha256": "61f1e13b66208524e9a62279af2c8818354d37fa7bfeb833c79037ecbd1ab35f",
+    "bytes": 3921,
+    "lines": 135
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/offline_capture/sglang_backend/__init__.py": {
+    "sha256": "370fe473d8b75382795d654568a02a3b8e60913ef4431d2382e0cda5d2481323",
+    "bytes": 407,
+    "lines": 13
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/offline_capture/sglang_backend/capture.py": {
+    "sha256": "568ad3e3ce463d5dd0aefca277d56846d5db6fd2fae2627c82d030708d9d33d3",
+    "bytes": 15173,
+    "lines": 394
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/offline_capture/sglang_backend/model_runner.py": {
+    "sha256": "98fdf2325ecb2e0afaf4351d690a678e14359a7b4febbf368a6666652fd6cb87",
+    "bytes": 7550,
+    "lines": 195
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/offline_capture/sglang_backend/patch.py": {
+    "sha256": "7841e5b75179c8915e31cd280bfb6d7d5ae3d5a52170d0b81fcc21576e276599",
+    "bytes": 15506,
+    "lines": 401
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/offline_capture/sglang_backend/utils.py": {
+    "sha256": "f31d77c3998c6dcc00ae6751e77f8770a3f2855f973d75fe8fe50ce38fc73089",
+    "bytes": 4906,
+    "lines": 147
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/optimizer.py": {
+    "sha256": "d5cf9234a00b143a137d01e46164c2098b83d94633afcc7b0e1685e607f3bd4b",
+    "bytes": 14836,
+    "lines": 348
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/__init__.py": {
+    "sha256": "2e673fa5caf51f69a6dc0118ace354dbebf9e56f03cdb4dc0e4b80ad1b606554",
+    "bytes": 903,
+    "lines": 33
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/contracts.py": {
+    "sha256": "23491749b84638a56087b3e6dfa30ccf24432a5fdd610eea8036356888d0a6ce",
+    "bytes": 7720,
+    "lines": 208
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/control_plane/__init__.py": {
+    "sha256": "f449c268c2b7b07153009ffa97ba0f045036ba235c1e427eeeafd84b63e5cd75",
+    "bytes": 602,
+    "lines": 21
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/control_plane/controller.py": {
+    "sha256": "9b2d0d99d5f2be577b5e0a2d94fb606c5672fe815c575f3a75c57c0519073f2d",
+    "bytes": 13142,
+    "lines": 303
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/control_plane/dp_ack.py": {
+    "sha256": "4dc632d95335dda5eecc7bca66d596822072379a6f2d6eb7aac4c152454d1c86",
+    "bytes": 12095,
+    "lines": 295
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/control_plane/flow_control.py": {
+    "sha256": "09e4a8993c9c13c1b86806b63cdd64246f9efe4d6dd702dd0feacd2935e8c150",
+    "bytes": 5193,
+    "lines": 135
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/control_plane/metadata_store.py": {
+    "sha256": "b8b8ce0bef387e6a772e51e6760644c829a11f4d19d49b7b773facd015777927",
+    "bytes": 10513,
+    "lines": 305
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/__init__.py": {
+    "sha256": "e16f53dbc48ce6228f19905378e0d92668d5fc6237fbc1b136fdbb4508cb1f8b",
+    "bytes": 1585,
+    "lines": 51
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/disagg_ingest.py": {
+    "sha256": "ce65f3e3e46739b2374b02bcc456c1e4413e72b7ed71018116611d48d26a8268",
+    "bytes": 4573,
+    "lines": 119
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/disaggregated.py": {
+    "sha256": "03f95113c1b10a8c9ea0eaf1b754e75ade1d3cd6831bc31306d571dc33eaa9a7",
+    "bytes": 13862,
+    "lines": 322
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/feature_dataloader.py": {
+    "sha256": "1c7f097fdc223b588ded9f24e1f5aee367ed4fc7ccea6414cc0e2ea9ea434d77",
+    "bytes": 29216,
+    "lines": 700
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/feature_store.py": {
+    "sha256": "b4041c9d6da20b4f1cbba4ef9f4b205b2a4d294ebcf55190a4e2ddd3cabdca2a",
+    "bytes": 29321,
+    "lines": 680
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/http_inbox.py": {
+    "sha256": "ce34f5bcd91bdda6410951a6a2e20ff51fd56028d28d6959e3537f04ec9f38e1",
+    "bytes": 12929,
+    "lines": 332
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/mooncake_store.py": {
+    "sha256": "1b206f50ef6e2bfab7dcec494032a0c453f82a078cf99b834174fc324832761e",
+    "bytes": 65378,
+    "lines": 1456
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/offline_reader.py": {
+    "sha256": "8702ad15014074039a6df291ad83f97a164c689e3fd7b6bddfbcefa26ea3dd39",
+    "bytes": 6824,
+    "lines": 166
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/ref_distributor.py": {
+    "sha256": "98f3e60d3d4b2108bdb2adaf35b2dfe3e66cf76081994254f8a2dc0239e24053",
+    "bytes": 17623,
+    "lines": 397
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/ref_serialization.py": {
+    "sha256": "95765c9546154ba449372fd3cfba93a22231c4841ebd5cd6e40a2241694ddc17",
+    "bytes": 583,
+    "lines": 23
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/sample_ref_queue.py": {
+    "sha256": "bb5b3f5d5fdc6a16d1c0e9b3719909e710d83785d77e55bfbc9e22e6a98738a2",
+    "bytes": 3065,
+    "lines": 88
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/runtime/data_plane/streaming_ref_channel.py": {
+    "sha256": "242b137fdc0c57ef01af0765e35dfd8e02f049b897ee0296aed4ea402cadd1a0",
+    "bytes": 23846,
+    "lines": 582
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/torch_compat.py": {
+    "sha256": "c3718b156c9f3af21467acd8ed997eb0603852909f15e484dc11d85ea7e55009",
+    "bytes": 1885,
+    "lines": 62
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/tracker.py": {
+    "sha256": "d1126737cb2246bb9bae9fad26aa63165725e93189e2f0ee0b82df4bc2cd10a2",
+    "bytes": 12623,
+    "lines": 375
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/__init__.py": {
+    "sha256": "f8a4079f3705c72783adbf01eb091bc92e1d9eef12bed0b72df3690aa1cf320a",
+    "bytes": 1059,
+    "lines": 30
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/assembly.py": {
+    "sha256": "c80d04a3df8961d21dc2d2f581c28d7b7ea93cb7b2e8d9f50614b6004d4dc00b",
+    "bytes": 24222,
+    "lines": 671
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/backend.py": {
+    "sha256": "1e37827378f8a5046a4395390763dad83050268d3fc53adcc3d1bcc282ca3f46",
+    "bytes": 19927,
+    "lines": 497
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/capture_contract.py": {
+    "sha256": "3991e499353f8c649e11f13255cae2ed369b1b5f2d934e418fcca4da641db197",
+    "bytes": 2329,
+    "lines": 71
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/checkpoint.py": {
+    "sha256": "4a5b3ab3bd8de61a01f05ea7e0a22cb65d48106efeb8a1abb73ebdc72e614a17",
+    "bytes": 19481,
+    "lines": 479
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/controller.py": {
+    "sha256": "60f444ae0a732da529c8d1c576c34184c1e83209147ab3b2817eac9393bc5930",
+    "bytes": 53157,
+    "lines": 1272
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/disaggregated.py": {
+    "sha256": "5a29aa719750afadabb5c4637a8c58d0a57d85df04c3c616e8788b19a75fdc8a",
+    "bytes": 34173,
+    "lines": 882
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/length_bucketing.py": {
+    "sha256": "c56e878f7e6f78fad073e089aea27d1fd68107f315563b2382c1c1fb2f980a68",
+    "bytes": 5143,
+    "lines": 123
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/model_loading.py": {
+    "sha256": "c3281848cd70ee7aa2420c2bf3214f1a988d1c845084097f7bb2de90b32da6bb",
+    "bytes": 16889,
+    "lines": 475
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/model_utils.py": {
+    "sha256": "a51249f66916ab07ed9710fa13dc4aabd5323cd4cdc8a9baef94e7c91ca7cfb5",
+    "bytes": 2108,
+    "lines": 63
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/pretrain_attention.py": {
+    "sha256": "bf2f5b5359ef6ebc7ff063d0ca79cd6f4d21624a462c45394816f9d454ce366b",
+    "bytes": 2548,
+    "lines": 54
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/profiling.py": {
+    "sha256": "041cff2414b4b7cfc3b7755c59675dccb0dfebb7fd4ad1f351080dcae31e0264",
+    "bytes": 4172,
+    "lines": 123
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/provenance.py": {
+    "sha256": "3ead3cd0c73f406b063605448f16f8c600815c6b5d184974ca86d3fecdd0a282",
+    "bytes": 15479,
+    "lines": 436
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/schedule.py": {
+    "sha256": "c4b22e05122fd77ed807fccb3195490430263a40ba943e237bf5f3fee5aebd16",
+    "bytes": 4181,
+    "lines": 120
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/strategies/__init__.py": {
+    "sha256": "aac0106d454c79db5a79cbd64e070b280e2ebebe59dd1d3617bb871ac470cf97",
+    "bytes": 202,
+    "lines": 6
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/strategies/base.py": {
+    "sha256": "88ea9e4ce7fe8c83e887b0df79857c22359987a2f55b6900c5b3d3907a4ab73f",
+    "bytes": 29397,
+    "lines": 780
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/tracking.py": {
+    "sha256": "39f29b9ea0027acc91e59adef29e3a164807b11904984c0380bb0c2cef2ebb82",
+    "bytes": 4790,
+    "lines": 137
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/trainer.py": {
+    "sha256": "b81febd7a09cf647a3657ca697c99aee870d8671ca070cba4c4773d9e600405e",
+    "bytes": 30190,
+    "lines": 672
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/training/vocab_mapping.py": {
+    "sha256": "a9aec0eac261fd3d3fde9903ab08bbb49428b25d17f277027caf1bcb4b50a3c0",
+    "bytes": 2818,
+    "lines": 71
+  },
+  "SpecNaacl/third_party/SpecForge/specforge/utils.py": {
+    "sha256": "a80a565baf352587960173eac609a729a60aed576223f50084972996e80a9dc3",
+    "bytes": 10952,
+    "lines": 287
+  },
+  "SpecNaacl/train_draft.py": {
+    "sha256": "9bd0bb45684ccdc0ac1074fe60e3df71928e4a3fc9b168900c23c18c76590232",
+    "bytes": 10535,
+    "lines": 167
+  },
+  "SpecNaacl/train_draft.sh": {
+    "sha256": "927f65a1c70f5d205aefccc167ed5cdfd6ade6815e751d491742c66fefd770d1",
+    "bytes": 331,
+    "lines": 9
+  },
+  "SpecNaacl/train_fastgrpo.sh": {
+    "sha256": "e45988faecd86f4f564f5cffd60bc4ae7a186eb9ee32fd102f1e0a2266b06946",
+    "bytes": 597,
+    "lines": 16
+  },
+  "SpecNaacl/train_llama31_8b.sh": {
+    "sha256": "2706978559aaa0273e0031fd04cd4dae38fe62b615c728a812e9e60647725951",
+    "bytes": 2182,
+    "lines": 43
+  },
+  "SpecNaacl/train_llama31_8b_fastgrpo.sh": {
+    "sha256": "8b54ce55c8c687c80a8dc883f6a5dc6ea5ff96cf6f72d9b1769f5ebd1f072ce3",
+    "bytes": 2126,
+    "lines": 42
+  },
+  "SpecNaacl/train_opd_reflex.sh": {
+    "sha256": "0c353df852809eea676debada7da036eab5f92e7b979df17d2fa1a383f2085ed",
+    "bytes": 149,
+    "lines": 4
+  },
+  "SpecNaacl/train_qwen25_14b.sh": {
+    "sha256": "78acb8f097f0f3804ccb50f45aa3c2de575fc90a67850c4a8b9920b30790b7e7",
+    "bytes": 1915,
+    "lines": 39
+  },
+  "SpecNaacl/train_qwen25_14b_fastgrpo.sh": {
+    "sha256": "1311973044eb83c93dd3903e2306493d36b42ebfb2d844f8c2ca2d17e24de4dc",
+    "bytes": 1859,
+    "lines": 38
+  },
+  "SpecNaacl/train_qwen25_1p5b.sh": {
+    "sha256": "4649a09e2eb338b5705c565e941cd93ee2a714b0ac3b0f777cd7e08ef9109c46",
+    "bytes": 1917,
+    "lines": 39
+  },
+  "SpecNaacl/train_qwen25_1p5b_fastgrpo.sh": {
+    "sha256": "efb2259ac1dc71a3c0891741844bcfd9506240a9895964863eecb247cf5368f2",
+    "bytes": 1861,
+    "lines": 38
+  },
+  "SpecNaacl/train_qwen25_3b.sh": {
+    "sha256": "e23477a7b2b01452856780b5480ea33794fde79abc21dfa0d84ff24e43a66576",
+    "bytes": 1913,
+    "lines": 39
+  },
+  "SpecNaacl/train_qwen25_3b_fastgrpo.sh": {
+    "sha256": "de0afbc054a1798db94039eca93c7f5af57b392041c26435798133e74f46396e",
+    "bytes": 1857,
+    "lines": 38
+  },
+  "SpecNaacl/train_qwen25_7b.sh": {
+    "sha256": "961d6723215a53b526df137100381ed82d697fc72aae8435b46ce098777d879c",
+    "bytes": 1913,
+    "lines": 39
+  },
+  "SpecNaacl/train_qwen25_7b_fastgrpo.sh": {
+    "sha256": "ce55724b88a8f6115d179fc59a690c9e0d948247397ff371980381f2d8324225",
+    "bytes": 1857,
+    "lines": 38
+  },
+  "SpecNaacl/train_qwen3_1p7b.sh": {
+    "sha256": "e8ca6280fb89e7d69d0469ee692435f726f61b463ffceaee36867588693a89ca",
+    "bytes": 1905,
+    "lines": 39
+  },
+  "SpecNaacl/train_qwen3_1p7b_fastgrpo.sh": {
+    "sha256": "a8296af10e54424484cf8f5508544aab52f7b4d997a4c96402affe3a59ec67f9",
+    "bytes": 1849,
+    "lines": 38
+  },
+  "SpecNaacl/train_qwen3_4b.sh": {
+    "sha256": "900f57e74551a530c3e18366f012c9067ea5334c9cc45acf7ec836f0a09b34b2",
+    "bytes": 1901,
+    "lines": 39
+  },
+  "SpecNaacl/train_qwen3_4b_fastgrpo.sh": {
+    "sha256": "f840bff38c3e098a8d290b28eb444f4a20182a3ff3b14e9b0a33e2842ab32901",
+    "bytes": 1845,
+    "lines": 38
+  },
+  "SpecNaacl/validation/environment_compat_20261008/result.json": {
+    "sha256": "7904e0fe457f8042d783a458609221f3f4b37f089f5b9a650d29b1c7c8dac3d4",
+    "bytes": 876,
+    "lines": 42
+  },
+  "SpecNaacl/validation/fastgrpo_rewrite_20261008/qwen15_rollout/report.json": {
+    "sha256": "48dd4571713b8f54b6eeabdb42f00b646e4d455842573b575ea86092348543fe",
+    "bytes": 14617,
+    "lines": 397
+  },
+  "SpecNaacl/validation/fastgrpo_rewrite_20261008/result.json": {
+    "sha256": "3e0df1bb473a0f3a6ebdf9c724e98cd99fc99f6b45127421cb84631e14c90f45",
+    "bytes": 411,
+    "lines": 15
+  },
+  "SpecNaacl/validation/fastgrpo_rewrite_20261008/tiny_rollout/report.json": {
+    "sha256": "4aaa23f7be76d86d155b22820f02041a0188ce0021ec66f677a4b3324b63f155",
+    "bytes": 15677,
+    "lines": 422
+  },
+  "SpecNaacl/validation/iteration_logging_20261008/result.json": {
+    "sha256": "d498be94f2f93bf8c77eaf6d47f7ef11a9c1cb59a309ede3d025165f4cde2e0d",
+    "bytes": 548,
+    "lines": 21
+  },
+  "SpecNaacl/validation/opd_20261007/crossover_32768_rtx3090.json": {
+    "sha256": "8e0d0c1bc38678a9647262a66f4287f1c26cfc9a7d4434a08459eb3af99f341b",
+    "bytes": 2880,
+    "lines": 111
+  },
+  "SpecNaacl/validation/opd_20261007/crossover_final_rtx3090.json": {
+    "sha256": "172b1804854d82b22ccd2350bbfe3a23cbe3ec2cd948ff90ee4685b17fb85dff",
+    "bytes": 2879,
+    "lines": 111
+  },
+  "SpecNaacl/validation/opd_20261007/crossover_isolated_rtx3090.json": {
+    "sha256": "abd0a688eb2c2e818656dd59380f3b6752e3b160a598343fb1f2025c1b05f916",
+    "bytes": 2883,
+    "lines": 111
+  },
+  "SpecNaacl/validation/opd_final_20261007/final_proposal_rtx3090.json": {
+    "sha256": "8201e60d9d65ab252d48bd6b513c1644815326834ccaa2b674505b842c2ec1ae",
+    "bytes": 4860,
+    "lines": 165
+  },
+  "SpecNaacl/validation/opd_final_20261007/final_proposal_rtx3090_v2.json": {
+    "sha256": "3e6492483b77a95401566fccd39c2fe976bce4a8e164d2f1973fce1ea05156a1",
+    "bytes": 4859,
+    "lines": 165
+  },
+  "SpecNaacl/validation/opd_final_20261007/proposal_rtx3090.json": {
+    "sha256": "762e82a5dd576e6ea287411b97881b31a57be3e6c1a0984933a246f8b7fbba17",
+    "bytes": 4856,
+    "lines": 165
+  },
+  "SpecNaacl/validation/opd_final_20261007/proposal_rtx3090_isolated.json": {
+    "sha256": "bcab9fa662ca15b9857a23cdf1b3e04478a1802810255ed8a1b114a1f8abdc40",
+    "bytes": 4853,
+    "lines": 165
+  },
+  "SpecNaacl/validation/opd_performance_20261007/rtx3090_proposal.json": {
+    "sha256": "264e57e3c5c315240cc2b0f88f70ac8a9f59d26534b1749db37012d5c43a81f3",
+    "bytes": 15644,
+    "lines": 533
+  },
+  "SpecNaacl/validation/opd_sampler_20261008/generation_rtx3090.json": {
+    "sha256": "e33b5db38a9762d9ce6e26951f65e435f15c74e2d1e00301bfa3342149566ad4",
+    "bytes": 20983,
+    "lines": 712
+  },
+  "SpecNaacl/validation/opd_sampler_20261008/profiler.json": {
+    "sha256": "638ace63c5a31cb33b919a8577d0e59a79215484d41784670f8cc9b64b2a9ddb",
+    "bytes": 529,
+    "lines": 24
+  },
+  "SpecNaacl/validation/opd_sampler_20261008/result.json": {
+    "sha256": "405a9860e51a28fb30384f6b256e7672be4ebd4aa45fb03f0fdda2bb734de1be",
+    "bytes": 300,
+    "lines": 11
+  },
+  "SpecNaacl/validation/opd_sampler_20261008/sampler_rtx3090.json": {
+    "sha256": "9a30d8cb47613b0d745b5c540c43c882ce535a0fb61611524469fd5f264551c0",
+    "bytes": 5855,
+    "lines": 254
+  },
+  "FlashGRPO/flashgrpo_b200/__init__.py": {
+    "sha256": "25956d4bfd1d673c213802c13f14dad97d9fceade6b3fae6f33d156f43afddfd",
+    "bytes": 125,
+    "lines": 5
+  },
+  "FlashGRPO/flashgrpo_b200/configs/__init__.py": {
+    "sha256": "3ffdaf9a75e3586a0ada51388b8b365011cfb408fa5049f99e4e8c5d615fa7f2",
+    "bytes": 34,
+    "lines": 1
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/concurrency_aware_tree.yaml": {
+    "sha256": "52c5cb04092fcb0f4ddad55d224994231125c772d301bd63342636e042579039",
+    "bytes": 99,
+    "lines": 3
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/dense_tree.yaml": {
+    "sha256": "f993e469715233c31dbf0d416d8eeff02d37bd5b539aa42cd2a12a2bbdc4c4e0",
+    "bytes": 89,
+    "lines": 3
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/exact_acceptance.yaml": {
+    "sha256": "59f1e9d2e9bc637f342908ae35a836a39bee198368e2fd9f9d0bd5516379b9e3",
+    "bytes": 95,
+    "lines": 3
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/fixed_tree.yaml": {
+    "sha256": "b9ce32374af0d35e0e309e37b6370e86389b3bf050c31067ef0d402b15073c53",
+    "bytes": 125,
+    "lines": 4
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/heads_3.yaml": {
+    "sha256": "262ca24cb59151d074dca3804237fa2138e433ea225fdd32c83313f192f75c02",
+    "bytes": 110,
+    "lines": 4
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/heads_4.yaml": {
+    "sha256": "4773290e00e8c44baafaa7b05bcd4814bc35083f5c94a9131f79a1a32144696e",
+    "bytes": 151,
+    "lines": 5
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/heads_5.yaml": {
+    "sha256": "ae2b07cf4513e14b645e325c17ded2c81306ac53baaa144a63b1bfff9e7b5bea",
+    "bytes": 154,
+    "lines": 5
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/online_heads.yaml": {
+    "sha256": "e7d06bc97e3808b0c28cb8da6b6f6351ac142fd1f2fd51b9da0b87ca37b93a03",
+    "bytes": 109,
+    "lines": 4
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/online_heads_concurrency_tree.yaml": {
+    "sha256": "50c304dd15c839eb29312a5d8e25851addf812b53eef578941565240b49aac01",
+    "bytes": 121,
+    "lines": 4
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/sparse_tree.yaml": {
+    "sha256": "c8f02b83ca5d9854fd951fb5297581a275610dcf007c7d26b323a48d200aaa17",
+    "bytes": 151,
+    "lines": 4
+  },
+  "FlashGRPO/flashgrpo_b200/configs/ablations/typical_acceptance_disabled.yaml": {
+    "sha256": "708054c1494f5ede5796e3286c8f637f499c1274bcc9b65249146ec7a52fc1a6",
+    "bytes": 197,
+    "lines": 6
+  },
+  "FlashGRPO/flashgrpo_b200/configs/debug_recompute_cache.yaml": {
+    "sha256": "5f4fd92783eff9de9353fbdc4855dec3285528f5810b3ce2ea073244a753fad1",
+    "bytes": 307,
+    "lines": 9
+  },
+  "FlashGRPO/flashgrpo_b200/configs/flashgrpo_pretrained_heads_extractkv.yaml": {
+    "sha256": "fd6f9709fcdd1e8f7c42ad722a15324579e855b2eddf5c4bbc20462f5520235d",
+    "bytes": 437,
+    "lines": 12
+  },
+  "FlashGRPO/flashgrpo_b200/configs/flashgrpo_qwen25_1p5b_simplelrabel3to5.yaml": {
+    "sha256": "4576a432d01794ba5fb50b2bf269c7f7141f91135283cbaa3c0a8262d756c9cf",
+    "bytes": 3640,
+    "lines": 154
+  },
+  "FlashGRPO/flashgrpo_b200/configs/pretrain_medusa_heads_sharegpt_qwen25_1p5b.yaml": {
+    "sha256": "290add2356fca59349f41fa6e1ec807ed4d5b6f1e374955926a6e99936566c71",
+    "bytes": 836,
+    "lines": 37
+  },
+  "FlashGRPO/flashgrpo_b200/configs/pretrain_medusa_heads_sharegpt_qwen25_7b_b200.yaml": {
+    "sha256": "9ec185956c6c92178f2f0770195a796a1c00984261d995c9f91c2d7325839da9",
+    "bytes": 977,
+    "lines": 42
+  },
+  "FlashGRPO/flashgrpo_b200/configs/pretrain_reflexgrpo_nochain_from_flash_step50_qwen25_1p5b.yaml": {
+    "sha256": "09e59e9e01bddba95ab69e82fa431ec9abb7aebb45a5f1fafdf670c8d55dad8e",
+    "bytes": 838,
+    "lines": 37
+  },
+  "FlashGRPO/flashgrpo_b200/configs/pretrain_reflexgrpo_sharegpt_qwen25_1p5b.yaml": {
+    "sha256": "1bb1cfd78b250f44cfa10ca88ae003a169fde27b3adcdee711faf068ff813ce5",
+    "bytes": 857,
+    "lines": 37
+  },
+  "FlashGRPO/flashgrpo_b200/configs/reflexgrpo_nochain_qwen25_1p5b_simplelrabel3to5.yaml": {
+    "sha256": "1a29e035365732b8179bd116b04e30387aaf8a06bd8d293d5118fee18ed9be95",
+    "bytes": 1775,
+    "lines": 71
+  },
+  "FlashGRPO/flashgrpo_b200/configs/reflexgrpo_optimized_b200_fast_heads_qwen25_1p5b_simplelrabel3to5.yaml": {
+    "sha256": "98bbd41035197453a208491d7b165e3b3ad2d75275362e226b7cf1befe392362",
+    "bytes": 435,
+    "lines": 11
+  },
+  "FlashGRPO/flashgrpo_b200/configs/reflexgrpo_optimized_b200_qwen25_1p5b_simplelrabel3to5.yaml": {
+    "sha256": "f867dbf7457dabb6631201e62861fa2be892b9c737d39c93dea76faad18a4782",
+    "bytes": 1440,
+    "lines": 41
+  },
+  "FlashGRPO/flashgrpo_b200/configs/reflexgrpo_optimized_b200_qwen25_7b_simplelrabel3to5.yaml": {
+    "sha256": "e72622571bdc011a8d6536e1d5b1eb3eaabcd1537f2192848f9a822ea262aba2",
+    "bytes": 2014,
+    "lines": 49
+  },
+  "FlashGRPO/flashgrpo_b200/configs/reflexgrpo_optimized_qwen25_1p5b_simplelrabel3to5.yaml": {
+    "sha256": "e4ffa03d045ea49d3c55d42412e2459d8ad464ba539728251bc97bfee239a1b4",
+    "bytes": 2579,
+    "lines": 102
+  },
+  "FlashGRPO/flashgrpo_b200/configs/reflexgrpo_qwen25_1p5b_simplelrabel3to5.yaml": {
+    "sha256": "ef6b0ad8e664f6917fbdf4302da5a5d6b36ad2d96fe68db78e479c06f5714f26",
+    "bytes": 1719,
+    "lines": 69
+  },
+  "FlashGRPO/flashgrpo_b200/configs/reflexgrpo_true_qwen25_1p5b_simplelrabel3to5.yaml": {
+    "sha256": "67c35bf668028ad93c4680b70b1071e6fd073550751536e7232a4fefaf9fb8d5",
+    "bytes": 1672,
+    "lines": 65
+  },
+  "FlashGRPO/flashgrpo_b200/decoding/__init__.py": {
+    "sha256": "db475224bca7ba958e80cc7167e4d970bfd7fcbcc4db73efe6b7fce7e842f44b",
+    "bytes": 127,
+    "lines": 3
+  },
+  "FlashGRPO/flashgrpo_b200/decoding/acceptance.py": {
+    "sha256": "a9713b6552fec6df67233f4d547faaaee39d8117f9f1b74ef19822dde632a3bc",
+    "bytes": 10158,
+    "lines": 260
+  },
+  "FlashGRPO/flashgrpo_b200/decoding/flash_medusa_decoder.py": {
+    "sha256": "59a90666bb4bc179b5a7c14354c96f394df51f0c9dcfa681d21702637c15fa7e",
+    "bytes": 61618,
+    "lines": 1230
+  },
+  "FlashGRPO/flashgrpo_b200/decoding/kv_extraction.py": {
+    "sha256": "6f4dcab5a014753ad9ff034c4bc28c1d34f72f4c89d28085daac13a5ebb25b98",
+    "bytes": 9088,
+    "lines": 218
+  },
+  "FlashGRPO/flashgrpo_b200/decoding/medusa_tree.py": {
+    "sha256": "5220507c00bea10fe086cc62836b7a472427e4e106c950ba390ab0b28b5c01b4",
+    "bytes": 10464,
+    "lines": 278
+  },
+  "FlashGRPO/flashgrpo_b200/decoding/reflex.py": {
+    "sha256": "23ce06cbc5e285cb497904a783a857d500bd0e917c85b7e40f13b8519cabc9f6",
+    "bytes": 31862,
+    "lines": 720
+  },
+  "FlashGRPO/flashgrpo_b200/decoding/tree_attention.py": {
+    "sha256": "c33f2884b1a383555153b8ba40b67389a822e53bab24ea8278ec87b87b763fc6",
+    "bytes": 3230,
+    "lines": 67
+  },
+  "FlashGRPO/flashgrpo_b200/models/__init__.py": {
+    "sha256": "7ad1e9974c4465c0b7e40e675449191dbc2bb5f58b3095c0832119995a902fa4",
+    "bytes": 65,
+    "lines": 3
+  },
+  "FlashGRPO/flashgrpo_b200/models/medusa_heads.py": {
+    "sha256": "65f7bfda4e1092310c9928b69f2c333973dd55f0b05dd208992a36f4d869d3bc",
+    "bytes": 21049,
+    "lines": 480
+  },
+  "FlashGRPO/flashgrpo_b200/models/qwen_flashgrpo_wrapper.py": {
+    "sha256": "d0f0226f088c22a064f8391c90e3724fd043f56ae915240ba45de14e98311c35",
+    "bytes": 8206,
+    "lines": 239
+  },
+  "FlashGRPO/flashgrpo_b200/pretrain.sh": {
+    "sha256": "f174048281db0643ade81be0f2233a92027efa443578dca7b325be7fff390b6d",
+    "bytes": 1446,
+    "lines": 38
+  },
+  "FlashGRPO/flashgrpo_b200/scripts/__init__.py": {
+    "sha256": "1ecdce23c7e6d5fc53a7354cb3e68a9482bd37fd2831a18389f9fc4130f25adb",
+    "bytes": 36,
+    "lines": 1
+  },
+  "FlashGRPO/flashgrpo_b200/scripts/check_safetensors_model.py": {
+    "sha256": "f6ef08f216cecca0b5f648ef375f810f0c50cfbf335c1907160a7448319158ee",
+    "bytes": 1631,
+    "lines": 51
+  },
+  "FlashGRPO/flashgrpo_b200/scripts/compare_eval_summaries.py": {
+    "sha256": "92bb331761ebeee8c527049d506ef6503db4aca79adb4b15aa8fef6a6e19ad34",
+    "bytes": 1591,
+    "lines": 51
+  },
+  "FlashGRPO/flashgrpo_b200/scripts/evaluate_lora_math.py": {
+    "sha256": "9a26e72a7bc3f573f075ab43e1f596b4d86c9889763778656f553a569a206aac",
+    "bytes": 9092,
+    "lines": 216
+  },
+  "FlashGRPO/flashgrpo_b200/scripts/measure_cpeak.py": {
+    "sha256": "c6b9f7283ada117363b97800b4d163ff8e1e1610f25aeb8737f1d4d06e99f749",
+    "bytes": 3520,
+    "lines": 78
+  },
+  "FlashGRPO/flashgrpo_b200/scripts/pretrain_medusa_heads.py": {
+    "sha256": "b3e25ec9363a17913fee00e1233c9117b1c0210815c4e09955ebc5db117a12dd",
+    "bytes": 33126,
+    "lines": 705
+  },
+  "FlashGRPO/flashgrpo_b200/scripts/run_smoke_test.py": {
+    "sha256": "4b0890c4e19d5ec02109bbadff52a90a3ede77188b18151e71e11f0a7c016c6e",
+    "bytes": 1844,
+    "lines": 52
+  },
+  "FlashGRPO/flashgrpo_b200/scripts/test_kv_extraction.py": {
+    "sha256": "b790b257a4a595e72366bea34afc1a49e1dabbd3b6f281672f9b7fff9c49bd54",
+    "bytes": 4509,
+    "lines": 101
+  },
+  "FlashGRPO/flashgrpo_b200/scripts/train_flashgrpo.py": {
+    "sha256": "c77cea214849adeba07f24fc6e5a4a5e15de77872cb16de6d927f16dac4dd9f9",
+    "bytes": 898,
+    "lines": 29
+  },
+  "FlashGRPO/flashgrpo_b200/scripts/train_flashgrpo_b200.py": {
+    "sha256": "c9e3d2b1c01666c6ce851e4abfcb69057b6c5a6a2db823223ef7418e0cac5865",
+    "bytes": 906,
+    "lines": 31
+  },
+  "FlashGRPO/flashgrpo_b200/tests/__init__.py": {
+    "sha256": "4da9e3726f5373e6902b02e7af03b4cbaae0d860e29a8cc97cf7f096a2ea5d2c",
+    "bytes": 23,
+    "lines": 1
+  },
+  "FlashGRPO/flashgrpo_b200/tests/test_exact_acceptance_distribution.py": {
+    "sha256": "591128082f4816a8b608345beeaf26d30d2be452463456e339abfd117b93a294",
+    "bytes": 3129,
+    "lines": 90
+  },
+  "FlashGRPO/flashgrpo_b200/tests/test_flashgrpo_smoke.py": {
+    "sha256": "10491067fabdd221ac97c2c66f1febddc13603562aec0d8db7e38d299d0f574e",
+    "bytes": 2479,
+    "lines": 80
+  },
+  "FlashGRPO/flashgrpo_b200/tests/test_kv_path_extraction_matches_recompute.py": {
+    "sha256": "6e5481af37b063ff1d6ababe933464c9a9fd8e3b84dbd6da7f39609db0e618a8",
+    "bytes": 1115,
+    "lines": 35
+  },
+  "FlashGRPO/flashgrpo_b200/tests/test_medusa_head_loss.py": {
+    "sha256": "8393011db6d8fdf2f084407590bd79b85027116d98695bbb8d0e17d4473cfa65",
+    "bytes": 773,
+    "lines": 22
+  },
+  "FlashGRPO/flashgrpo_b200/tests/test_reflex_optimized.py": {
+    "sha256": "c73a816464690bd8be3b56d00b6fa861a753033069b4f80a4113c2268c4cfdd3",
+    "bytes": 7621,
+    "lines": 202
+  },
+  "FlashGRPO/flashgrpo_b200/tests/test_tree_attention_equivalence.py": {
+    "sha256": "b06db201e9513bca6f93e9d801f59c102fec35585d3c6a1513b9e3953f248196",
+    "bytes": 1053,
+    "lines": 26
+  },
+  "FlashGRPO/flashgrpo_b200/train.sh": {
+    "sha256": "c7f0133fd178ae3666979f818420c2bef51d8c457ceafbd96ebd21f0aed4c335",
+    "bytes": 2124,
+    "lines": 47
+  },
+  "FlashGRPO/flashgrpo_b200/training/__init__.py": {
+    "sha256": "c3ae40d186b8005a26dce586fa884c8ced117ad8aa045ef0a0f38e08d9906fd5",
+    "bytes": 40,
+    "lines": 1
+  },
+  "FlashGRPO/flashgrpo_b200/training/flashgrpo_trainer.py": {
+    "sha256": "5339c866761dfcf3dfb71f02620006d4a9965ae7029d35fe379bd2e4b55970fc",
+    "bytes": 80614,
+    "lines": 1562
+  },
+  "FlashGRPO/flashgrpo_b200/training/online_medusa_trainer.py": {
+    "sha256": "a1df8cd56f37c18a4e46bf169505dedf3c59ba7c4c682c93540291a6ee4531b9",
+    "bytes": 29478,
+    "lines": 601
+  },
+  "FlashGRPO/flashgrpo_b200/training/reflex_aux.py": {
+    "sha256": "0dc50a222f075f2b8f708d06ba9c42ab1638271b99f29cd1d05410d6b5a264c3",
+    "bytes": 25529,
+    "lines": 566
+  },
+  "FlashGRPO/flashgrpo_b200/utils/__init__.py": {
+    "sha256": "b72ce56e305230644e3a5a639f2b1c86adcbb198a3d9712265066dd9ed13fa03",
+    "bytes": 37,
+    "lines": 1
+  },
+  "FlashGRPO/flashgrpo_b200/utils/config.py": {
+    "sha256": "fd8d4a851b2339dc4f09acff147dc1f97669946b1e1e2f8224fe1ca29afe3787",
+    "bytes": 1675,
+    "lines": 57
+  },
+  "FlashGRPO/flashgrpo_b200/utils/cpeak_measure.py": {
+    "sha256": "802bbf5b2615ed1b46d51db5a91a10c702dde3878478b5d0088a7cf032bff28c",
+    "bytes": 714,
+    "lines": 16
+  },
+  "FlashGRPO/flashgrpo_b200/utils/gpu_monitor.py": {
+    "sha256": "67b62f58c780e24ce36e9d1d9349d9a1be223740cc11a3fcb58f62d145d56fb1",
+    "bytes": 3098,
+    "lines": 88
+  },
+  "FlashGRPO/flashgrpo_b200/utils/metrics.py": {
+    "sha256": "1de49f380cc033f0bc53e2cac30d5c7e684ef975f48fb8a264cbf0c18f7205f8",
+    "bytes": 2773,
+    "lines": 73
+  },
+  "FlashGRPO/flashgrpo_b200/utils/seed.py": {
+    "sha256": "aca16ffc54a90185574d3670eae4c0a7b87b306b6cb1f5ff56ff3dede8c255ea",
+    "bytes": 239,
+    "lines": 12
+  },
+  "FlashGRPO/flashgrpo_b200/utils/timing.py": {
+    "sha256": "2e19f44454e5273cf02f59e7c1a95218a298aed39d8c0acc7d15cafd046fffc6",
+    "bytes": 720,
+    "lines": 31
+  },
+  "FlashGRPO/helper/__init__.py": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "bytes": 0,
+    "lines": 0
+  },
+  "FlashGRPO/helper/get_QAs.py": {
+    "sha256": "f12e62765cb3828b92cb99e621373ce8a831cef02f4bfbfd4f6fe6d8674bd26a",
+    "bytes": 6397,
+    "lines": 136
+  },
+  "FlashGRPO/helper/modeling_draft.py": {
+    "sha256": "38ef31ee3a5bebb959cc488e0f34639d149e1c88ab2d52ed543fd68b22aee5c7",
+    "bytes": 23679,
+    "lines": 559
+  },
+  "FlashGRPO/helper/rewards.py": {
+    "sha256": "a82936908d2c1984417192c2ff470b18d7d1845c7f0308577a3509bbacef8be3",
+    "bytes": 2228,
+    "lines": 74
+  },
+  "FlashGRPO/helper/specualtive_generate.py": {
+    "sha256": "eed9e722560f64dae104b45a858b0a931f70287e1ad47907a975f42e557d3969",
+    "bytes": 49830,
+    "lines": 1149
+  }
+}

@@ -1,0 +1,153 @@
+# MedusaGRPO
+
+Repo độc lập cho `medusa` và `medusa_reflex`, dùng target GRPO của SpecNaacl.
+Không import hoặc chạy source bên SpecNaacl/FlashGRPO/PureGRPO ở runtime.
+
+## Cấu trúc
+
+```text
+grpo_speculative.py          training loop port từ SpecNaacl
+train_draft.py               ShareGPT pretrain, 5 epoch mặc định
+medusa/model.py              3 independent residual heads, shared target lm_head
+medusa/tree.py               sparse prefix planner và feedback selection
+medusa/tree_kernels.py       GPU tree construction, một program/response
+medusa/generate.py           exact verification, pending token, persistent KV
+medusa/opd.py                shared A, per-head B_fast, async feedback
+medusa/opd_kernels.py        batched updates cho cả 3 heads
+medusa/training.py           online head objective, không forward target thêm
+helper/                     loss/reward/data/sampling/OPD kernels đã vendor
+configs/_shared/             defaults B200 và OPD
+configs/<model>/             target settings tương ứng SpecNaacl
+scripts/launch/              generic launchers, validate, resume, logging
+scripts/benchmark_pair.py    paired real GRPO benchmark và tree selection
+scripts/tune_opd_proposals.py sparse/fused/GEMM proposal tuning theo hardware/vocab
+tests/                      CPU tests, checkpoint/resume, CUDA tests có điều kiện
+docs/IMPLEMENTATION.md       audit, fairness, định nghĩa metrics và giới hạn kiểm chứng
+```
+
+Có 7 pretrain scripts, 14 method scripts và 7 `train_<model>.sh` aliases cho
+Medusa+Reflex: `qwen25_1p5b`, `qwen25_3b`, `qwen25_7b`, `qwen25_14b`,
+`qwen3_1p7b`, `qwen3_4b`, `llama31_8b`.
+
+## Chạy Qwen2.5-1.5B trên B200
+
+Các default model/data paths được giữ theo SpecNaacl:
+
+```bash
+cd /mnt/hdd/nhatminh/SpecDecode/MedusaGRPO
+uv venv --python 3.12 .venv
+source .venv/bin/activate
+uv pip install --reinstall-package torch -r requirements.txt
+export PYTHON_BIN="$PWD/.venv/bin/python"
+export MODEL=/workspace/storage-shared/models/Qwen2.5-1.5B-Instruct
+export DATA_ROOT=/workspace/storage-shared/nlp/minhpn19/data
+export CUDA_VISIBLE_DEVICES=0
+export NPROC_PER_NODE=1
+```
+
+`TARGET_ADAPTER` phải là **cùng checkpoint LoRA khởi tạo mà các baseline khác
+đang dùng**. SpecNaacl hiện để default này rỗng, nên repo không tự đoán checkpoint.
+
+```bash
+export TARGET_ADAPTER=/absolute/path/to/common_initial_target_lora
+```
+
+Nếu chưa có initial LoRA, tạo **một lần** và dùng checkpoint này cho cả năm
+phương pháp. Lệnh dưới đây không thay thế checkpoint của experiment đã chạy:
+
+```bash
+python scripts/create_initial_lora.py --model "$MODEL" \
+  --output outputs/initial_target/qwen25_1p5b --seed 42
+export TARGET_ADAPTER="$PWD/outputs/initial_target/qwen25_1p5b"
+# Khi chạy các baseline SpecNaacl/PureGRPO, cũng trỏ chúng tới checkpoint này.
+```
+
+Pretrain một lần, rồi giữ nguyên checkpoint cho cả hai ablation:
+
+```bash
+bash pretrain_qwen25_1p5b.sh
+export DRAFT_CHECKPOINT="$(readlink -f outputs/pretrain/qwen25_1p5b/latest_checkpoint)"
+bash train_qwen25_1p5b_medusa.sh
+bash train_qwen25_1p5b_reflex.sh
+# Alias của Medusa+Reflex:
+bash train_qwen25_1p5b.sh
+```
+
+Pretrain default: 5 epoch đầy đủ, max length 2048, seed 42, BF16, SDPA.
+Target backbone và lm_head được freeze. Batch/accumulation theo model; các biến
+`PRETRAIN_BATCH_SIZE` và `PRETRAIN_ACCUMULATION_STEPS` có thể override.
+Checkpoint cuối nằm ở `outputs/pretrain/<model>/latest_checkpoint/draft.pth`.
+Training xuất vào `outputs/train/<model>/<unique_run_name>`.
+
+```bash
+DRY_RUN=true bash train_qwen25_1p5b_medusa.sh
+MAX_TARGET_OPTIMIZER_STEPS=10 bash train_qwen25_1p5b_medusa.sh
+RESUME=auto bash pretrain_qwen25_1p5b.sh
+RESUME=auto bash train_qwen25_1p5b_reflex.sh
+# Hoặc resume một run cụ thể:
+RUN_DIR=/absolute/path/to/run RESUME=auto bash train_qwen25_1p5b_reflex.sh
+```
+
+`MAX_TARGET_OPTIMIZER_STEPS` là budget **tổng** tính cả phần đã resume;
+`MAX_ROLLOUT_PROMPTS` giới hạn tổng prompt đã rollout, kể cả reward-filtered.
+Với multi-GPU, prompt budget phải chia hết cho world size. Có tqdm ở rank 0.
+
+## Tuning và benchmark B200
+
+Default cây là **provisional**, chưa được chọn bằng đo B200. Global node budget
+512, max 12 nodes/response, top-k 4/3/2. Với 128 active responses, cây dùng 4
+nodes/response và vẫn có một đường tới cả ba heads. Không nâng lên dense 41 nodes.
+
+```bash
+python scripts/tune_opd_proposals.py --models qwen25_1p5b \
+  --target-config "$MODEL/config.json" --draft-checkpoint "$DRAFT_CHECKPOINT" \
+  --rank 8 --dtype bf16 --topk 16 --shapes 1x1,8x1,32x1,64x1,128x1
+
+python scripts/benchmark_pair.py --model qwen25_1p5b --steps 10 --trials 3 \
+  --budgets 512:8,512:12,768:12
+```
+
+Benchmark chạy production GRPO launchers với cùng checkpoint, seed, settings và
+optimizer budget. Bảng kết quả gồm AAL, generation/E2E tokens/s, per-head
+utilization, nodes và target forwards. `selected_tree.env` chọn một cấu hình dùng
+chung, theo median generation throughput của từng phương pháp và geometric mean
+của cặp. Dùng `--profile` ở một lượt riêng để đo OPD event times. Profiling không
+bật trong lượt production mặc định.
+
+```bash
+source outputs/benchmarks/<benchmark_run>/selected_tree.env
+bash train_qwen25_1p5b_medusa.sh
+bash train_qwen25_1p5b_reflex.sh
+```
+
+Các OPD defaults: `OPD_SELECTION=visited_capped_frontier`,
+`OPD_MAX_FRONTIER_PER_HEAD=2`, `OPD_RANK=8`, `OPD_TOPK=16`,
+`OPD_FAST_LR=0.01`, `OPD_UPDATE_STREAM=1`. Ablations:
+
+```bash
+OPD_SELECTION=visited_only bash train_qwen25_1p5b_reflex.sh
+OPD_SELECTION=all_internal_weighted bash train_qwen25_1p5b_reflex.sh
+OPD_ENABLED=0 bash train_qwen25_1p5b_reflex.sh
+```
+
+## Kiểm tra
+
+```bash
+python -m pytest -q
+python scripts/compile_kernels.py   # compile sm100; không thực thi GPU
+python scripts/smoke_cpu.py         # synthetic CPU production-loop smoke
+python scripts/validate_environment.py --require-cuda
+```
+
+Validation hiện tại: CPU tests và synthetic GRPO/pretrain/resume đã chạy; ba
+kernel mới compile thành công cho sm100; sparse tree Triton interpreter khớp
+CPU oracle. CUDA/B200 execution, throughput tuning và 5 epoch ShareGPT thật trên
+7 model **chưa được kiểm chứng trong phiên triển khai này**. Máy hiện tại có RTX
+3090, nhưng môi trường PyTorch hiện là CPU; tải CUDA dependencies bị lỗi mạng.
+CUDA tests tự skip khi runtime CUDA chưa có. Không dùng kết quả CPU để kết luận
+speedup B200.
+
+Kết quả lưu tại [`docs/VALIDATION.json`](docs/VALIDATION.json): **36 passed,
+2 CUDA tests skipped**. [`docs/cpu_smoke_report.json`](docs/cpu_smoke_report.json)
+chứa AAL, throughput, per-head utilization và target forward counters của cặp
+smoke CPU; đây là dữ liệu kiểm tra pipeline, không phải kết quả performance B200.

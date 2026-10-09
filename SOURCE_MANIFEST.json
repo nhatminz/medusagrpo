@@ -1,0 +1,118 @@
+{
+  "grpo_speculative.py": {
+    "source": "SpecNaacl/grpo_speculative.py",
+    "sha256": "4ea9b441c81250587565d1c97904cb4c7290a09103c5aa1e9256ba1724e51e2f"
+  },
+  "train_draft.py": {
+    "source": "SpecNaacl/train_draft.py",
+    "sha256": "9bd0bb45684ccdc0ac1074fe60e3df71928e4a3fc9b168900c23c18c76590232"
+  },
+  "policy_lag_analysis.py": {
+    "source": "SpecNaacl/policy_lag_analysis.py",
+    "sha256": "2eacebcc600935b2c45e2db8b75b4588d235f7c6c8296747ff67a701a85565ff"
+  },
+  "requirements.txt": {
+    "source": "SpecNaacl/requirements.txt",
+    "sha256": "373731e733272f3eaab127a466a8509e425797901d1f66d4173cd649c73d1074"
+  },
+  ".python-version": {
+    "source": "SpecNaacl/.python-version",
+    "sha256": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d"
+  },
+  "LICENSE": {
+    "source": "SpecNaacl/LICENSE",
+    "sha256": "0530078c37f1ed2dc2bacbd92dbea826e8a4ed895978a7f421604983191ac520"
+  },
+  "helper/__init__.py": {
+    "source": "SpecNaacl/helper/__init__.py",
+    "sha256": "13a9095f8cbb5cab149c508822e2a5021dd033f3e4e3665c44d89fc70abd90cb"
+  },
+  "helper/fastgrpo_training.py": {
+    "source": "SpecNaacl/helper/fastgrpo_training.py",
+    "sha256": "bbc0971609b7ac0e4961921155ff844faec8de428303fda7e76882fa3b7a9359"
+  },
+  "helper/get_QAs.py": {
+    "source": "SpecNaacl/helper/get_QAs.py",
+    "sha256": "72974e50046cd70fe956a00a787fdaa070bce36110ee239a7d4ecd94dcfd58d2"
+  },
+  "helper/rewards.py": {
+    "source": "SpecNaacl/helper/rewards.py",
+    "sha256": "4a14324812d999a31e8b414cd8dca33d98c275876e7b81ca1e0847874ae55f30"
+  },
+  "helper/checkpointing.py": {
+    "source": "SpecNaacl/helper/checkpointing.py",
+    "sha256": "16a8f37b5faec68a820e7cb70d8e547d90d9fd5d3ab010eb4d4066ea459854cb"
+  },
+  "helper/opd_reflex.py": {
+    "source": "SpecNaacl/helper/opd_reflex.py",
+    "sha256": "cb6041e45aa10109d4280c93f03ffe27fdaac334d2854b23ea4e25a49917e07a"
+  },
+  "helper/opd_reflex_kernels.py": {
+    "source": "SpecNaacl/helper/opd_reflex_kernels.py",
+    "sha256": "65fdb32878ec1aec9b3c4c83a105d9f938f7d9512aceed37ed8e2bfefd01259b"
+  },
+  "helper/opd_profiles.py": {
+    "source": "SpecNaacl/helper/opd_profiles.py",
+    "sha256": "feacabb631e3ee1a87d4fde179ab64e9ad4308465e28e47b34b2ffb2d5092a1c"
+  },
+  "helper/opd_attention.py": {
+    "source": "SpecNaacl/helper/opd_attention.py",
+    "sha256": "b7ae3e3c41c73c1763930fd172074540e26b2a3a6c028ca79cea97b8fd3071f7"
+  },
+  "helper/opd_attention_kernels.py": {
+    "source": "SpecNaacl/helper/opd_attention_kernels.py",
+    "sha256": "afefad13dead7020885843ccde9aec84e509b7696e27cb115629000ee0b7089f"
+  },
+  "helper/shared_rollout.py": {
+    "source": "SpecNaacl/helper/shared_rollout.py",
+    "sha256": "8ec3ba1c4ff27d4f5b32ba7cdc1a97cbd7a3cb58cf0be3ad8c06fcae9eba38d8"
+  },
+  "helper/tree_kernels.py": {
+    "source": "SpecNaacl/helper/tree_kernels.py",
+    "sha256": "cb2bf42fd6128945ccf5ebd51c77d819648e3fea9cd53eeedc4f623614f53248"
+  },
+  "helper/tree_verification.py": {
+    "source": "SpecNaacl/helper/tree_verification.py",
+    "sha256": "70abc46dd67af397d8288695f992b97d819cf29b73409c9dfdd333e39adeec29"
+  },
+  "helper/opd_static_cache.py": {
+    "source": "SpecNaacl/helper/opd_static_cache.py",
+    "sha256": "3d048c93cd70a0556acdf522df5cb55a2d050b226853e0456bc73f568ff64d98"
+  },
+  "helper/opd_kv_kernels.py": {
+    "source": "SpecNaacl/helper/opd_kv_kernels.py",
+    "sha256": "355404f3dbfcf0a2d7be3d50d15474a9a8f7bb227ab24eb3ee009e229ad415ce"
+  },
+  "helper/opd_sampling.py": {
+    "source": "SpecNaacl/helper/opd_sampling.py",
+    "sha256": "04d53d765fe4884aec5403ec4ec1ce869bab314d3fc577e63f36077ebc2bf5e9"
+  },
+  "helper/opd_optimizer.py": {
+    "source": "SpecNaacl/helper/opd_optimizer.py",
+    "sha256": "7b38bd020385a2a703e4634473d7eeb94e4e8f119ce41c8fdbca464eb4ed7387"
+  },
+  "helper/step_metrics.py": {
+    "source": "SpecNaacl/helper/step_metrics.py",
+    "sha256": "0597ba0a566d1da52809c2ae725af2f4b7e75f9d6412f79e60943b6441a41062"
+  },
+  "helper/rollout_metrics.py": {
+    "source": "SpecNaacl/helper/rollout_metrics.py",
+    "sha256": "fecb866a88846f1986dbcc1f88295277b0f8554c618835f95d4f36d3d9d3923d"
+  },
+  "helper/drift_metrics.py": {
+    "source": "SpecNaacl/helper/drift_metrics.py",
+    "sha256": "3bef046c88aebe97c8e86c66e502f5d88ca1c3783f7783cca46e509d433f678f"
+  },
+  "helper/pretrain_data.py": {
+    "source": "SpecNaacl/helper/pretrain_data.py",
+    "sha256": "181e4dfb791d6cbd8125aaf4ace3a02f1654e116e2203d05cf7531e7d5e7af08"
+  },
+  "scripts/write_run_metadata.py": {
+    "source": "SpecNaacl/scripts/write_run_metadata.py",
+    "sha256": "57b5116f42666c0a6ffce535abec99fbc9e7c9d027a716613b17b1fd6c65aaa0"
+  },
+  "scripts/validate_environment.py": {
+    "source": "SpecNaacl/scripts/validate_environment.py",
+    "sha256": "bfe6e9b5813d9d7e73f53415b4707577e17398de2227b8cc40240561bfe9d785"
+  }
+}

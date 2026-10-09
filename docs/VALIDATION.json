@@ -1,0 +1,34 @@
+{
+  "tests": {
+    "command": ".venv/bin/python -m pytest -q",
+    "passed": 36,
+    "skipped": 2,
+    "elapsed_s": 40.44,
+    "skipped_reason": "CUDA runtime is unavailable in the current CPU-only PyTorch environment"
+  },
+  "kernel_compilation": {
+    "architecture": "sm100",
+    "kernels": [
+      "_build",
+      "_all_updates",
+      "_all_end"
+    ],
+    "compiled": true,
+    "executed_on_cuda": false
+  },
+  "triton_interpreter": {
+    "sparse_tree_cpu_parity": true
+  },
+  "protected_sources": {
+    "snapshot_files": 407,
+    "modified_snapshot_files": 0
+  },
+  "smoke_report": "cpu_smoke_report.json",
+  "not_validated": [
+    "CUDA/B200 kernel execution",
+    "B200 memory and throughput tuning",
+    "Full 5-epoch ShareGPT pretraining on the seven real models",
+    "Multi-GPU end-to-end training"
+  ],
+  "tree_default_status": "provisional; select a shared configuration with scripts/benchmark_pair.py on B200"
+}
