@@ -71,7 +71,7 @@ def test_gpu_prefill_probability_precision_and_group_rng(tiny_model):
     for method in ('medusa','medusa_reflex'):
         torch.manual_seed(9)
         out=speculative_generate(m,x,mask,SimpleNamespace(eos_token_id=22),method=method,
-            do_sample=True,temperature=.8,top_p=.95,repeated_generate_nums=4,max_length=4)
+            do_sample=True,temperature=.8,top_p=.95,repeated_generate_nums=4,max_length=4,generation_length_policy='per_response')
         assert out['generated_token_ids']==[[int(first[r,0])] for r in range(2) for _ in range(4)]
         assert torch.equal(torch.cuda.get_rng_state(),expected_rng)
 

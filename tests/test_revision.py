@@ -69,7 +69,7 @@ def test_first_token_grouping_rng_matches_specnaacl(tiny_model):
         torch.manual_seed(57)
         result=speculative_generate(tiny_model,x,mask,SimpleNamespace(eos_token_id=22),
             repeated_generate_nums=4,do_sample=True,temperature=.8,top_p=.7,top_k=5,
-            max_length=4,method=method,**kw)
+            max_length=4,method=method,generation_length_policy='per_response',**kw)
         assert result['generated_token_ids']==[[int(first[r,0])] for r in range(2) for _ in range(4)]
         assert torch.equal(torch.get_rng_state(),expected_rng)
         assert result['target_forward_calls']==1
@@ -139,7 +139,7 @@ def test_handcrafted_root_pending_bonus_and_head_accounting(monkeypatch,eos,max_
     monkeypatch.setattr(model.draft_model,'logits',heads_fn)
     monkeypatch.setenv('MAX_TREE_NODES_PER_SEQ','4')
     result=speculative_generate(model,torch.tensor([[0]]),torch.ones(1,1,dtype=torch.long),
-        SimpleNamespace(eos_token_id=eos),do_sample=False,max_length=max_length)
+        SimpleNamespace(eos_token_id=eos),do_sample=False,max_length=max_length,generation_length_policy='per_response')
     assert result['generated_token_ids']==[expected]
     assert [result[f'head{h}_accepted_tokens'] for h in (1,2,3)]==heads
     assert sum(heads)==result['total_accepted_draft_tokens']
@@ -262,6 +262,7 @@ def test_missing_baseline_source_is_not_reported_as_pass(tmp_path):
     ('runtime_semantics_version','old_runtime','semantics mismatch'),
     ('method','medusa_reflex','method mismatch'),
     ('opd_enabled',True,'OPD_ENABLED mismatch'),
+    ('generation_length_policy','per_response','generation length policy mismatch'),
 ])
 def test_resume_rejects_incompatible_runtime_or_ablation(tmp_path,field,value,message):
     from medusa.generate import RUNTIME_SEMANTICS_VERSION

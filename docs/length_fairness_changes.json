@@ -1,0 +1,161 @@
+{
+  "scope": "Only MedusaGRPO",
+  "inventory_extensions": [
+    ".py",
+    ".sh",
+    ".md",
+    ".json",
+    ".env",
+    ".txt"
+  ],
+  "external_files_unchanged": 443,
+  "changed": {
+    "MedusaGRPO/README.md": {
+      "before": "378de99fbb6aef248b57ae398f3b83a742adf62e641bce11a86b45f1cfdeb1d5",
+      "after": "8936d2f576cb8ebdce9c41b46fde70e1fe16559d8916bd417ce183b87b777a90"
+    },
+    "MedusaGRPO/grpo_speculative.py": {
+      "before": "68050c28e26a3b344c932f40d3f22244f401f5f1e10e9bbefaceb513cb7228f5",
+      "after": "5ed685e89230681661d7de5a1d64c3ca25c183d1d19c45bf396d2a6dc9231f7e"
+    },
+    "MedusaGRPO/tests/test_revision.py": {
+      "before": "29097d1a3368881410c21039b04457df38daa49954ad626027d6ca7eb38e215c",
+      "after": "aba72e8397242486272f221f0523a38d7eaca50276b7929f26014445a63f95c9"
+    },
+    "MedusaGRPO/tests/test_length_fairness.py": {
+      "before": null,
+      "after": "7e4bf28094fe60e3d4e4fad1ed94ca126e45d8a354800629c08af48b95b54862"
+    },
+    "MedusaGRPO/tests/test_exactness.py": {
+      "before": "78fb62acb7e83a9f5b6a6d862108710d4d95be0a3e185c47d913d45d17e8d8af",
+      "after": "70f6c7400296632982df6df1cf1c8a5dc30eab3b0d83b89e8fb1984e3866eda1"
+    },
+    "MedusaGRPO/tests/test_final_correctness.py": {
+      "before": "9a90336232f4d8c0754e55a4056653adc49bea6a603731408fa39d725937723e",
+      "after": "343e2e5ee67f89496ae4cef4c35e6fc3e8984670d92474ed7d0e6101390382e0"
+    },
+    "MedusaGRPO/tests/test_cuda.py": {
+      "before": "71cf9182ca4baf190a644449cfc6100ee1877a94905011bcc53278569b1ac4b3",
+      "after": "1cdba9915adacebae1055255711b877d7f075904cf58f5969e4958a8a6032d8f"
+    },
+    "MedusaGRPO/scripts/_fairness_config.py": {
+      "before": null,
+      "after": "0ee342232853a33d94e370575d035d0795505f383717844e40d78696ef772876"
+    },
+    "MedusaGRPO/scripts/benchmark_pair.py": {
+      "before": "46170ff73efe82f2060d805dd31b1e9d596a5bfe7f5dd566615ed8612c1154e4",
+      "after": "def0b4c9af6b4491bb2d86f9f031d835548ad07dda675ece36c2d6f2d64091c3"
+    },
+    "MedusaGRPO/scripts/smoke_model.py": {
+      "before": "16ac156ca0c562e5ac3edd216970a0c87f7e75fe9546549a5aa05493b0d8cf03",
+      "after": "7057442690bd992617667fe269cfcced063d0889dcea0294fcc4c38b5629801a"
+    },
+    "MedusaGRPO/scripts/check_fairness.py": {
+      "before": "10095b479e165f75389d4bd31b9718a7d7aaa7431fb0e0d3aea265040dd50712",
+      "after": "3318b3840573417e62080a505f4ec3a18a53f8cb4d1428e9bc2322642bfcf1c9"
+    },
+    "MedusaGRPO/helper/shared_adapter.py": {
+      "before": "7a4617198fa7d2d60333611005b8f52501b8d76609f16defc38fc0c98f30f4f8",
+      "after": "67a379372deb7ef8e71b108c6145dbccae7a82f47d418d5abb34dc4276cad99d"
+    },
+    "MedusaGRPO/medusa/generate.py": {
+      "before": "e92fc6b32f397b2a3a5602fe026c99590ef1d4ad28adc3b6061b42e0aab5d406",
+      "after": "d10704d23e610d0543ba0d2494c7a079795e58b68e4a68d0279973a3bbf4bfa7"
+    },
+    "MedusaGRPO/docs/length_fairness_before.json": {
+      "before": null,
+      "after": "99d10b68de548d08b4d5495f3e9ca831b58e2eb44fad17e93407092ade9e62a3"
+    },
+    "MedusaGRPO/docs/length_fairness_report.json": {
+      "before": null,
+      "after": "69b123c068ed99c7c53246b8af7be57428be3535a276505fb8b93a9ea189f00a"
+    },
+    "MedusaGRPO/docs/length_real_qwen25_3b_cuda_smoke.json": {
+      "before": null,
+      "after": "850d9f457fcf438cfaa6c1e989d2ce27b4d71132a395241697a284856ca730fc"
+    },
+    "MedusaGRPO/docs/length_training_pair.json": {
+      "before": null,
+      "after": "54bc9e05c8b6e5efcc95e9f7fe3edd010a5aa842320e3ce3947c328670588db6"
+    },
+    "MedusaGRPO/docs/LENGTH_FAIRNESS_VALIDATION.json": {
+      "before": null,
+      "after": "e816857eb4226cdb9005d980fd3a09751ce9b675273307f449cfe4ad3cb6bd85"
+    },
+    "MedusaGRPO/docs/FINAL_CORRECTNESS.md": {
+      "before": "a11f0be069f20ba912e9f9cb80422e077784a647c1bbf88e33253e9ee626423c",
+      "after": "7d6e8d56e5dba570ca54faab539959cb7cfa1a08644cce385c515b88403d33e4"
+    },
+    "MedusaGRPO/docs/LENGTH_FAIRNESS.md": {
+      "before": null,
+      "after": "6bd0d9b75e6e807038b331842c77a01e05c1861249ac568e1d6a474846d85b25"
+    },
+    "MedusaGRPO/docs/length_real_qwen25_3b_per_response_cuda_smoke.json": {
+      "before": null,
+      "after": "08399f2ca6fc1fb741a3dddcf21356b5d8f29638450fad58a962f087316c9843"
+    },
+    "MedusaGRPO/scripts/launch/train_model.sh": {
+      "before": "1f4cbfbb009ce684c0884a4b5021bdff9e1668321ee803f39b99cdb3a8e87cce",
+      "after": "1b131516a6e8b80633d16bea73119748f184a477736f6d3939a4f002ef2aa1f8"
+    },
+    "MedusaGRPO/configs/qwen25_7b/launcher.env": {
+      "before": null,
+      "after": "5327bac8f267d2b0b8df60826ec93dac9057d66663c47d34cdd207d07a25faf0"
+    },
+    "MedusaGRPO/configs/qwen3_4b/launcher.env": {
+      "before": null,
+      "after": "5327bac8f267d2b0b8df60826ec93dac9057d66663c47d34cdd207d07a25faf0"
+    },
+    "MedusaGRPO/configs/llama31_8b/launcher.env": {
+      "before": null,
+      "after": "5327bac8f267d2b0b8df60826ec93dac9057d66663c47d34cdd207d07a25faf0"
+    },
+    "MedusaGRPO/configs/qwen25_14b/launcher.env": {
+      "before": null,
+      "after": "5327bac8f267d2b0b8df60826ec93dac9057d66663c47d34cdd207d07a25faf0"
+    },
+    "MedusaGRPO/configs/qwen25_14b/b200.env": {
+      "before": "efe3079356bc00d98bd6c4e16552f54e6dfd0782b4f53a9cf9c942c6b13836f4",
+      "after": "ee3587bf40e47703e73e702959969dd9cbc1f80aa2b147632bb198acd83af4c1"
+    },
+    "MedusaGRPO/configs/qwen25_1p5b/launcher.env": {
+      "before": null,
+      "after": "5327bac8f267d2b0b8df60826ec93dac9057d66663c47d34cdd207d07a25faf0"
+    },
+    "MedusaGRPO/configs/qwen25_1p5b/b200.env": {
+      "before": "1c82bd008dc47287b6978180a88ab2864c34fef2b5282120f80db6061b5897cf",
+      "after": "9449b923939f31c15c1fe87c3013615fcfa9558b245a92eef37b9bd9210db929"
+    },
+    "MedusaGRPO/configs/_shared/b200_common.env": {
+      "before": "6834308e00437bf50314061abd0626fcd6d1a29bcc443ce283804fe9f8fef0f4",
+      "after": "06c81b10f31ad131570c4df57d06138e82e74bfb36d5d0ab06b654f9ab1be3ee"
+    },
+    "MedusaGRPO/configs/qwen3_1p7b/launcher.env": {
+      "before": null,
+      "after": "5327bac8f267d2b0b8df60826ec93dac9057d66663c47d34cdd207d07a25faf0"
+    },
+    "MedusaGRPO/configs/qwen3_1p7b/b200.env": {
+      "before": "f411e7eee5b1c17a94b98488dbfdece74b75c33348de11415a3b2f0f653f8b34",
+      "after": "3c00c4325c018b80d75f6d22ebd43ac266a3c3a5a00c3eccac26af224b8568d8"
+    },
+    "MedusaGRPO/configs/qwen25_3b/launcher.env": {
+      "before": null,
+      "after": "5327bac8f267d2b0b8df60826ec93dac9057d66663c47d34cdd207d07a25faf0"
+    }
+  },
+  "deleted": [],
+  "protected_algorithm_files": {
+    "medusa/opd.py": "c4f8a61d375eacff7c0cdeccf5bdc7d8264cb610702575c5c6b58c8c4f9aa55c",
+    "medusa/opd_kernels.py": "ffdbcbfa9fa6fa70b206d0225408401d316698e8c3315d7a167a3992e146f2bc",
+    "medusa/tree.py": "45cf98ba9bb827ad4ae71059319c6b3d5cec94c0c50277b6940bc51aac1e97c5",
+    "medusa/tree_kernels.py": "2f79704eddc54513ae1736d4c3134d7828a7302905a85a54968e44232fafe146",
+    "medusa/training.py": "6c1e88db0d43b2e4d884a00db6dac12ea458d09b13e9c7d7696af75611c97ec1",
+    "helper/opd_reflex.py": "6590ba3cddb1df8d33688aa8f0b0bae29646c5b72660937086b6306fafaf51f3",
+    "helper/opd_reflex_kernels.py": "7f0ce39ef48d48323eeda4795121747d07be6ead07b6c5e9d2fed9b509e7dd88",
+    "helper/tree_verification.py": "611ee9e706207eb8d9e6dd60fb0b73a24e8e9cf1ad22d0fa00b00c2ad6ece3fa",
+    "helper/tree_kernels.py": "b2bd4d4a831f71477085c8a24f881ac2d019e51b5512157c2516449e3acc1bb8",
+    "helper/rewards.py": "4a14324812d999a31e8b414cd8dca33d98c275876e7b81ca1e0847874ae55f30",
+    "helper/get_QAs.py": "72974e50046cd70fe956a00a787fdaa070bce36110ee239a7d4ecd94dcfd58d2",
+    "helper/response_alignment.py": "350338c045bf2319757c4747857e25290a66e71d08304342c09dd6d8d0fe36ff"
+  }
+}

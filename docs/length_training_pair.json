@@ -1,0 +1,54 @@
+{
+  "fixture": "Synthetic native Qwen2; controlled rewards; not full-model benchmark",
+  "hardware": "NVIDIA GeForce RTX 3090",
+  "checks": {
+    "target_lora": {
+      "status": "PASS",
+      "sha256": "fb40381af04e9dc35c2fa522116d8dd795341b33fcfd215b608871feec757b04"
+    },
+    "draft": {
+      "status": "PASS",
+      "sha256": "5d351809834e3ae0726d3d0aba2f162ba4e3cbbb443120fe7285ca2156aba3f3"
+    },
+    "prompt_order_sha256": {
+      "status": "PASS",
+      "value": "ce7044d699b3db8da5aa4d2098619876bb895feb6e605c44d5cfc9996261e495"
+    },
+    "optimizer_step_cadence": {
+      "status": "PASS",
+      "value": [
+        [
+          2,
+          1
+        ],
+        [
+          4,
+          2
+        ]
+      ]
+    },
+    "target_optimizer_steps": {
+      "status": "PASS",
+      "value": 2
+    },
+    "generation_length_policy": {
+      "status": "PASS",
+      "value": "specnaacl_compatible"
+    },
+    "observed_sampler_eos": {
+      "status": "PASS",
+      "value": {
+        "status": "PASS",
+        "length_policy": "specnaacl_compatible",
+        "sampler_mode": "finite",
+        "first_token": "shared_per_prompt",
+        "prefill_autocast": false,
+        "verification_autocast": true,
+        "temperature": 1.0,
+        "top_p": 0.95,
+        "top_k": null,
+        "eos_token_id": 96
+      }
+    }
+  }
+}

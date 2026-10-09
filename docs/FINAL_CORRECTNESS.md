@@ -1,5 +1,11 @@
 # Final correctness audit (2026-10-09)
 
+**Historical report.** The subsequent Medusa-only fairness revision is documented
+in [LENGTH_FAIRNESS.md](LENGTH_FAIRNESS.md). Its default is now
+`specnaacl_compatible`; the independent response budget and generation-length
+FAIL described below refer to the previous implementation. The old validation
+artifacts remain historical evidence, not results for the new policy.
+
 This revision supersedes the historical `REVISION_AUDIT.md` and its 85-test
 results. The latest request explicitly authorizes the common training fix in
 MedusaGRPO, SpecNaacl and puregrpo. No FastGRPO/Reflex generator, PureGRPO decoder,

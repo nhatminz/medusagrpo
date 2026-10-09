@@ -7,7 +7,16 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 COMMON_ENV="${COMMON_ENV:-$PROJECT_DIR/configs/_shared/b200_common.env}"
 MODEL_ENV="${MODEL_ENV:-$PROJECT_DIR/configs/$MODEL_KEY/b200.env}"
 source "$COMMON_ENV"
+# Match effective upstream wrappers while retaining model b200.env defaults.
+# Explicit BATCH_SIZE/ACCUMULATION_STEPS exports still take precedence.
+LAUNCHER_ENV="${LAUNCHER_ENV:-$PROJECT_DIR/configs/$MODEL_KEY/launcher.env}"
+if [[ -f "$LAUNCHER_ENV" ]]; then source "$LAUNCHER_ENV"; fi
 source "$MODEL_ENV"
+export GENERATION_LENGTH_POLICY="${GENERATION_LENGTH_POLICY:-specnaacl_compatible}"
+case "$GENERATION_LENGTH_POLICY" in
+  specnaacl_compatible|per_response) ;;
+  *) echo "ERROR: invalid GENERATION_LENGTH_POLICY: $GENERATION_LENGTH_POLICY" >&2;exit 2 ;;
+esac
 # New optional settings must not rely on all server wrappers/configs having been
 # updated together. Keep defaults here too, before ANY expansion under set -u.
 # An explicit environment/config override always takes precedence.
@@ -126,6 +135,7 @@ cmd=(
   --temperature "$TEMPERATURE"
   --top_p "$TOP_P"
   --max_length "$GEN_MAX_LENGTH"
+  --generation_length_policy "$GENERATION_LENGTH_POLICY"
   --max_prompt_length "$MAX_PROMPT_LENGTH"
   --max_training_padding_gap "$MAX_TRAINING_PADDING_GAP"
   --max_training_token "$MAX_TRAINING_TOKEN"
@@ -211,7 +221,7 @@ ln -sfn "$RUN_DIR" "$TRAIN_MODEL_ROOT/active_run_${METHOD}"
   --item "persistent_draft_objective=medusa_future_ce_offsets_2_3_4" \
   --item "batch_size=$BATCH_SIZE" --item "accumulation_steps=$ACCUMULATION_STEPS" \
   --item "responses_per_prompt=$RESPONSES_PER_PROMPT" --item "temperature=$TEMPERATURE" \
-  --item "top_p=$TOP_P" --item "max_length=$GEN_MAX_LENGTH" \
+  --item "generation_length_policy=$GENERATION_LENGTH_POLICY" --item "top_p=$TOP_P" --item "max_length=$GEN_MAX_LENGTH" \
   --item "max_prompt_length=$MAX_PROMPT_LENGTH" --item "num_epochs=$NUM_EPOCHS" \
   --item "resume_checkpoint=$RESUME_CHECKPOINT" --item "method=$METHOD" \
   --item "opd_rank=$OPD_RANK" --item "opd_topk=$OPD_TOPK" \

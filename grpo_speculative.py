@@ -20,7 +20,7 @@ from helper.response_alignment import append_response_group, sort_training_rows,
 from helper.shared_adapter import preflight_shared_adapter, verify_loaded_adapter, initialization_report
 from helper.rewards import accuracy_reward_func , format_reward_func
 from helper.get_QAs import get_test_QAs , get_train_QAs, get_QAs_from_path, select_train_subset
-from medusa.generate import speculative_generate,RUNTIME_SEMANTICS_VERSION
+from medusa.generate import speculative_generate,RUNTIME_SEMANTICS_VERSION,resolve_length_policy
 from medusa.model import MedusaModel as Model
 from helper.fastgrpo_training import compute_target_loss
 from medusa.training import train_heads as upstream_train_draft
@@ -214,6 +214,7 @@ def save_training_checkpoint(
         "grpo_alignment_version": "response_rows_v2",
         "initial_target_tensor_sha256":getattr(model.target_model,"_shared_initialization",{}).get("loaded_tensor_sha256"),
         "runtime_semantics_version":RUNTIME_SEMANTICS_VERSION,
+        "generation_length_policy":getattr(model,"_generation_length_policy","specnaacl_compatible"),
         "world_size": int(current_world_size),
         "rank_states": rank_states,
         "cumulative_elapsed_time_s": max(
@@ -252,6 +253,8 @@ def load_training_checkpoint(path, *, model, optimizer_target, optimizer_draft):
     from medusa.generate import RUNTIME_SEMANTICS_VERSION
     if checkpoint.get('runtime_semantics_version')!=RUNTIME_SEMANTICS_VERSION:
         raise ValueError('resume sampling/feedback semantics mismatch; initialize a new run from weights instead')
+    if checkpoint.get('generation_length_policy','specnaacl_compatible') != getattr(model,'_generation_length_policy','specnaacl_compatible'):
+        raise ValueError('resume generation length policy mismatch')
     if checkpoint.get('grpo_alignment_version') != 'response_rows_v2':
         raise ValueError('GRPO alignment changed; old runs require retraining from initial weights')
     current_world_size = dist.get_world_size() if dist.is_initialized() else 1
@@ -360,6 +363,7 @@ parser.add_argument('--grpo_iteration_num',type=int,default=1)
 parser.add_argument('--repeated_generate_nums',type=int,default=8)
 parser.add_argument('--beta',type=float,default=0.01)
 parser.add_argument('--epsilon',type=float,default=0.1)
+parser.add_argument('--generation_length_policy',choices=('specnaacl_compatible','per_response'),default=None)
 parser.add_argument('--max_length',type=int,default=2048)
 parser.add_argument('--max_prompt_length', type=int, default=2048,
                     help='Maximum prompt tokens before rollout; kept separate from max generated sequence length.')
@@ -423,6 +427,7 @@ parser.add_argument('--analysis_draft_update_steps', type=int, default=1)
 parser.add_argument('--analysis_bootstrap_samples', type=int, default=2000)
 parser.add_argument('--analysis_resume', default='true')
 args = parser.parse_args()
+args.generation_length_policy=resolve_length_policy(args.generation_length_policy)
 preflight_shared_adapter(args.load_lora_path, args.model_dir)
 method,_=resolve_method(args.method)
 runtime_device=torch.device(args.device)
@@ -696,6 +701,7 @@ if method == 'medusa_reflex':
     model.enable_opd(args.opd_rank)
 print(adapter_path)
 model._training_method=method
+model._generation_length_policy=args.generation_length_policy
 model._opd_enabled=method=='medusa_reflex' and os.environ.get('OPD_ENABLED','1')=='1'
 tokenizer = AutoTokenizer.from_pretrained(model_dir,padding_side="left")
 
@@ -750,7 +756,7 @@ if  args.load_lora_path != "":
     model.target_model.load_adapter(args.load_lora_path,adapter_name="default")
     verify_loaded_adapter(model.target_model,args.load_lora_path,args.model_dir)
 model.target_model.print_trainable_parameters()
-initialization_proof=initialization_report(model.target_model,args,draft=model.draft_model,method=method)
+initialization_proof=initialization_report(model.target_model,args,draft=model.draft_model,method=method,tokenizer=tokenizer)
 
 def _get_base_causal_lm(causal_lm):
     """Return the underlying causal LM while preserving injected LoRA modules."""
@@ -1130,6 +1136,7 @@ def _evaluate_analysis_branch(branch_name, draft_state, eval_batch, policy_step)
                 tokenizer=tokenizer,
                 do_sample=True,
                 max_length=max_length,
+                generation_length_policy=args.generation_length_policy,
                 repeated_generate_nums=repeated_generate_nums,
                 temperature=temperature,
                 top_p=top_p,
@@ -1310,7 +1317,7 @@ for epoch in epoch_bar:
 
             with torch.inference_mode():
                 outputs=speculative_generate(model=model,input_ids=input_ids,attention_mask=attention_mask,tokenizer=tokenizer,
-                do_sample=True,max_length=max_length,repeated_generate_nums=repeated_generate_nums,temperature=temperature,top_p=top_p,
+                do_sample=True,max_length=max_length,generation_length_policy=args.generation_length_policy,repeated_generate_nums=repeated_generate_nums,temperature=temperature,top_p=top_p,
                 verification_capacity=verification_capacity,
                 max_draft_token_length=max_draft_token_length,
                 max_draft_k=max_draft_k,
@@ -1749,6 +1756,7 @@ for epoch in epoch_bar:
                             tokenizer=tokenizer,
                             do_sample=True,
                             max_length=max_length,
+                            generation_length_policy=args.generation_length_policy,
                             repeated_generate_nums=repeated_generate_nums,
                             temperature=temperature,
                             top_p=top_p,
@@ -2276,7 +2284,7 @@ summary.update(target_adapter=args.load_lora_path,initial_medusa_checkpoint=adap
     cpeak_nodes=int(os.environ.get('CPEAK_NODES',str(verification_capacity))),
     max_tree_nodes_per_seq=int(os.environ.get('MAX_TREE_NODES_PER_SEQ','12')),
     fixed_tree_topk_by_depth=os.environ.get('FIXED_TREE_TOPK_BY_DEPTH','4,3,2'))
-summary.update(initialization=initialization_proof,grpo_alignment_version=GRPO_ALIGNMENT_VERSION,
+summary.update(generation_length_policy=args.generation_length_policy,initialization=initialization_proof,grpo_alignment_version=GRPO_ALIGNMENT_VERSION,
     target_optimizer_steps=batch_data.get('target_optimizer_steps',0),
     rollout_prompts_seen=batch_data.get('rollout_prompts_seen',0),
     prompt_order_sha256=batch_data.get('prompt_order_sha256'),

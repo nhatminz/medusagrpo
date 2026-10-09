@@ -1,0 +1,111 @@
+{
+  "revision": "Medusa-only selectable length fairness",
+  "hardware": "NVIDIA GeForce RTX 3090",
+  "torch": "2.8.0+cu126",
+  "full_suite": {
+    "command": "TRITON_CACHE_DIR=\"$PWD/outputs/triton_cache\" .venv-cuda/bin/python -m pytest tests -q",
+    "passed": 180,
+    "failed": 0,
+    "skipped": 0,
+    "log": "outputs/length_full_tests_final.log"
+  },
+  "final_checker_regression": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "log": "outputs/length_fairness_regression_final.log"
+  },
+  "compileall": {
+    "files": 61,
+    "status": "PASS"
+  },
+  "shell_syntax": {
+    "files": 46,
+    "status": "PASS"
+  },
+  "external_source_hashes": {
+    "checked": 443,
+    "changed": 0
+  },
+  "unchanged_algorithm_hashes": {
+    "medusa/opd.py": "c4f8a61d375eacff7c0cdeccf5bdc7d8264cb610702575c5c6b58c8c4f9aa55c",
+    "medusa/opd_kernels.py": "ffdbcbfa9fa6fa70b206d0225408401d316698e8c3315d7a167a3992e146f2bc",
+    "medusa/tree.py": "45cf98ba9bb827ad4ae71059319c6b3d5cec94c0c50277b6940bc51aac1e97c5",
+    "medusa/tree_kernels.py": "2f79704eddc54513ae1736d4c3134d7828a7302905a85a54968e44232fafe146",
+    "medusa/training.py": "6c1e88db0d43b2e4d884a00db6dac12ea458d09b13e9c7d7696af75611c97ec1",
+    "helper/opd_reflex.py": "6590ba3cddb1df8d33688aa8f0b0bae29646c5b72660937086b6306fafaf51f3",
+    "helper/opd_reflex_kernels.py": "7f0ce39ef48d48323eeda4795121747d07be6ead07b6c5e9d2fed9b509e7dd88",
+    "helper/tree_verification.py": "611ee9e706207eb8d9e6dd60fb0b73a24e8e9cf1ad22d0fa00b00c2ad6ece3fa",
+    "helper/tree_kernels.py": "b2bd4d4a831f71477085c8a24f881ac2d019e51b5512157c2516449e3acc1bb8",
+    "helper/rewards.py": "4a14324812d999a31e8b414cd8dca33d98c275876e7b81ca1e0847874ae55f30",
+    "helper/get_QAs.py": "72974e50046cd70fe956a00a787fdaa070bce36110ee239a7d4ecd94dcfd58d2",
+    "helper/response_alignment.py": "350338c045bf2319757c4747857e25290a66e71d08304342c09dd6d8d0fe36ff"
+  },
+  "configuration_status": "PASS",
+  "full_fairness_status": "NOT VERIFIED",
+  "models": [
+    {
+      "model": "qwen25_1p5b",
+      "configuration_status": "PASS",
+      "status": "NOT VERIFIED"
+    },
+    {
+      "model": "qwen25_3b",
+      "configuration_status": "PASS",
+      "status": "NOT VERIFIED"
+    },
+    {
+      "model": "qwen25_7b",
+      "configuration_status": "PASS",
+      "status": "NOT VERIFIED"
+    },
+    {
+      "model": "qwen25_14b",
+      "configuration_status": "PASS",
+      "status": "NOT VERIFIED"
+    },
+    {
+      "model": "qwen3_1p7b",
+      "configuration_status": "PASS",
+      "status": "NOT VERIFIED"
+    },
+    {
+      "model": "qwen3_4b",
+      "configuration_status": "PASS",
+      "status": "NOT VERIFIED"
+    },
+    {
+      "model": "llama31_8b",
+      "configuration_status": "PASS",
+      "status": "NOT VERIFIED"
+    }
+  ],
+  "synthetic_bf16_training_pair": {
+    "status": "PASS",
+    "optimizer_steps_per_method": 2,
+    "proof": "docs/length_training_pair.json"
+  },
+  "real_qwen25_3b_smoke": {
+    "status": "PASS",
+    "policies": [
+      "specnaacl_compatible",
+      "per_response"
+    ],
+    "heads": "synthetic initialized heads",
+    "target": "base target without experiment LoRA",
+    "disabled_rng": true,
+    "serial_async": true,
+    "no_extra_head_training_target_forward": true
+  },
+  "b200_smoke_benchmark": {
+    "status": "SKIPPED",
+    "reason": "Only RTX 3090 available; no B200 correctness/performance claim"
+  },
+  "not_verified": [
+    "Seven full-model experiment initialization/checkpoints",
+    "Loaded EOS/sampler mode across all baseline runs",
+    "PureGRPO production runtime/checkpoint parity",
+    "Multi-GPU rank coverage/resume",
+    "Production full-model concurrency/OOM and end-to-end throughput"
+  ]
+}

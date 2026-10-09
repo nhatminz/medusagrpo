@@ -88,7 +88,7 @@ def test_true_prompt_budget_mixed_eos_and_pending(tiny_model,method,near_limit,d
     mask=torch.zeros_like(x)
     for row,length in enumerate(lengths):mask[row,-length:]=1;x[row,:width-length]=0
     result=speculative_generate(tiny_model,x,mask,SimpleNamespace(eos_token_id=22),
-        max_length=width+1,method=method,return_all_draft_input=True)
+        max_length=width+1,method=method,return_all_draft_input=True,generation_length_policy='per_response')
     assert list(map(len,result['generated_token_ids']))==[1,3,5]
     assert result['prompt_lengths']==lengths
     for row,ids in enumerate(result['all_draft_input_ids']):
@@ -108,7 +108,7 @@ def test_mixed_prompt_eos_removes_only_finished_rows(tiny_model):
     with torch.no_grad():tiny_model.target_model.lm_head.weight.zero_()
     x=torch.tensor([[1,1,1],[0,0,1]]);mask=torch.tensor([[1,1,1],[0,0,1]])
     for eos,expected in ((0,[1,1]),(22,[1,3])):
-        result=speculative_generate(tiny_model,x,mask,SimpleNamespace(eos_token_id=eos),max_length=4)
+        result=speculative_generate(tiny_model,x,mask,SimpleNamespace(eos_token_id=eos),max_length=4,generation_length_policy='per_response')
         assert list(map(len,result['generated_token_ids']))==expected
 
 
@@ -154,7 +154,19 @@ def test_fairness_checker_never_promotes_missing_or_mismatched_proofs():
             'target_optimizer_steps':2}
     result=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',),runtime_reports=reports)
     assert result['models'][0]['checks']['loaded_initial_target_lora']['status']=='PASS'
-    assert result['status']=='FAIL' # Known length/precision differences remain visible.
+    assert result['status']=='NOT VERIFIED' # Hashes alone cannot prove executed fairness.
+    ablation=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',),
+                   env={'GENERATION_LENGTH_POLICY':'per_response'},runtime_reports=reports)
+    assert ablation['models'][0]['checks']['generation_length']['status']=='FAIL'
+    assert ablation['status']=='FAIL'
+    reports[('qwen25_1p5b','medusa_reflex')]['initialization']['draft']={'status':'PASS'}
+    result=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',),runtime_reports=reports)
+    assert result['models'][0]['checks']['loaded_draft_medusa']['status']=='NOT VERIFIED'
+    # Equal runtime overrides across all methods still differ from the audited
+    # launch configuration and must not be promoted to PASS.
+    for summary in reports.values():summary['initialization']['effective_args']={'batch_size':99}
+    result=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',),runtime_reports=reports)
+    assert result['models'][0]['checks']['observed_vs_declared_configuration']['status']=='FAIL'
     reports[('qwen25_1p5b','puregrpo')]['initialization']['target_lora']['loaded_tensor_sha256']='wrong'
     result=audit(ROOT.parent/'SpecNaacl',ROOT.parent/'puregrpo',models=('qwen25_1p5b',),runtime_reports=reports)
     assert result['models'][0]['checks']['loaded_initial_target_lora']['status']=='FAIL'
@@ -184,7 +196,7 @@ def test_heterogeneous_eos_rounds_use_individual_budgets(monkeypatch):
     x=torch.tensor([[1,1,5],[0,1,2],[0,0,0]]);mask=torch.tensor([[1,1,1],[0,1,1],[0,0,1]])
     outputs=[]
     for method in ('medusa','medusa_reflex'):
-        result=speculative_generate(model,x,mask,SimpleNamespace(eos_token_id=7),method=method,max_length=8)
+        result=speculative_generate(model,x,mask,SimpleNamespace(eos_token_id=7),method=method,max_length=8,generation_length_policy='per_response')
         assert result['generated_token_ids']==[[6,7],[3,4,5,6,7],[1,2,3,4,5,6,7]]
         assert result['response_generated_tokens']==[2,5,7]
         outputs.append(result['generated_token_ids'])

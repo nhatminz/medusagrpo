@@ -25,7 +25,7 @@ def main():
     p.add_argument('--steps',type=int,default=10)
     p.add_argument('--max-prompts',type=int,default=0)
     p.add_argument('--trials',type=int,default=3)
-    p.add_argument('--budgets',default='512:8,512:12,768:12',help='global_nodes:per_response_nodes pairs')
+    p.add_argument('--budgets',default='512:12',help='global_nodes:per_response_nodes pairs; main benchmark keeps 512 nodes')
     p.add_argument('--topk',default='4,3,2')
     p.add_argument('--output',type=Path)
     p.add_argument('--dry-run',action='store_true')
@@ -46,7 +46,7 @@ def main():
                 name=f'nodes{global_budget}_max{max_nodes}_trial{trial}_method-{method}'
                 run=output/name
                 env=dict(os.environ,RUN_DIR=str(run),RUN_NAME=name,RESUME='',DRY_RUN='true' if a.dry_run else 'false',
-                    GRPO_BENCHMARK='1',PYTHON_BIN=sys.executable,CPEAK_NODES=str(global_budget),MAX_TREE_NODES_PER_SEQ=str(max_nodes),
+                    GRPO_BENCHMARK='1',GENERATION_LENGTH_POLICY=os.environ.get('GENERATION_LENGTH_POLICY','specnaacl_compatible'),PYTHON_BIN=sys.executable,CPEAK_NODES=str(global_budget),MAX_TREE_NODES_PER_SEQ=str(max_nodes),
                     FIXED_TREE_TOPK_BY_DEPTH=a.topk,MAX_TARGET_OPTIMIZER_STEPS=str(a.steps),MAX_ROLLOUT_PROMPTS=str(a.max_prompts),
                     OPD_SELECTION='visited_capped_frontier',OPD_MAX_FRONTIER_PER_HEAD='2',OPD_PROFILE='1' if a.profile else '0')
                 suffix='medusa' if method=='medusa' else 'reflex'
@@ -70,7 +70,7 @@ def main():
                 tokens=sum(float(r['iter_rollout_tokens']) for r in steady)
                 generation=sum(float(r['iter_generation_time_s']) for r in steady)
                 wall=sum(float(r['iter_wall_time_s']) for r in steady)
-                record=dict(method=method,global_nodes=global_budget,max_nodes=max_nodes,trial=trial,
+                record=dict(generation_length_policy=summary['generation_length_policy'],method=method,global_nodes=global_budget,max_nodes=max_nodes,trial=trial,
                     generation_tokens_per_s=tokens/max(generation,1e-9),end_to_end_tokens_per_s=tokens/max(wall,1e-9),
                     whole_run_tokens_per_s=summary['total_rollout_tokens']/max(summary['total_wall_time_s'],1e-9),
                     opd_feedback_time_s=sum(float(r.get('opd_feedback_time') or 0) for r in steady) if a.profile else None,

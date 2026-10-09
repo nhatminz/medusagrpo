@@ -14,7 +14,14 @@ from helper.opd_attention import AttentionWorkspace
 from medusa.tree import plan_tree,build_sparse_tree,restrict_feedback
 from medusa.opd import MedusaOPD
 TARGET_SAMPLER_MODE=os.environ.get('OPD_SAMPLER_MODE','finite')
-RUNTIME_SEMANTICS_VERSION='actual_prompt_response_budget_v3'
+RUNTIME_SEMANTICS_VERSION='selectable_batch_round_length_v4'
+LENGTH_POLICIES=('specnaacl_compatible','per_response')
+
+
+def resolve_length_policy(value=None):
+    value=value or os.environ.get('GENERATION_LENGTH_POLICY','specnaacl_compatible')
+    if value not in LENGTH_POLICIES:raise ValueError('unsupported GENERATION_LENGTH_POLICY: '+str(value))
+    return value
 
 
 def base_lm(model):
@@ -54,11 +61,13 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
         return_all_draft_input=False,method='medusa',verification_capacity=512,
         opd_rank=8,opd_topk=16,opd_fast_lr=.01,opd_visited_weight=1.,opd_frontier_weight=1.,
         opd_update_stream=True,opd_profile=False,opd_diagnostics=False,opd_backend='auto',
-        opd_train_projector=False,opd_enabled=None,**unused):
+        opd_train_projector=False,opd_enabled=None,generation_length_policy=None,**unused):
     if method not in ('medusa','medusa_reflex'):raise ValueError('unsupported Medusa method')
+    length_policy=resolve_length_policy(generation_length_policy)
+    compatible=length_policy=='specnaacl_compatible'
     enabled=method=='medusa_reflex' and (os.environ.get('OPD_ENABLED','1')=='1' if opd_enabled is None else opd_enabled)
     b,prompt=input_ids.shape;repeats=int(repeated_generate_nums or 1);total=b*repeats
-    if prompt>=max_length:raise ValueError('max_length must exceed padded prompt length')
+    if not compatible and prompt>=max_length:raise ValueError('max_length must exceed padded prompt length')
     eos=int(tokenizer.eos_token_id);device=input_ids.device
     cpeak=int(os.environ.get('CPEAK_NODES',str(verification_capacity)))
     max_nodes=int(os.environ.get('MAX_TREE_NODES_PER_SEQ','12'))
@@ -97,7 +106,10 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
     if any(length<1 for length,_ in initial_packet):raise ValueError('empty valid prompt')
     # Reuse the existing scheduling readback; left-padding consumes storage,
     # never a response token budget. Physical KV positions remain batch-wide.
-    max_new=max_length-min(length for length,_ in initial_packet)
+    # Source checks after a complete verification round, including the first
+    # round when prefill already meets max_length. Reserve its full overshoot.
+    max_new=max_length-min(length for length,_ in initial_packet)+(4 if compatible else 0)
+    if compatible:max_new=max(5,max_new) # prefill + mandatory complete first round
     storage_length=prompt+max_new
     response_budget=(max_length-prompt_lengths).repeat_interleave(repeats,0)
     pending=pending[:,0].repeat_interleave(repeats,0)
@@ -128,8 +140,11 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
         import helper.tree_kernels as kernels
     rounds=nodes=active_rounds=0
     reasons={}
-    # Remove prefill EOS before verification; do not sample past EOS.
-    survivor=[r for i,(length,token) in enumerate(initial_packet) if token!=eos and max_length-length>1
+    # Historical source initializes end_sig=0 even for prefill EOS, and checks
+    # max_length only after round 1. Reproduce scheduling/RNG in compatible mode;
+    # final output still ends at its FIRST EOS, as in the source output filter.
+    survivor=[r for i,(length,token) in enumerate(initial_packet)
+              if compatible or (token!=eos and max_length-length>1)
               for r in range(i*repeats,(i+1)*repeats)]
     keep=torch.tensor(survivor,device=device,dtype=torch.long)
     if keep.numel()!=total:cache.batch_select_indices(keep)
@@ -160,9 +175,11 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
             metadata_builder=retain_metadata if enabled else None,return_probs=False,mode=TARGET_SAMPLER_MODE)
         del verify_logits
         path=trace_verified_path(tree,samples,eos,kernels=kernels)
-        # Enforce remaining token budget on device; no feedback after truncation.
-        remaining=response_budget[global_ids]-counts[global_ids]
-        path.lengths.copy_(torch.minimum(path.lengths,remaining))
+        # Compatible mode consumes the full EOS-limited path then checks the
+        # batch maximum. Per-response ablation truncates before scatter/feedback.
+        remaining=(torch.full_like(global_ids,path_capacity) if compatible else
+                   response_budget[global_ids]-counts[global_ids])
+        if not compatible:path.lengths.copy_(torch.minimum(path.lengths,remaining))
         slots=torch.arange(path.tokens.shape[1],device=device)[None,:]
         valid=slots<path.lengths[:,None]
         path.packed_indices.masked_fill_(~valid,-1)
@@ -176,7 +193,14 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
             del teacher
         last=(path.lengths-1)[:,None]
         pending=path.tokens.gather(1,last).squeeze(1)
-        finished=(pending==eos)|(path.lengths>=remaining)
+        if compatible:
+            # logical excludes the outstanding pending token; +1 includes it.
+            # Include rows ending at EOS in THIS round before removing them,
+            # exactly as source checks real_sequences_length before pruning.
+            batch_limit=(logical+path.lengths+1>=max_length).any()
+            finished=(pending==eos)|batch_limit
+        else:
+            finished=(pending==eos)|(path.lengths>=remaining)
         # One small scheduling/dispatch packet per round, no feedback readback.
         snapshots=torch.stack([s.dispatch_snapshot[0] for s in engine.engines]).long()
         packet=torch.cat((torch.stack((path.lengths,finished.long()),1).flatten(),snapshots)).cpu().tolist()
@@ -224,6 +248,9 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
     # Serialize outputs with one bulk D2H copy, not one blocking copy/response.
     generated_host=generated[:,:max(lengths)].cpu()
     generated_ids=[generated_host[r,:lengths[r]].tolist() for r in range(total)]
+    if compatible:
+        # Source filters prefill EOS only when serializing final outputs.
+        generated_ids=[row[:row.index(eos)+1] if eos in row else row for row in generated_ids]
     inputs=states=None
     if return_all_draft_input:
         inputs=[];states=[]
@@ -234,10 +261,11 @@ def _speculative_generate(model,input_ids,attention_mask,tokenizer,do_sample=Fal
             inputs.append(ids_storage[r,start:prompt+lengths[r]].clone())
             states.append(states_storage[r,start:prompt+lengths[r]].clone())
     accepted=sum(hc[h*3+2] for h in range(3));proposed=sum(hc[h*3+1] for h in range(3))
-    metrics.update(generated_token_ids=generated_ids,max_sequence_length=max(lengths),
+    output_lengths=list(map(len,generated_ids))
+    metrics.update(generation_length_policy=length_policy,generated_token_ids=generated_ids,max_sequence_length=max(output_lengths),
         total_acc_length=sum(response_acc),total_decoded_token_num=sum(response_rounds),
         total_accepted_draft_tokens=accepted,total_proposed_draft_tokens=proposed,
-        response_generated_tokens=lengths,response_accepted_length_sum=response_acc,response_verification_rounds=response_rounds,
+        response_generated_tokens=output_lengths,response_accepted_length_sum=response_acc,response_verification_rounds=response_rounds,
         all_draft_input_ids=inputs,all_draft_input_states=states,total_time_cost=time.perf_counter()-started,
         prefill_time_cost=0.,target_time_cost=0.,draft_time_cost=0.,check_time_cost=0.,
         verification_batches=rounds,active_response_rounds=active_rounds,verified_tree_nodes=nodes,

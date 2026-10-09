@@ -22,6 +22,7 @@ def main():
     parser.add_argument('--target-adapter',help='optional common initial target LoRA')
     parser.add_argument('--responses',type=int,default=2)
     parser.add_argument('--new-tokens',type=int,default=12)
+    parser.add_argument('--length-policy',choices=('specnaacl_compatible','per_response'),default='specnaacl_compatible')
     parser.add_argument('--output',type=Path,required=True)
     args=parser.parse_args()
     if not torch.cuda.is_available():parser.error('actual CUDA runtime required')
@@ -51,7 +52,7 @@ def main():
         start=time.perf_counter()
         out=speculative_generate(model,batch.input_ids,batch.attention_mask,tokenizer,method=method,do_sample=True,
             repeated_generate_nums=args.responses,max_length=batch.input_ids.shape[1]+args.new_tokens,
-            return_all_draft_input=True,opd_train_projector=True,**options)
+            return_all_draft_input=True,opd_train_projector=True,generation_length_policy=args.length_policy,**options)
         assert len(calls)==out['target_forward_calls']==out['verification_batches']+1
         records.append(dict(method=method,options=options,generated_tokens=sum(out['response_generated_tokens']),
             target_forward_calls=out['target_forward_calls'],verification_batches=out['verification_batches'],
@@ -79,7 +80,8 @@ def main():
         real_target_weights=True,heads=args.heads or 'synthetic zero-residual initialization; not pretrained experiment heads',
         target_adapter=args.target_adapter or 'none; base-target decoder/head smoke only',
         prompts=2,responses_per_prompt=args.responses,max_length=batch.input_ids.shape[1]+args.new_tokens,
-        per_response_budgets=(batch.input_ids.shape[1]+args.new_tokens-batch.attention_mask.sum(-1)).cpu().tolist(),records=records,
+        generation_length_policy=args.length_policy,
+        prompt_lengths=batch.attention_mask.sum(-1).cpu().tolist(),records=records,
         disabled_and_b0_output_rng_parity=True,serial_async_parity=True,head_losses=model.last_head_losses,
         head_training_peak_allocated_bytes=torch.cuda.max_memory_allocated(),no_extra_head_training_target_forward=True,
         limitations=['Not a GRPO/reward or 5-epoch real pretraining run','Not a B200 benchmark',

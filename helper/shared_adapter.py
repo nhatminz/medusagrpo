@@ -102,7 +102,7 @@ def preflight_shared_adapter(path, model_dir=None):
     adapter_artifact(path)
 
 
-def initialization_report(target, args, *, draft=None, method=None):
+def initialization_report(target, args, *, draft=None, method=None, tokenizer=None):
     """Startup proof only; no calls in decoding, feedback or optimizer loops."""
     import importlib.metadata
     import os
@@ -115,11 +115,22 @@ def initialization_report(target, args, *, draft=None, method=None):
                   environment={name: os.environ.get(name) for name in (
                       'CPEAK_NODES','MAX_TREE_NODES_PER_SEQ','FIXED_TREE_TOPK_BY_DEPTH',
                       'OPD_ENABLED','OPD_SELECTION','OPD_MAX_FRONTIER_PER_HEAD',
-                      'OPD_FRONTIER_WEIGHT','OPD_FAST_LR','OPD_RANK','OPD_TOPK')},
+                      'OPD_FRONTIER_WEIGHT','OPD_FAST_LR','OPD_RANK','OPD_TOPK','OPD_SAMPLER_MODE','GENERATION_LENGTH_POLICY')},
                   packages={name:importlib.metadata.version(name) for name in ('torch','transformers','peft')},
                   cuda=torch.version.cuda, gpu=torch.cuda.get_device_name() if torch.cuda.is_available() else None,
                   target_dtype=str(next(target.parameters()).dtype),
                   attention_implementation=getattr(target.config, '_attn_implementation', None))
+    if tokenizer is not None:
+        result['tokenizer_runtime']=dict(status='PASS',eos_token_id=tokenizer.eos_token_id,
+            pad_token_id=tokenizer.pad_token_id,padding_side=tokenizer.padding_side,
+            chat_template_sha256=hashlib.sha256(str(tokenizer.chat_template).encode()).hexdigest())
+    if method in ('medusa','medusa_reflex'):
+        from medusa.generate import TARGET_SAMPLER_MODE,resolve_length_policy
+        result['generation']=dict(status='PASS',length_policy=resolve_length_policy(getattr(args,'generation_length_policy',None)),
+            sampler_mode=TARGET_SAMPLER_MODE,first_token='shared_per_prompt',
+            prefill_autocast=False,verification_autocast=target.device.type=='cuda',
+            temperature=args.temperature,top_p=args.top_p,top_k=None,
+            eos_token_id=tokenizer.eos_token_id if tokenizer is not None else None)
     if official:
         result['target_backbone'] = dict(status='PASS',loaded_tensor_sha256=state_dict_sha256(
             {k:v for k,v in target.state_dict().items() if 'lora_' not in k}))

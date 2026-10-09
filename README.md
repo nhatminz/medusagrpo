@@ -3,6 +3,19 @@
 Repo độc lập cho `medusa` và `medusa_reflex`, dùng target GRPO của SpecNaacl.
 Không import hoặc chạy source bên SpecNaacl/FlashGRPO/PureGRPO ở runtime.
 
+Revision fairness mới nhất: [`docs/LENGTH_FAIRNESS.md`](docs/LENGTH_FAIRNESS.md).
+`GENERATION_LENGTH_POLICY=specnaacl_compatible` là mặc định của cả hai methods:
+kiểm tra maximum actual sequence length của batch sau khi hoàn tất verification
+round, kể cả bonus/rejection token và rows vừa EOS, trước khi prune. Có thể vượt
+`max_length` trong round cuối như SpecNaacl. `per_response` giữ lại cho ablation.
+Checkpoint lưu policy và từ chối resume khi đổi policy.
+
+Model configs đã khớp SpecNaacl: Qwen2.5-1.5B và Qwen3-1.7B là batch/accumulation
+16/2, Qwen2.5-14B là 4/8. **Launchers SpecNaacl hiện ghi đè thành 8/4 ở cả 7
+models**, nên `configs/<model>/launcher.env` của Medusa giữ cùng defaults thực.
+Biến export của người chạy luôn ưu tiên. Dùng `LAUNCHER_ENV=/dev/null` để chọn
+model-config defaults; checker sẽ báo lệch nếu baseline chưa có cùng override.
+
 ## Cấu trúc
 
 ```text
@@ -116,7 +129,7 @@ python scripts/tune_opd_proposals.py --models qwen25_1p5b \
   --rank 8 --dtype bf16 --topk 16 --shapes 1x1,8x1,32x1,64x1,128x1
 
 python scripts/benchmark_pair.py --model qwen25_1p5b --steps 10 --trials 3 \
-  --budgets 512:8,512:12,768:12
+  --budgets 512:12
 ```
 
 Benchmark chạy production GRPO launchers với cùng checkpoint, seed, settings và
@@ -154,19 +167,22 @@ python scripts/check_fairness.py --output docs/fairness_report.json
 python scripts/check_fairness.py --use-environment --output outputs/fairness.json
 ```
 
-Fairness checker exit 0 nghĩa audit đã chạy. `--strict` hiện trả exit 1 vì
-length stopping của các baseline và sampling precision còn khác nhau.
+Fairness checker exit 0 nghĩa audit đã chạy. `--strict` trả exit 1 khi còn FAIL
+hoặc NOT VERIFIED. Cấu hình và stopping policy của 7 models hiện PASS; hashes
+checkpoint/runtime đầy đủ của các baseline và B200 chưa được cung cấp.
 Lỗi sort response/advantage đã được sửa đồng nhất trong cả ba trainer; các
 GRPO run cũ cần retrain từ initial LoRA chung. `GRPO_BENCHMARK=1` bắt buộc
 checkpoint chung và xác minh tensor thực sau khi load. Xem báo cáo mới
-[`docs/FINAL_CORRECTNESS.md`](docs/FINAL_CORRECTNESS.md) và
-[`docs/FINAL_VALIDATION.json`](docs/FINAL_VALIDATION.json).
+[`docs/LENGTH_FAIRNESS.md`](docs/LENGTH_FAIRNESS.md) và
+[`docs/LENGTH_FAIRNESS_VALIDATION.json`](docs/LENGTH_FAIRNESS_VALIDATION.json).
 
 Kiểm tra thực tế dùng CPU Python 3.12/torch2.8 và RTX3090/torch2.8+cu126.
 Suite gồm tiny native-architecture smoke của 7 configs, GRPO/head gradient
 parity, CUDA KV recomputation, B0/disabled RNG, async, pretrain5epochs và resume.
-Kết quả mới: **537 tests passed, không failed/skipped trên môi trường CUDA**, ở
-[`docs/FINAL_VALIDATION.json`](docs/FINAL_VALIDATION.json).
+Revision fairness hiện tại: **180 Medusa tests passed, 0 failed/skipped** trên
+môi trường CUDA, cộng regression checker sau thay đổi cuối. Kết quả lịch sử
+537 tests của ba repos nằm ở [`docs/FINAL_VALIDATION.json`](docs/FINAL_VALIDATION.json);
+lần này chỉ sửa và chạy suite của Medusa.
 [`docs/VALIDATION.json`](docs/VALIDATION.json) giữ kết quả revision trước.
 [`docs/real_qwen25_1p5b_cuda_smoke.json`](docs/real_qwen25_1p5b_cuda_smoke.json)
 giữ smoke Qwen2.5-1.5B trước đây. Lần sửa cuối đã kiểm tra weights thật
