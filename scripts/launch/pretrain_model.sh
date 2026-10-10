@@ -13,6 +13,7 @@ PRETRAIN_ACCUMULATION_STEPS="${requested_pretrain_accum:-${DRAFT_PRETRAIN_ACCUMU
 : "${MODEL:?MODEL is required}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-$PROJECT_DIR/outputs}"
+export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
 
 case "${PRETRAIN_DATASET,,}" in
   sharegpt)
@@ -76,6 +77,7 @@ cmd=("$PYTHON_BIN" -m torch.distributed.run --standalone "--nproc_per_node=$NPRO
   --model_output_root "$MODEL_OUTPUT_ROOT" --resume "$PRETRAIN_RESUME" --load_lora_path "$TARGET_ADAPTER")
 if (($#)); then cmd+=("$@"); fi
 printf 'Run dir: %s\nModel: %s\nDataset: %s\n' "$RUN_DIR" "$MODEL" "$PRETRAIN_DATASET_PATH"
+printf 'CUDA_VISIBLE_DEVICES: %s\n' "$CUDA_VISIBLE_DEVICES"
 printf 'Command:'; printf ' %q' "${cmd[@]}"; printf '\n'
 if [[ "${DRY_RUN:-false}" == true ]];then return 0 2>/dev/null || exit 0;fi
 [[ -f "$MODEL/config.json" ]] || { echo "Missing model: $MODEL" >&2; exit 2; }

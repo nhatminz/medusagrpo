@@ -47,6 +47,7 @@ esac
 
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-$PROJECT_DIR/outputs}"
+export CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0}"
 case "${DATASET,,}" in
   gsm8k)
     TRAIN_OPTION="gsm8k"
@@ -187,6 +188,8 @@ if (($#)); then cmd+=("$@"); fi
 
 printf 'Run name : %s\nRun dir  : %s\nModel    : %s\nDataset  : %s\nDraft    : %s\nMethod   : %s\nEngine   : %s\nGPUs     : %s\n' \
   "$RUN_NAME" "$RUN_DIR" "$MODEL" "$DATASET_PATH" "$DRAFT_CHECKPOINT" "$METHOD" "$METHOD" "$NPROC_PER_NODE"
+printf 'CUDA_VISIBLE_DEVICES: %s\nTree     : CPEAK_NODES=%s MAX_TREE_NODES_PER_SEQ=%s TOPK=%s\n' \
+  "$CUDA_VISIBLE_DEVICES" "$CPEAK_NODES" "$MAX_TREE_NODES_PER_SEQ" "$FIXED_TREE_TOPK_BY_DEPTH"
 printf 'Command  :'; printf ' %q' "${cmd[@]}"; printf '\n'
 if [[ "${DRY_RUN:-false}" == "true" ]]; then return 0 2>/dev/null || exit 0; fi
 

@@ -1,60 +1,66 @@
 # Per-model shell configuration
 
-All 28 train/pretrain wrappers for the seven supported models now contain an
-explicit export block. Running a different model resets model, family, data,
-initial LoRA, heads, output roots, active Python, CUDA device/world size,
-BF16/SDPA, batch/accumulation, seed, length policy and configuration file paths.
-Inherited values of these variables are replaced in the launched child shell;
-the parent terminal is not modified. Model paths retain the server defaults
-from the inspected configs. Outputs are relative to the Medusa repository.
+All 21 train scripts and 7 pretrain scripts use caller environment values first.
+`LAUNCHER_USE_ENV=1` remains compatible but is no longer required. Unset or empty
+values use the same per-model defaults as before. Clear an old exported model
+or checkpoint variable if you want the new model wrapper to choose its default.
 
 Default initial target checkpoint:
 `outputs/initial_target/<model_key>_seed42`.
 Default pretrained heads:
 `outputs/pretrain/<model_key>/latest_checkpoint`.
-Create/pretrain these once; wrappers do not create missing checkpoints or
-silently substitute another model's initialization. Training wrappers enable
-`GRPO_BENCHMARK=1` so actual loaded target and heads hashes are recorded.
+Create these once; wrappers do not create missing checkpoints. Train wrappers
+default to `GRPO_BENCHMARK=1`, preserving actual loaded tensor hash checks.
 
-Activate the appropriate environment once, then run directly:
+Training batch/accumulation comes from the shared launcher's existing
+`configs/<model>/launcher.env` layer (8/4) followed by model config. Explicit
+`BATCH_SIZE`/`ACCUMULATION_STEPS` values win. `LAUNCHER_ENV=/dev/null` still
+selects model-config defaults. Pretrain batch/accumulation keeps each model's
+existing defaults and accepts `PRETRAIN_BATCH_SIZE`/`PRETRAIN_ACCUMULATION_STEPS`.
+
+Model wrappers no longer assign `DATASET_PATH` or `PRETRAIN_DATASET_PATH`.
+Shared launchers resolve training `DATASET=gsm8k|simplelr|dapo` and pretraining
+`PRETRAIN_DATASET=sharegpt|gsm8k|simplelr|dapo` beneath `DATA_ROOT`. Explicit
+paths are preserved, including paths containing spaces.
 
 ```bash
-RESUME=auto bash train_qwen25_1p5b_reflex.sh
-RESUME=auto bash train_qwen25_3b_reflex.sh
-RESUME=auto bash train_qwen25_7b_reflex.sh
-RESUME=auto bash train_qwen25_14b_reflex.sh
-RESUME=auto bash train_qwen3_1p7b_reflex.sh
-RESUME=auto bash train_qwen3_4b_reflex.sh
+CUDA_VISIBLE_DEVICES=2 DATASET=gsm8k DRY_RUN=true \
+  bash train_qwen3_1p7b_reflex.sh
+
+CUDA_VISIBLE_DEVICES=2 DATASET=dapo DATASET_PATH=/custom/train.parquet \
+  bash train_qwen25_3b_medusa.sh
+
+CUDA_VISIBLE_DEVICES=2 PRETRAIN_DATASET=sharegpt \
+  PRETRAIN_DATASET_PATH=/custom/sharegpt.json bash pretrain_qwen25_3b.sh
+
+TARGET_ADAPTER=/custom/initial DRAFT_CHECKPOINT=/custom/heads \
+  RESUME=auto bash train_qwen25_3b_reflex.sh
 ```
 
 `train_<model>.sh` aliases select Reflex; `_medusa.sh` selects baseline Medusa.
-`pretrain_<model>.sh` selects that model's initial target and pretraining batch.
-Training batch/accumulation stays 8/4 to match actual SpecNaacl wrappers;
-pretraining keeps each model's existing settings. No decoding/OPD code changes.
+`RESUME`, `RUN_DIR`, `RUN_NAME`, budgets and OPD options remain overrideable.
+Existing model/method resume rules are unchanged.
 
-`RESUME`, `RUN_DIR`, `RUN_NAME`, `DRY_RUN`, training budgets and OPD options are
-still accepted as run controls. Automatic resume uses the existing model/method
-active-run link; an explicit RUN_DIR selects a specific run. A completed run or
-missing compatible checkpoint may cause `RESUME=auto` to start a new run under
-the existing launcher rules. Do not reuse RUN_DIR from a different model.
+The shared config defaults `OPD_FRONTIER_WEIGHT` to 0.5. Explicit environment
+weights win. Visited weight stays 1.0, selection stays `visited_capped_frontier`,
+and the frontier cap stays 2. No generation, ReflexOPD gradient, tree or kernel
+implementation changes accompany this launcher update.
 
-Edit a wrapper's export block to change its permanent configuration. Its paired
-method wrapper must use the same target/head checkpoints for fairness. For
-explicit environment overrides (custom experiments/ablation/tooling), opt in:
+The paired benchmark inherits GPU, dataset, paths and weights, uses model-specific
+checkpoint defaults if none are supplied, and retains paired loaded-tensor checks.
+Both methods use the same initial target, heads, seed, tree and training budget.
+Profiling remains off unless `--profile` is provided. Throughput computation,
+`results.json` and `selected_tree.env` are unchanged.
 
 ```bash
-LAUNCHER_USE_ENV=1 TARGET_ADAPTER=/custom/initial DRAFT_CHECKPOINT=/custom/heads \
-  bash train_qwen25_3b_reflex.sh
+CUDA_VISIBLE_DEVICES=2 DATASET=gsm8k python scripts/benchmark_pair.py \
+  --model qwen3_1p7b --steps 10 --trials 3 --budgets 512:12 --dry-run
+# Remove --dry-run for the actual GPU benchmark.
 ```
 
-The paired benchmark tool opts in to preserve its explicit checkpoint paths,
-tree settings and trial budgets. Default fairness audits inspect the real model
-wrappers. They supply the SAME per-model initial target path to baseline dry-run
-commands, record that binding as `shared_initialization_input`, and still
-require loaded tensor proofs. This is an explicit input for comparing the
-experiment recipe, not proof that baseline defaults select this checkpoint.
-`--use-environment` opts in to environment mode for custom configuration audits.
-
-Regression tests launch all 28 wrappers with deliberately stale exports and
-check the actual generated CLI commands. They also cover environment opt-in,
-explicit RUN_DIR preservation and automatic method-specific resume detection.
+Regression tests cover defaults, GPU/dataset overrides, explicit paths and
+training settings for all 28 wrappers; legacy `LAUNCHER_USE_ENV=1`; automatic
+resume; and paired benchmark dry-runs for all seven models with both default and
+explicit checkpoints. Dry-runs do not allocate a GPU or fabricate timing results.
+The old `WRAPPER_EXPORTS_VALIDATION.json` describes the previous overwrite policy;
+current validation is recorded in `LAUNCHER_OVERRIDES_VALIDATION.json`.

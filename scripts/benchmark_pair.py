@@ -32,7 +32,8 @@ def main():
     p.add_argument('--profile',action='store_true',help='optional OPD event timings; adds profiling overhead')
     a=p.parse_args()
     if min(a.steps,a.trials)<1:p.error('positive steps and trials required')
-    if not os.environ.get('TARGET_ADAPTER') and not a.dry_run:p.error('TARGET_ADAPTER must name the common initial LoRA')
+    # Production wrappers resolve model-specific initial LoRA/head defaults;
+    # explicit checkpoint paths in os.environ take precedence for both methods.
     if not a.dry_run:
         import torch
         if not torch.cuda.is_available():p.error('CUDA runtime required; this tool does not fabricate GPU timings')

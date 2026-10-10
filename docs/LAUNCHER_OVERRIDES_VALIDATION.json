@@ -1,0 +1,148 @@
+{
+  "date": "2026-10-10",
+  "scope": "MedusaGRPO only",
+  "changed_files": [
+    "MedusaGRPO/README.md",
+    "MedusaGRPO/configs/_shared/b200_common.env",
+    "MedusaGRPO/docs/WRAPPER_EXPORTS.md",
+    "MedusaGRPO/pretrain_llama31_8b.sh",
+    "MedusaGRPO/pretrain_qwen25_14b.sh",
+    "MedusaGRPO/pretrain_qwen25_1p5b.sh",
+    "MedusaGRPO/pretrain_qwen25_3b.sh",
+    "MedusaGRPO/pretrain_qwen25_7b.sh",
+    "MedusaGRPO/pretrain_qwen3_1p7b.sh",
+    "MedusaGRPO/pretrain_qwen3_4b.sh",
+    "MedusaGRPO/scripts/benchmark_pair.py",
+    "MedusaGRPO/scripts/launch/pretrain_model.sh",
+    "MedusaGRPO/scripts/launch/train_model.sh",
+    "MedusaGRPO/tests/test_wrapper_exports.py",
+    "MedusaGRPO/train_llama31_8b.sh",
+    "MedusaGRPO/train_llama31_8b_medusa.sh",
+    "MedusaGRPO/train_llama31_8b_reflex.sh",
+    "MedusaGRPO/train_qwen25_14b.sh",
+    "MedusaGRPO/train_qwen25_14b_medusa.sh",
+    "MedusaGRPO/train_qwen25_14b_reflex.sh",
+    "MedusaGRPO/train_qwen25_1p5b.sh",
+    "MedusaGRPO/train_qwen25_1p5b_medusa.sh",
+    "MedusaGRPO/train_qwen25_1p5b_reflex.sh",
+    "MedusaGRPO/train_qwen25_3b.sh",
+    "MedusaGRPO/train_qwen25_3b_medusa.sh",
+    "MedusaGRPO/train_qwen25_3b_reflex.sh",
+    "MedusaGRPO/train_qwen25_7b.sh",
+    "MedusaGRPO/train_qwen25_7b_medusa.sh",
+    "MedusaGRPO/train_qwen25_7b_reflex.sh",
+    "MedusaGRPO/train_qwen3_1p7b.sh",
+    "MedusaGRPO/train_qwen3_1p7b_medusa.sh",
+    "MedusaGRPO/train_qwen3_1p7b_reflex.sh",
+    "MedusaGRPO/train_qwen3_4b.sh",
+    "MedusaGRPO/train_qwen3_4b_medusa.sh",
+    "MedusaGRPO/train_qwen3_4b_reflex.sh"
+  ],
+  "added_files": [
+    "MedusaGRPO/docs/LAUNCHER_OVERRIDES_VALIDATION.json"
+  ],
+  "shell_syntax": {
+    "status": "PASS",
+    "files": 46
+  },
+  "python_compileall": "PASS",
+  "full_suite": {
+    "passed": 326,
+    "failed": 0,
+    "skipped": 18,
+    "warnings": 5,
+    "seconds": 70.67
+  },
+  "additional_production_benchmark_admission_regression": {
+    "passed": 1,
+    "failed": 0
+  },
+  "total_tests_validated": {
+    "passed": 327,
+    "failed": 0,
+    "skipped": 18
+  },
+  "skips": "Actual CUDA runtime unavailable in local PyTorch; no B200 validation claim",
+  "models": {
+    "qwen25_1p5b": {
+      "defaults": "PASS",
+      "medusa_overrides": "PASS",
+      "medusa_reflex_overrides": "PASS",
+      "alias_overrides": "PASS",
+      "pretrain_overrides": "PASS",
+      "benchmark_pair_dry_run": "PASS"
+    },
+    "qwen25_3b": {
+      "defaults": "PASS",
+      "medusa_overrides": "PASS",
+      "medusa_reflex_overrides": "PASS",
+      "alias_overrides": "PASS",
+      "pretrain_overrides": "PASS",
+      "benchmark_pair_dry_run": "PASS"
+    },
+    "qwen25_7b": {
+      "defaults": "PASS",
+      "medusa_overrides": "PASS",
+      "medusa_reflex_overrides": "PASS",
+      "alias_overrides": "PASS",
+      "pretrain_overrides": "PASS",
+      "benchmark_pair_dry_run": "PASS"
+    },
+    "qwen25_14b": {
+      "defaults": "PASS",
+      "medusa_overrides": "PASS",
+      "medusa_reflex_overrides": "PASS",
+      "alias_overrides": "PASS",
+      "pretrain_overrides": "PASS",
+      "benchmark_pair_dry_run": "PASS"
+    },
+    "qwen3_1p7b": {
+      "defaults": "PASS",
+      "medusa_overrides": "PASS",
+      "medusa_reflex_overrides": "PASS",
+      "alias_overrides": "PASS",
+      "pretrain_overrides": "PASS",
+      "benchmark_pair_dry_run": "PASS"
+    },
+    "qwen3_4b": {
+      "defaults": "PASS",
+      "medusa_overrides": "PASS",
+      "medusa_reflex_overrides": "PASS",
+      "alias_overrides": "PASS",
+      "pretrain_overrides": "PASS",
+      "benchmark_pair_dry_run": "PASS"
+    },
+    "llama31_8b": {
+      "defaults": "PASS",
+      "medusa_overrides": "PASS",
+      "medusa_reflex_overrides": "PASS",
+      "alias_overrides": "PASS",
+      "pretrain_overrides": "PASS",
+      "benchmark_pair_dry_run": "PASS"
+    }
+  },
+  "required_command": {
+    "command": "CUDA_VISIBLE_DEVICES=2 DATASET=gsm8k DRY_RUN=true bash train_qwen3_1p7b_reflex.sh",
+    "status": "PASS",
+    "cuda_visible_devices": "2",
+    "dataset_path": "/workspace/storage-shared/nlp/minhpn19/data/gsm8k/main/train-00000-of-00001.parquet"
+  },
+  "benchmark_example_dry_run": {
+    "status": "PASS",
+    "trials": 3,
+    "methods": [
+      "medusa",
+      "medusa_reflex"
+    ],
+    "cuda_visible_devices": "2",
+    "dataset": "gsm8k",
+    "frontier_weight": 0.5,
+    "profiling": false
+  },
+  "protected_file_hashes": {
+    "status": "UNCHANGED",
+    "files": 474,
+    "scope": "All snapshotted SpecNaacl/PureGRPO files and Medusa helper, generation, training and kernel implementations"
+  },
+  "benchmark_metrics": "Generation/E2E throughput, results.json and selected_tree.env computation unchanged; dry-run does not fabricate artifacts"
+}

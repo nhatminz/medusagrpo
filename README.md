@@ -13,14 +13,15 @@ Checkpoint lưu policy và từ chối resume khi đổi policy.
 Model configs đã khớp SpecNaacl: Qwen2.5-1.5B và Qwen3-1.7B là batch/accumulation
 16/2, Qwen2.5-14B là 4/8. **Launchers SpecNaacl hiện ghi đè thành 8/4 ở cả 7
 models**, nên `configs/<model>/launcher.env` của Medusa giữ cùng defaults thực.
-Các wrapper `.sh` hiện chứa exports riêng cho từng model và ghi đè cấu hình
-model còn sót trong terminal. Initial LoRA tự chọn
+Các wrapper `.sh` chứa defaults riêng cho từng model; biến môi trường người
+dùng truyền vào luôn được ưu tiên, không cần `LAUNCHER_USE_ENV=1`. Initial LoRA tự chọn
 `outputs/initial_target/<model_key>_seed42`; heads tự chọn
 `outputs/pretrain/<model_key>/latest_checkpoint`. Chỉ cần activate môi trường rồi
 chạy `RESUME=auto bash train_qwen25_1p5b_reflex.sh` (checkpoint phải có sẵn).
-Sửa block exports trong wrapper để thay đường dẫn. Với benchmark/ablation cần
-override qua environment, dùng `LAUNCHER_USE_ENV=1`; khi đó
-`LAUNCHER_ENV=/dev/null` chọn model-config defaults và checker vẫn báo lệch nếu
+Truyền trực tiếp `CUDA_VISIBLE_DEVICES=2 DATASET=gsm8k` để đổi GPU/dataset.
+Shared launcher tự chọn dataset path, hoặc giữ `DATASET_PATH` được truyền rõ ràng.
+`LAUNCHER_USE_ENV=1` vẫn tương thích; `LAUNCHER_ENV=/dev/null` chọn model-config
+defaults và checker vẫn báo lệch nếu
 baseline chưa có cùng cấu hình. Xem [WRAPPER_EXPORTS.md](docs/WRAPPER_EXPORTS.md).
 
 ## Cấu trúc
@@ -83,7 +84,6 @@ Môi trường kiểm tra RTX 3090 trong workspace là `.venv-cuda` với torch
 
 ```bash
 # Chỉ cần khi dùng checkpoint ngoài đường dẫn mặc định của wrapper.
-export LAUNCHER_USE_ENV=1
 export TARGET_ADAPTER=/absolute/path/to/common_initial_target_lora
 ```
 
@@ -100,7 +100,6 @@ python scripts/create_initial_lora.py \
 Pretrain một lần, rồi giữ nguyên checkpoint cho cả hai ablation:
 
 ```bash
-unset LAUNCHER_USE_ENV
 bash pretrain_qwen25_1p5b.sh
 bash train_qwen25_1p5b_medusa.sh
 bash train_qwen25_1p5b_reflex.sh
@@ -111,7 +110,7 @@ bash train_qwen25_1p5b.sh
 Pretrain default: 5 epoch đầy đủ, max length 2048, seed 42, BF16, SDPA.
 Target backbone và lm_head được freeze. Batch/accumulation theo model; các biến
 `PRETRAIN_BATCH_SIZE` và `PRETRAIN_ACCUMULATION_STEPS` nằm trong từng wrapper;
-environment override cần `LAUNCHER_USE_ENV=1`.
+environment override được áp dụng trực tiếp.
 Checkpoint cuối nằm ở `outputs/pretrain/<model>/latest_checkpoint/draft.pth`.
 Training xuất vào `outputs/train/<model>/<unique_run_name>`.
 
@@ -141,6 +140,23 @@ python scripts/tune_opd_proposals.py --models qwen25_1p5b \
 
 python scripts/benchmark_pair.py --model qwen25_1p5b --steps 10 --trials 3 \
   --budgets 512:12
+```
+
+`benchmark_pair.py` dùng cùng defaults model/checkpoints như launcher, kế thừa
+GPU/dataset/path và các OPD weights từ environment. Default
+`OPD_FRONTIER_WEIGHT=0.5`, `OPD_VISITED_WEIGHT=1.0`, capped frontier vẫn là 2.
+Không bật profiling mặc định; `--profile` chỉ dùng cho lượt đo riêng.
+
+```bash
+CUDA_VISIBLE_DEVICES=2 DATASET=gsm8k DRY_RUN=true \
+  bash train_qwen3_1p7b_reflex.sh
+
+CUDA_VISIBLE_DEVICES=2 PRETRAIN_DATASET=gsm8k \
+  bash pretrain_qwen3_1p7b.sh
+
+CUDA_VISIBLE_DEVICES=2 DATASET=gsm8k python scripts/benchmark_pair.py \
+  --model qwen3_1p7b --steps 10 --trials 3 --budgets 512:12 --dry-run
+# Bỏ --dry-run để chạy benchmark thật và xuất results.json, selected_tree.env.
 ```
 
 Benchmark chạy production GRPO launchers với cùng checkpoint, seed, settings và
